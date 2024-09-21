@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "package": "moddedmite.rustedironcore.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "target": "DEFAULT",
+  "minVersion": "0.8.3",
+  "mixins": [
+    "other.client.GuiIngameMixin",
+    "other.client.MinecraftMixin",
+    "other.entity.EntityClientPlayerMPMixin",
+    "other.entity.ServerPlayerMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+	}
+}

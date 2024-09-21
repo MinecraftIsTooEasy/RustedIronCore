@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "rusted_iron_core_rust_removal",
+  "version": "0.2.0-Indev",
+  "depends": {
+    "mite": "1.6.4",
+    "fishmodloader": ">=3.0.0"
+  },
+  "environment": "*",
+  "name": "RustedIronCore-RustRemoval",
+  "description": "",
+  "authors": [
+    "Xy_Lose",
+    "Debris"
+  ],
+  "entrypoints": {
+    "main": [
+      "moddedmite.rustedironcore.RustedIronCore"
+    ]
+  },
+  "mixins": [
+    "RustedIronCore.api.mixins.json",
+    "RustedIronCore.other.mixins.json"
+  ],
+  "custom": {
+    "loom:injected_interfaces": {
+      "net/minecraft/EntityClientPlayerMP": [
+        "moddedmite/rustedironcore/api/player/ClientPlayerAPI"
+      ]
+    }
+  }
+}
