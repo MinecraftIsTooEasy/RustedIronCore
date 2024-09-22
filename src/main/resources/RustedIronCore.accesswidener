@@ -2,3 +2,8 @@ accessWidener v2 named
 
 extendable class net/minecraft/BlockDoor
 accessible field net/minecraft/NetClientHandler mc Lnet/minecraft/Minecraft;
+accessible field net/minecraft/Material name Ljava/lang/String;
+
+accessible field net/minecraft/ContainerWorkbench x I
+accessible field net/minecraft/ContainerWorkbench y I
+accessible field net/minecraft/ContainerWorkbench z I

@@ -6,7 +6,22 @@
   "minVersion": "0.8.3",
   "mixins": [
     "api.client.audio.SoundsMITEMixin",
-    "api.client.render.RenderMixin"
+    "api.client.render.RenderMixin",
+    "other.client.GuiContainerMixin",
+    "other.client.GuiCraftingMixin",
+    "other.client.ResourceLocationMixin",
+    "other.container.ContainerWorkBenchMixin",
+    "other.entity.ClientPlayerMixin",
+    "other.entity.EntityArrowMixin",
+    "other.item.ItemArrowMixin",
+    "other.item.ItemBlockMixin",
+    "other.item.ItemBowMixin",
+    "other.item.ItemDoorMixin",
+    "other.network.NetClientHandlerMixin",
+    "other.network.NetServerHandlerMixin",
+    "other.tileEntity.TileEntityFurnaceMixin",
+    "other.util.FurnaceRecipesMixin",
+    "other.util.RecipeHelperMixin"
   ],
   "injectors": {
     "defaultRequire": 1
