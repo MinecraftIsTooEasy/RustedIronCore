@@ -6,8 +6,8 @@ import moddedmite.rustedironcore.network.PacketByteBuf;
 import net.minecraft.*;
 
 public class S2CUpdateNutrition implements Packet {
-    private final int protein;
     private final int phytonutrients;
+    private final int protein;
     private final int essential_fats;
 
     public S2CUpdateNutrition(int phytonutrients, int protein, int essential_fats) {

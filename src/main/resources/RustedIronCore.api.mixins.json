@@ -9,6 +9,7 @@
     "api.client.render.RenderMixin",
     "other.client.GuiContainerMixin",
     "other.client.GuiCraftingMixin",
+    "other.client.InventoryEffectRendererMixin",
     "other.client.ResourceLocationMixin",
     "other.container.ContainerWorkBenchMixin",
     "other.entity.ClientPlayerMixin",
@@ -20,8 +21,11 @@
     "other.network.NetClientHandlerMixin",
     "other.network.NetServerHandlerMixin",
     "other.tileEntity.TileEntityFurnaceMixin",
+    "other.util.EnchantmentHelperMixin",
     "other.util.FurnaceRecipesMixin",
-    "other.util.RecipeHelperMixin"
+    "other.util.PotionMixin",
+    "other.util.RecipeHelperMixin",
+    "other.world.BiomeDecoratorMixin"
   ],
   "injectors": {
     "defaultRequire": 1

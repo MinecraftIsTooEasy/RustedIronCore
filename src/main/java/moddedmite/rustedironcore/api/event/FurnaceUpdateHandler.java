@@ -15,13 +15,13 @@ public class FurnaceUpdateHandler {
 
     private final List<IFurnaceUpdateListener> furnaceUpdateHandlers = new ArrayList<>();
 
-    public void registerFurnaceUpdateHandler(IFurnaceUpdateListener listener) {
+    public void registerFurnaceUpdateListener(IFurnaceUpdateListener listener) {
         if (!this.furnaceUpdateHandlers.contains(listener)) {
             this.furnaceUpdateHandlers.add(listener);
         }
     }
 
-    public void unRegisterFurnaceUpdateHandler(IFurnaceUpdateListener listener) {
+    public void unregisterFurnaceUpdateListener(IFurnaceUpdateListener listener) {
         this.furnaceUpdateHandlers.remove(listener);
     }
 

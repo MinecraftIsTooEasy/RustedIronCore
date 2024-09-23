@@ -58,6 +58,14 @@ public abstract class TileEntityFurnaceMixin extends TileEntity {
         return SmeltingSpecial.match(getInputItemStack(), heat_level).map(SmeltingSpecial.SmeltingResult::consumption).orElse(constant);
     }
 
+    /**
+     * @author Debris
+     * @reason for at least some compatible
+     */
+    @Overwrite
+    public int getCookProgressScaled(int par1) {
+        return this.furnaceCookTime * par1 / FurnaceUpdateHandler.getInstance().onFurnaceCookTimeTargetModify((TileEntityFurnace) (Object) this, 200);
+    }
 
     /**
      * @author Debris
@@ -95,7 +103,7 @@ public abstract class TileEntityFurnaceMixin extends TileEntity {
                 if (this.isBurning() && this.canSmelt(this.heat_level)) {
                     FurnaceUpdateHandler.getInstance().onFurnaceCookTimeAdd((TileEntityFurnace) (Object) this);
                     this.furnaceCookTime += FurnaceUpdateHandler.getInstance().onFurnaceCookTimeIncreaseModify((TileEntityFurnace) (Object) this, 1);
-                    if (this.furnaceCookTime == FurnaceUpdateHandler.getInstance().onFurnaceCookTimeTargetModify((TileEntityFurnace) (Object) this, 200)) {
+                    if (this.furnaceCookTime >= FurnaceUpdateHandler.getInstance().onFurnaceCookTimeTargetModify((TileEntityFurnace) (Object) this, 200)) {
                         this.furnaceCookTime = 0;
                         this.smeltItem(this.heat_level);
                         FurnaceUpdateHandler.getInstance().onFurnaceCookSuccess((TileEntityFurnace) (Object) this);
