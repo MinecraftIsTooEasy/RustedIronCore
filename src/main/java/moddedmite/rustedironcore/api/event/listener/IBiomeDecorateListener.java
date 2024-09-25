@@ -1,4 +1,4 @@
-package moddedmite.rustedironcore.api.interfaces;
+package moddedmite.rustedironcore.api.event.listener;
 
 import net.minecraft.BiomeDecorator;
 

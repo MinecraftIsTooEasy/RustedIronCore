@@ -1,6 +1,6 @@
 package moddedmite.rustedironcore.mixin.other.world;
 
-import moddedmite.rustedironcore.api.event.BiomeDecorateHandler;
+import moddedmite.rustedironcore.api.event.Handlers;
 import net.minecraft.BiomeDecorator;
 import net.minecraft.BiomeGenBase;
 import org.objectweb.asm.Opcodes;
@@ -13,16 +13,16 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class BiomeDecoratorMixin {
     @Inject(method = "<init>", at = @At("RETURN"))
     private void onInit(BiomeGenBase par1BiomeGenBase, CallbackInfo ci) {
-        BiomeDecorateHandler.getInstance().onBiomeDecoratorInit((BiomeDecorator) (Object) this);
+        Handlers.BiomeDecorate.onBiomeDecoratorInit((BiomeDecorator) (Object) this);
     }
 
     @Inject(method = "generateOres", at = @At("HEAD"))
     private void onOresGeneration(CallbackInfo ci) {
-        BiomeDecorateHandler.getInstance().onOresGeneration((BiomeDecorator) (Object) this);
+        Handlers.BiomeDecorate.onOresGeneration((BiomeDecorator) (Object) this);
     }
 
     @Inject(method = "decorate()V", at = @At(value = "FIELD", target = "Lnet/minecraft/BiomeDecorator;generateLakes:Z", opcode = Opcodes.GETFIELD))
     private void onDecorate(CallbackInfo ci) {
-        BiomeDecorateHandler.getInstance().onDecorate((BiomeDecorator) (Object) this);
+        Handlers.BiomeDecorate.onDecorate((BiomeDecorator) (Object) this);
     }
 }
