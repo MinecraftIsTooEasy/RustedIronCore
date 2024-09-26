@@ -20,7 +20,10 @@ public class SmeltingSpecial {
     public static void registerSpecialRecipe(SpecialRecipe specialRecipe, boolean shouldCheckHeatLevel) {
         specialRecipes.add((input_item_stack, heat_level) -> {
             SmeltingResult smeltingResult = specialRecipe.getSmeltingResult(input_item_stack, heat_level);
-            return heat_level < TileEntityFurnace.getHeatLevelRequired(input_item_stack.itemID) ? null : smeltingResult;
+            if (shouldCheckHeatLevel && heat_level < TileEntityFurnace.getHeatLevelRequired(input_item_stack.itemID)) {
+                return null;
+            }
+            return smeltingResult;
         });
     }
 

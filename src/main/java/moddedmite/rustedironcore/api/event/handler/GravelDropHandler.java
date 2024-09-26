@@ -13,6 +13,18 @@ import java.util.Random;
 import java.util.function.Function;
 
 public class GravelDropHandler extends AbstractHandler<IGravelDropListener> {
+    public GravelDropHandler() {
+        this.register(GravelDropHandler.VanillaListener);
+        this.registerGravelLootEntry(GravelDropHandler.CopperEntry);
+        this.registerGravelLootEntry(GravelDropHandler.SilverEntry);
+        this.registerGravelLootEntry(GravelDropHandler.GoldEntry);
+        this.registerGravelLootEntry(GravelDropHandler.ObsidianEntry);
+        this.registerGravelLootEntry(GravelDropHandler.EmeraldEntry);
+        this.registerGravelLootEntry(GravelDropHandler.DiamondEntry);
+        this.registerGravelLootEntry(GravelDropHandler.MithrilEntry);
+        this.registerGravelLootEntry(GravelDropHandler.AdamantiumEntry);
+    }
+
     public static final IGravelDropListener VanillaListener = new IGravelDropListener() {
         @Override
         public int onNetherGravelDropIDModify(BlockBreakInfo info, int original) {

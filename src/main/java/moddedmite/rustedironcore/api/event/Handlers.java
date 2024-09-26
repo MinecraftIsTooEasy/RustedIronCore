@@ -10,16 +10,5 @@ public class Handlers {
     public static final EntityMobMixinHandler EntityMobMixin = new EntityMobMixinHandler();
     public static final FurnaceUpdateHandler FurnaceUpdate = new FurnaceUpdateHandler();
     public static final GravelDropHandler GravelDrop = new GravelDropHandler();
-
-    static {
-        GravelDrop.register(GravelDropHandler.VanillaListener);
-        GravelDrop.registerGravelLootEntry(GravelDropHandler.CopperEntry);
-        GravelDrop.registerGravelLootEntry(GravelDropHandler.SilverEntry);
-        GravelDrop.registerGravelLootEntry(GravelDropHandler.GoldEntry);
-        GravelDrop.registerGravelLootEntry(GravelDropHandler.ObsidianEntry);
-        GravelDrop.registerGravelLootEntry(GravelDropHandler.EmeraldEntry);
-        GravelDrop.registerGravelLootEntry(GravelDropHandler.DiamondEntry);
-        GravelDrop.registerGravelLootEntry(GravelDropHandler.MithrilEntry);
-        GravelDrop.registerGravelLootEntry(GravelDropHandler.AdamantiumEntry);
-    }
+    public static final PlayerEventHandler PlayerEvent = new PlayerEventHandler();
 }

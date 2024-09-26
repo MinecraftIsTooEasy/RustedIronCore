@@ -7,7 +7,7 @@ import java.util.Random;
 public class RandomUtil {
     public static <T extends IntegerWeightedEntry> T getRandomEntry(List<T> list, Random random) {
         int total = getTotalWeight(list);
-        float randomInt = random.nextInt(total);
+        int randomInt = random.nextInt(total);
         Iterator<T> iterator = list.iterator();
         T chosen;
         do {
