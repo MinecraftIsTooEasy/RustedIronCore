@@ -1,18 +1,24 @@
 {
   "schemaVersion": 1,
-  "id": "rusted_iron_core_rust_removal",
-  "version": "0.2.0-Indev",
+  "id": "rusted_iron_core",
+  "version": "${version}",
   "depends": {
     "mite": "1.6.4",
     "fishmodloader": ">=3.0.0"
   },
   "environment": "*",
-  "name": "RustedIronCore-RustRemoval",
-  "description": "",
+  "name": "Rusted Iron Core",
+  "description": "An api mod for 1.6.4-MITE",
+  "icon": "assets/ric/icon.png",
+  "license": "MIT",
   "authors": [
     "Xy_Lose",
     "Debris"
   ],
+  "contact": {
+    "homepage": "https://github.com/ysesiq/RustedIronCore-RustRemoval",
+    "issues": "https://github.com/ysesiq/RustedIronCore-RustRemoval/issues"
+  },
   "entrypoints": {
     "main": [
       "moddedmite.rustedironcore.RustedIronCore"
