@@ -1,6 +1,7 @@
 package moddedmite.rustedironcore.mixin.other.client;
 
-import net.minecraft.*;
+import net.minecraft.Gui;
+import net.minecraft.GuiIngame;
 import org.spongepowered.asm.mixin.Mixin;
 
 @Mixin(GuiIngame.class)

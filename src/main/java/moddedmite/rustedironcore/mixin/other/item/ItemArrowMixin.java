@@ -1,6 +1,6 @@
 package moddedmite.rustedironcore.mixin.other.item;
 
-import moddedmite.rustedironcore.property.MaterialProperties;
+import moddedmite.rustedironcore.api.event.Handlers;
 import net.minecraft.ItemArrow;
 import net.minecraft.Material;
 import org.spongepowered.asm.mixin.Final;
@@ -25,8 +25,9 @@ public class ItemArrowMixin {
 
     @Inject(method = "<clinit>()V", at = @At("RETURN"))
     private static void addArrowMaterials(CallbackInfo callback) {
+        Handlers.ArrowRegister.onRegister();
         Material[] original = material_types;
-        Material[] arrowMaterials = MaterialProperties.ArrowRecoveryChance.keySet().toArray(Material[]::new);
+        Material[] arrowMaterials = Handlers.ArrowRegister.keySet().toArray(Material[]::new);
         Material[] expanded = new Material[original.length + arrowMaterials.length];
         System.arraycopy(original, 0, expanded, 0, original.length);
         System.arraycopy(arrowMaterials, 0, expanded, original.length, arrowMaterials.length);
@@ -35,6 +36,6 @@ public class ItemArrowMixin {
 
     @Inject(method = "getChanceOfRecovery", at = @At("HEAD"), cancellable = true)
     private void addArrows(CallbackInfoReturnable<Float> cir) {
-        MaterialProperties.ArrowRecoveryChance.getOptional(this.arrowhead_material).ifPresent(cir::setReturnValue);
+        Handlers.ArrowRegister.match(this.arrowhead_material).ifPresent(cir::setReturnValue);
     }
 }

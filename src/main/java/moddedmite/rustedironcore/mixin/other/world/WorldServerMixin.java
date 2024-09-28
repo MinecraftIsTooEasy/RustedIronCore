@@ -1,6 +1,7 @@
 package moddedmite.rustedironcore.mixin.other.world;
 
-import moddedmite.rustedironcore.api.register.SpawnConditions;
+import moddedmite.rustedironcore.api.event.Handlers;
+import moddedmite.rustedironcore.api.event.handler.SpawnConditionHandler;
 import net.minecraft.*;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -36,8 +37,8 @@ public abstract class WorldServerMixin extends World {
             SpawnListEntry entry = (SpawnListEntry) WeightedRandom.getRandomItem(this.rand, possible_creatures);
             Class entity_class = entry.entityClass;
 
-            if (SpawnConditions.has(entity_class)) {
-                Class<? extends Entity> result = SpawnConditions.get(entity_class).getResult(this, x, y, z);
+            if (Handlers.SpawnCondition.has(entity_class)) {
+                Class<? extends Entity> result = Handlers.SpawnCondition.get(entity_class).getResult(this, x, y, z);
                 if (result == null) {
                     continue;
                 }

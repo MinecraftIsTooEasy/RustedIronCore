@@ -3,7 +3,9 @@ package moddedmite.rustedironcore.network.packets;
 import moddedmite.rustedironcore.network.Network;
 import moddedmite.rustedironcore.network.Packet;
 import moddedmite.rustedironcore.network.PacketByteBuf;
-import net.minecraft.*;
+import net.minecraft.EntityClientPlayerMP;
+import net.minecraft.EntityPlayer;
+import net.minecraft.ResourceLocation;
 
 public class S2CUpdateNutrition implements Packet {
     private final int phytonutrients;

@@ -1,12 +1,7 @@
 package moddedmite.rustedironcore.mixin.other.entity;
 
 import moddedmite.rustedironcore.api.player.ClientPlayerAPI;
-import net.minecraft.ClientPlayer;
-import net.minecraft.EntityClientPlayerMP;
-import net.minecraft.Minecraft;
-import net.minecraft.NetClientHandler;
-import net.minecraft.Session;
-import net.minecraft.World;
+import net.minecraft.*;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 

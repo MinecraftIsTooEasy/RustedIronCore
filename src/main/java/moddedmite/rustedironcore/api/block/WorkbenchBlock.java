@@ -30,11 +30,11 @@ public class WorkbenchBlock extends BlockWorkbench {
         return this.checkAgainst;
     }
 
-    public void registerSimpleRecipe(RecipeRegistryEvent register) {
+    public void registerSimpleRecipe(RecipeRegistryEvent event) {
         for (int plank_subtype = 0; plank_subtype < 4; ++plank_subtype) {
-            register.registerShapedRecipe(new ItemStack(this), true, "IL", "s#", 'I', ItemIngot.getMatchingItem(ItemIngot.class, this.material), 'L', Item.leather, 's', Item.stick, '#', new ItemStack(Block.planks, 1, plank_subtype));
+            event.registerShapedRecipe(new ItemStack(this), true, "IL", "s#", 'I', ItemIngot.getMatchingItem(ItemIngot.class, this.material), 'L', Item.leather, 's', Item.stick, '#', new ItemStack(Block.planks, 1, plank_subtype));
         }
-    }// you should call it when you register through fml api
+    }// you should call it when you event through fml api
 
     @Override
     public Icon getIcon(int side, int metadata) {

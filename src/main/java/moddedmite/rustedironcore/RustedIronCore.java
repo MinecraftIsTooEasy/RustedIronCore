@@ -6,9 +6,13 @@ import moddedmite.rustedironcore.network.packets.S2CUpdateNutrition;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.Minecraft;
 import net.xiaoyu233.fml.FishModLoader;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class RustedIronCore implements ModInitializer {
     public static final String MOD_ID = "RustedIronCore";
+
+    public static final Logger logger = LogManager.getLogger(MOD_ID);
 
     @Override
     public void onInitialize() {

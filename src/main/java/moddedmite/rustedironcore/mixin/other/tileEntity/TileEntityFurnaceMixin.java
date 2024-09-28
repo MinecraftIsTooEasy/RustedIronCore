@@ -1,7 +1,7 @@
 package moddedmite.rustedironcore.mixin.other.tileEntity;
 
 import moddedmite.rustedironcore.api.event.Handlers;
-import moddedmite.rustedironcore.api.register.SmeltingSpecial;
+import moddedmite.rustedironcore.api.event.handler.SmeltingHandler;
 import net.minecraft.*;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -55,7 +55,7 @@ public abstract class TileEntityFurnaceMixin extends TileEntity {
 
     @ModifyConstant(method = "smeltItem", constant = @Constant(intValue = 1))
     private int modifyConsumption(int constant) {
-        return SmeltingSpecial.match(getInputItemStack(), heat_level).map(SmeltingSpecial.SmeltingResult::consumption).orElse(constant);
+        return Handlers.Smelting.match(getInputItemStack(), heat_level).map(SmeltingHandler.SmeltingResult::consumption).orElse(constant);
     }
 
     /**

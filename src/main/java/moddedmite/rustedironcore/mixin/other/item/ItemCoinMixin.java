@@ -1,7 +1,7 @@
 package moddedmite.rustedironcore.mixin.other.item;
 
-import moddedmite.rustedironcore.property.MaterialProperties;
 import moddedmite.rustedironcore.api.util.ItemUtil;
+import moddedmite.rustedironcore.property.MaterialProperties;
 import net.minecraft.Item;
 import net.minecraft.ItemCoin;
 import net.minecraft.ItemNugget;

@@ -11,4 +11,9 @@ public class Handlers {
     public static final FurnaceUpdateHandler FurnaceUpdate = new FurnaceUpdateHandler();
     public static final GravelDropHandler GravelDrop = new GravelDropHandler();
     public static final PlayerEventHandler PlayerEvent = new PlayerEventHandler();
+    public static final ArrowRegisterHandler ArrowRegister = new ArrowRegisterHandler();
+    // this is called after items and blocks are registered
+    public static final AbstractHandler<Runnable> PropertiesRegistry = new AbstractHandler<>();
+    public static final SmeltingHandler Smelting = new SmeltingHandler();
+    public static final SpawnConditionHandler SpawnCondition = new SpawnConditionHandler();
 }

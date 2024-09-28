@@ -3,8 +3,11 @@ package moddedmite.rustedironcore.api.event;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class AbstractHandler<T> {
+public class AbstractHandler<T> {
     protected final List<T> listeners = new ArrayList<>();
+
+    public AbstractHandler() {
+    }
 
     public void register(T t) {
         if (!this.listeners.contains(t)) {
@@ -16,7 +19,7 @@ public abstract class AbstractHandler<T> {
         this.listeners.remove(t);
     }
 
-    protected List<T> getListeners() {
+    public List<T> getListeners() {
         return this.listeners;
     }
 }

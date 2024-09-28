@@ -1,7 +1,7 @@
 package moddedmite.rustedironcore.mixin.other.item;
 
+import moddedmite.rustedironcore.api.event.Handlers;
 import moddedmite.rustedironcore.api.item.BowItem;
-import moddedmite.rustedironcore.property.MaterialProperties;
 import net.minecraft.ItemBow;
 import net.minecraft.Material;
 import org.spongepowered.asm.mixin.Final;
@@ -28,8 +28,9 @@ public class ItemBowMixin {
 
     @Inject(method = "<clinit>", at = @At("TAIL"))
     private static void addArrowMaterials(CallbackInfo ci) {
+        Handlers.ArrowRegister.onRegister();
         Material[] original = possible_arrow_materials;
-        Material[] arrowMaterials = MaterialProperties.ArrowRecoveryChance.keySet().toArray(Material[]::new);
+        Material[] arrowMaterials = Handlers.ArrowRegister.keySet().toArray(Material[]::new);
         Material[] expanded = new Material[original.length + arrowMaterials.length];
         System.arraycopy(original, 0, expanded, 0, original.length);
         System.arraycopy(arrowMaterials, 0, expanded, original.length, arrowMaterials.length);
