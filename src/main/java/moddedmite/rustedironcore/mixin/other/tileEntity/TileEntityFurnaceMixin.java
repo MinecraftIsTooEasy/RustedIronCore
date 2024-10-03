@@ -2,12 +2,16 @@ package moddedmite.rustedironcore.mixin.other.tileEntity;
 
 import moddedmite.rustedironcore.api.event.Handlers;
 import moddedmite.rustedironcore.api.event.handler.SmeltingHandler;
+import moddedmite.rustedironcore.property.ItemProperties;
 import net.minecraft.*;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(TileEntityFurnace.class)
 public abstract class TileEntityFurnaceMixin extends TileEntity {
@@ -136,5 +140,10 @@ public abstract class TileEntityFurnaceMixin extends TileEntity {
             this.furnaceCookTime = 0;
 
         }
+    }
+
+    @Inject(method = "getHeatLevelRequired", at = @At("HEAD"), cancellable = true)
+    private static void injectHeatLevel(int item_id, CallbackInfoReturnable<Integer> cir) {
+        ItemProperties.HeatLevelRequired.getOptional(Item.getItem(item_id)).ifPresent(cir::setReturnValue);
     }
 }

@@ -1,5 +1,6 @@
 package moddedmite.rustedironcore.mixin.other.entity;
 
+import moddedmite.rustedironcore.Constants;
 import moddedmite.rustedironcore.network.Network;
 import moddedmite.rustedironcore.network.packets.S2CUpdateNutrition;
 import net.minecraft.ServerPlayer;
@@ -24,9 +25,21 @@ public abstract class ServerPlayerMixin {
     private int last_protein;
     @Unique
     private int last_essential_fats;
+    @Unique
+    private int nutritionSyncCountDown = 0;
 
     @Inject(method = {"onUpdateEntity"}, at = {@At(value = "INVOKE", target = "Lnet/minecraft/FoodStats;getHunger()F")})
     private void updateNutrition(CallbackInfo ci) {
+        if (this.nutritionSyncCountDown == 0) {
+            this.syncNutrition();
+            this.nutritionSyncCountDown = Constants.NutritionSyncTicks;
+        } else {
+            this.nutritionSyncCountDown--;
+        }
+    }
+
+    @Unique
+    private void syncNutrition() {
         if (this.phytonutrients != this.last_phytonutrients || this.protein != this.last_protein || this.essential_fats != this.last_essential_fats) {
             Network.sendToClient((ServerPlayer) (Object) this, new S2CUpdateNutrition(this.phytonutrients, this.protein, this.essential_fats));
             this.last_phytonutrients = this.phytonutrients;

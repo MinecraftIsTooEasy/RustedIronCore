@@ -51,6 +51,9 @@ public class GravelDropHandler extends AbstractHandler<IGravelDropListener> {
         this.lootEntries.add(gravelLootEntry);
     }
 
+    public void unregisterGravelLootEntry(GravelLootEntry gravelLootEntry){
+        this.lootEntries.remove(gravelLootEntry);
+    }
 
     public int getRandomDropID(BlockBreakInfo info, Random random) {
         GravelLootEntry randomEntry = RandomUtil.getRandomEntryFloat(this.lootEntries, random);
@@ -62,7 +65,7 @@ public class GravelDropHandler extends AbstractHandler<IGravelDropListener> {
     public static final GravelLootEntry SilverEntry = new GravelLootEntry((float) 2 / 9, blockBreakInfo -> Item.silverNugget.itemID);
     public static final GravelLootEntry GoldEntry = new GravelLootEntry((float) 2 / 27, blockBreakInfo -> Item.goldNugget.itemID);
     public static final GravelLootEntry ObsidianEntry = new GravelLootEntry((float) 2 / 81, blockBreakInfo -> blockBreakInfo.wasExploded() ? -1 : Item.shardObsidian.itemID);
-    public static final GravelLootEntry EmeraldEntry = new GravelLootEntry((float) 2 / 243, blockBreakInfo -> blockBreakInfo.wasExploded() ? -1 : Item.emerald.itemID);
+    public static final GravelLootEntry EmeraldEntry = new GravelLootEntry((float) 2 / 243, blockBreakInfo -> blockBreakInfo.wasExploded() ? -1 : Item.shardEmerald.itemID);
     public static final GravelLootEntry DiamondEntry = new GravelLootEntry((float) 2 / 729, blockBreakInfo -> blockBreakInfo.wasExploded() ? -1 : Item.shardDiamond.itemID);
     public static final GravelLootEntry MithrilEntry = new GravelLootEntry((float) 2 / 2187, blockBreakInfo -> Item.mithrilNugget.itemID);
     public static final GravelLootEntry AdamantiumEntry = new GravelLootEntry((float) 2 / 4374, blockBreakInfo -> Item.adamantiumNugget.itemID);

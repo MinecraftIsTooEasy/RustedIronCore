@@ -8,7 +8,9 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class Network {
-    public static final ResourceLocation UpdateNutrition = new ResourceLocation(RustedIronCore.MOD_ID, "update_nutrition");
+    public static final String CompactID = "RIC";
+
+    public static final ResourceLocation UpdateNutrition = new ResourceLocation(CompactID, "update_nutrition");
 
     private static BiConsumer<ServerPlayer, Packet> clientSender;
 
