@@ -28,7 +28,7 @@ public class GravelDropHandler extends AbstractHandler<IGravelDropListener> {
     public static final IGravelDropListener VanillaListener = new IGravelDropListener() {
         @Override
         public int onNetherGravelDropIDModify(BlockBreakInfo info, int original) {
-            if (original == Item.copperNugget.itemID && original == Item.silverNugget.itemID && original == Item.mithrilNugget.itemID && original == Item.adamantiumNugget.itemID) {
+            if (original == Item.copperNugget.itemID || original == Item.silverNugget.itemID || original == Item.mithrilNugget.itemID || original == Item.adamantiumNugget.itemID) {
                 return Item.goldNugget.itemID;
             }
             if (original == Item.shardObsidian.itemID || original == Item.shardEmerald.itemID || original == Item.shardDiamond.itemID) {
