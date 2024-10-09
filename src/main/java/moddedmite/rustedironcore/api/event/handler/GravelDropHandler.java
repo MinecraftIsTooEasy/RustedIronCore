@@ -6,6 +6,7 @@ import moddedmite.rustedironcore.random.FloatWeightedEntry;
 import moddedmite.rustedironcore.random.RandomUtil;
 import net.minecraft.BlockBreakInfo;
 import net.minecraft.Item;
+import net.minecraft.MathHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,13 +46,38 @@ public class GravelDropHandler extends AbstractHandler<IGravelDropListener> {
         return original;
     }
 
+    public void onDropResult(BlockBreakInfo info, int id_dropped) {
+        this.listeners.forEach(x -> x.onDropResult(info, id_dropped));
+    }
+
+    public float onDropAsGravelChanceModify(BlockBreakInfo info, float original) {
+        for (IGravelDropListener listener : this.listeners) {
+            original = listener.onDropAsGravelChanceModify(info, original);
+        }
+        return MathHelper.clamp_float(original, 0.0F, 1.0F);
+    }
+
+    public float onDropAsFlintChanceModify(BlockBreakInfo info, float original) {
+        for (IGravelDropListener listener : this.listeners) {
+            original = listener.onDropAsFlintChanceModify(info, original);
+        }
+        return MathHelper.clamp_float(original, 0.0F, 1.0F);
+    }
+
+    public float onDropFlintAsChipChanceModify(BlockBreakInfo info, float original) {
+        for (IGravelDropListener listener : this.listeners) {
+            original = listener.onDropFlintAsChipChanceModify(info, original);
+        }
+        return MathHelper.clamp_float(original, 0.0F, 1.0F);
+    }
+
     private final List<GravelLootEntry> lootEntries = new ArrayList<>();
 
     public void registerGravelLootEntry(GravelLootEntry gravelLootEntry) {
         this.lootEntries.add(gravelLootEntry);
     }
 
-    public void unregisterGravelLootEntry(GravelLootEntry gravelLootEntry){
+    public void unregisterGravelLootEntry(GravelLootEntry gravelLootEntry) {
         this.lootEntries.remove(gravelLootEntry);
     }
 

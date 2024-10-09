@@ -16,7 +16,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class DedicatedServerMixin {
     @Inject(method = "playerLoggedIn", at = @At("RETURN"))
     private void onPlayerLoggedIn(ServerPlayer player, CallbackInfo ci) {
-        System.out.println("RIC: dedicated server calling");
         boolean firstLogin = (((PlayerAPI) (EntityPlayer) player)).firstLogin();
         Handlers.PlayerEvent.onPlayerLoggedIn(new PlayerLoggedInEvent(player, firstLogin));
         if (firstLogin) {

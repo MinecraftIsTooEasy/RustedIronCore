@@ -26,5 +26,8 @@ public interface IBiomeGenerateListener {
         return original;
     }
 
+    default void onStrongholdAllowedRegister(List<BiomeGenBase> original) {
+    }
+
 
 }

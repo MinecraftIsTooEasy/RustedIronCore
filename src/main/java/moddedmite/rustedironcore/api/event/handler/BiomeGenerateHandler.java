@@ -32,4 +32,8 @@ public class BiomeGenerateHandler extends AbstractHandler<IBiomeGenerateListener
         }
         return original;
     }
+
+    public void onStrongholdAllowedRegister(List<BiomeGenBase> original) {
+        this.listeners.forEach(x -> x.onStrongholdAllowedRegister(original));
+    }
 }

@@ -1,11 +1,11 @@
 package moddedmite.rustedironcore.mixin.other.entity;
 
 import moddedmite.rustedironcore.api.event.Handlers;
-import net.minecraft.EntityCreature;
-import net.minecraft.EntityMob;
-import net.minecraft.NBTTagCompound;
-import net.minecraft.World;
+import net.minecraft.*;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(EntityMob.class)
 public abstract class EntityMobMixin extends EntityCreature {
@@ -23,5 +23,10 @@ public abstract class EntityMobMixin extends EntityCreature {
     public void readEntityFromNBT(NBTTagCompound par1NBTTagCompound) {
         super.readEntityFromNBT(par1NBTTagCompound);
         Handlers.EntityMobMixin.onReadEntityFromNBT((EntityMob) (Object) this, par1NBTTagCompound);
+    }
+
+    @Inject(method = "attackEntityFrom", at = @At("HEAD"))
+    private void halfDamageByPlayer(Damage damage, CallbackInfoReturnable<EntityDamageResult> cir) {
+        Handlers.Combat.onMobReceiveDamageModify((EntityMob) (Object) this, damage);
     }
 }

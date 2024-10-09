@@ -1,7 +1,6 @@
 package moddedmite.rustedironcore.mixin.other.world;
 
 import moddedmite.rustedironcore.api.event.Handlers;
-import moddedmite.rustedironcore.api.event.handler.SpawnConditionHandler;
 import net.minecraft.*;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;

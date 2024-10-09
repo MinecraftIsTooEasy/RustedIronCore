@@ -51,4 +51,8 @@ public class RandomUtil {
         return result;
     }
 
+    public static <T> T getRandom(List<T> list, Random random) {
+        return list.get(random.nextInt(list.size()));
+    }
+
 }

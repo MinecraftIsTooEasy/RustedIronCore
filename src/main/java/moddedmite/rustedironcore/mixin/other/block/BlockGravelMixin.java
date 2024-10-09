@@ -37,19 +37,19 @@ public abstract class BlockGravelMixin extends BlockFalling {
             fortune = 3;
         }
         rand = info.world.rand;
-        if (rand.nextInt(12 - fortune * 2) > 2) {
-            return super.dropBlockAsEntityItem(info);
-        }
+        float dropAsGravelChance = Handlers.GravelDrop.onDropAsGravelChanceModify(info, 1.0F - (float) 3 / (12 - 2 * fortune));
+        if (rand.nextFloat() < dropAsGravelChance) return super.dropBlockAsEntityItem(info);
         int id_dropped;
-        if (rand.nextInt(3) > 0) {
-            if (rand.nextInt(16) == 0) {
-                id_dropped = info.wasExploded() ? Item.chipFlint.itemID : Item.flint.itemID;
-            } else {
+        float dropAsFlintChance = Handlers.GravelDrop.onDropAsFlintChanceModify(info, (float) (2 / 3));
+        if (rand.nextFloat() < dropAsFlintChance) {
+            float dropFlintAsChipChance = Handlers.GravelDrop.onDropFlintAsChipChanceModify(info, (float) 15 / 16);
+            if (rand.nextFloat() < dropFlintAsChipChance) {
                 if (info.wasExploded()) {
                     return super.dropBlockAsEntityItem(info);
                 }
-
                 id_dropped = Item.chipFlint.itemID;
+            } else {
+                id_dropped = info.wasExploded() ? Item.chipFlint.itemID : Item.flint.itemID;
             }
         } else {
             id_dropped = Handlers.GravelDrop.getRandomDropID(info, rand);
@@ -92,6 +92,8 @@ public abstract class BlockGravelMixin extends BlockFalling {
         if (info.wasHarvestedByPlayer() && (id_dropped == Item.chipFlint.itemID || id_dropped == Item.flint.itemID)) {
             info.getResponsiblePlayer().triggerAchievement(AchievementList.flintFinder);
         }
+
+        Handlers.GravelDrop.onDropResult(info, id_dropped);
 
         return this.dropBlockAsEntityItem(info, id_dropped);
 

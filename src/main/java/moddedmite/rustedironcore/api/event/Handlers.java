@@ -16,4 +16,9 @@ public class Handlers {
     public static final AbstractHandler<Runnable> PropertiesRegistry = new AbstractHandler<>();
     public static final SmeltingHandler Smelting = new SmeltingHandler();
     public static final SpawnConditionHandler SpawnCondition = new SpawnConditionHandler();
+    public static final CraftingHandler Crafting = new CraftingHandler();
+    public static final TradingHandler Trading = new TradingHandler();
+    public static final CombatHandler Combat = new CombatHandler();
+    public static final TickHandler Tick = new TickHandler();
+    public static final LootTableHandler LootTable = new LootTableHandler();
 }

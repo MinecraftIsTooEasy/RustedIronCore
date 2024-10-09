@@ -1,5 +1,6 @@
 package moddedmite.rustedironcore.api.block;
 
+import moddedmite.rustedironcore.api.event.events.CraftingRecipeRegisterEvent;
 import net.minecraft.*;
 import net.xiaoyu233.fml.reload.event.RecipeRegistryEvent;
 
@@ -35,6 +36,12 @@ public class WorkbenchBlock extends BlockWorkbench {
             event.registerShapedRecipe(new ItemStack(this), true, "IL", "s#", 'I', ItemIngot.getMatchingItem(ItemIngot.class, this.material), 'L', Item.leather, 's', Item.stick, '#', new ItemStack(Block.planks, 1, plank_subtype));
         }
     }// you should call it when you event through fml api
+
+    public void registerSimpleRecipe(CraftingRecipeRegisterEvent event) {
+        for (int plank_subtype = 0; plank_subtype < 4; ++plank_subtype) {
+            event.registerShapedRecipe(new ItemStack(this), true, "IL", "s#", 'I', ItemIngot.getMatchingItem(ItemIngot.class, this.material), 'L', Item.leather, 's', Item.stick, '#', new ItemStack(Block.planks, 1, plank_subtype));
+        }
+    }
 
     @Override
     public Icon getIcon(int side, int metadata) {

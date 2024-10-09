@@ -1,6 +1,5 @@
 package moddedmite.rustedironcore.network;
 
-import moddedmite.rustedironcore.RustedIronCore;
 import net.minecraft.ResourceLocation;
 import net.minecraft.ServerPlayer;
 

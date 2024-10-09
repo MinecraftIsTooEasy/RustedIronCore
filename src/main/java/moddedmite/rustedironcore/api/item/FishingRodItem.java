@@ -1,5 +1,6 @@
 package moddedmite.rustedironcore.api.item;
 
+import moddedmite.rustedironcore.api.event.events.CraftingRecipeRegisterEvent;
 import moddedmite.rustedironcore.api.util.ItemUtil;
 import moddedmite.rustedironcore.property.MaterialProperties;
 import net.minecraft.*;
@@ -33,6 +34,9 @@ public class FishingRodItem extends ItemFishingRod {
     }
 
     public void registerSimpleRecipe(RecipeRegistryEvent event) {
+        event.registerShapedRecipe(new ItemStack(this), true, "  S", " SG", "SAG", 'A', ItemUtil.getNuggetForMaterial(this.material), 'S', Item.stick, 'G', Item.silk);
+    }
+    public void registerSimpleRecipe(CraftingRecipeRegisterEvent event) {
         event.registerShapedRecipe(new ItemStack(this), true, "  S", " SG", "SAG", 'A', ItemUtil.getNuggetForMaterial(this.material), 'S', Item.stick, 'G', Item.silk);
     }
 }

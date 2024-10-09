@@ -16,9 +16,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MinecraftServerMixin {
     @Inject(method = "playerLoggedIn", at = @At("RETURN"))
     private void onPlayerLoggedIn(ServerPlayer player, CallbackInfo ci) {
-        System.out.println("RIC: default server calling");
-        Handlers.PlayerEvent.onPlayerLoggedIn(new PlayerLoggedInEvent(player, (((PlayerAPI) (EntityPlayer) player)).firstLogin()));
-        ((PlayerAPI) ((EntityPlayer) player)).setFirstLogin(false);
+        boolean firstLogin = (((PlayerAPI) (EntityPlayer) player)).firstLogin();
+        Handlers.PlayerEvent.onPlayerLoggedIn(new PlayerLoggedInEvent(player, firstLogin));
+        if (firstLogin) {
+            ((PlayerAPI) ((EntityPlayer) player)).setFirstLogin(false);
+        }
     }
 
     @Inject(method = "playerLoggedOut", at = @At("RETURN"))

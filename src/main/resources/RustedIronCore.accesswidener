@@ -7,3 +7,11 @@ accessible field net/minecraft/Material name Ljava/lang/String;
 accessible field net/minecraft/ContainerWorkbench x I
 accessible field net/minecraft/ContainerWorkbench y I
 accessible field net/minecraft/ContainerWorkbench z I
+
+accessible method net/minecraft/CraftingManager addRecipe (Lnet/minecraft/ItemStack;Z[Ljava/lang/Object;)Lnet/minecraft/ShapedRecipes;
+accessible method net/minecraft/CraftingManager addShapelessRecipe (Lnet/minecraft/ItemStack;Z[Ljava/lang/Object;)Lnet/minecraft/ShapelessRecipes;
+
+accessible field net/minecraft/EntityVillager villagerStockList Ljava/util/Map;
+accessible method net/minecraft/EntityVillager adjustProbability (F)F
+accessible field net/minecraft/EntityVillager blacksmithSellingList Ljava/util/Map;
+accessible class net/minecraft/ComponentNetherBridgePiece
