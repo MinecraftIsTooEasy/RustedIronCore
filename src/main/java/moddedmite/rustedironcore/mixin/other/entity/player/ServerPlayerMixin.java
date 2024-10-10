@@ -1,4 +1,4 @@
-package moddedmite.rustedironcore.mixin.other.entity;
+package moddedmite.rustedironcore.mixin.other.entity.player;
 
 import moddedmite.rustedironcore.Constants;
 import moddedmite.rustedironcore.network.Network;

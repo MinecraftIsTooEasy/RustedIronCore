@@ -1,4 +1,4 @@
-package moddedmite.rustedironcore.mixin.other.entity;
+package moddedmite.rustedironcore.mixin.other.entity.player;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;

@@ -40,7 +40,7 @@ public abstract class BlockGravelMixin extends BlockFalling {
         float dropAsGravelChance = Handlers.GravelDrop.onDropAsGravelChanceModify(info, 1.0F - (float) 3 / (12 - 2 * fortune));
         if (rand.nextFloat() < dropAsGravelChance) return super.dropBlockAsEntityItem(info);
         int id_dropped;
-        float dropAsFlintChance = Handlers.GravelDrop.onDropAsFlintChanceModify(info, (float) (2 / 3));
+        float dropAsFlintChance = Handlers.GravelDrop.onDropAsFlintChanceModify(info, (float) 2 / 3);
         if (rand.nextFloat() < dropAsFlintChance) {
             float dropFlintAsChipChance = Handlers.GravelDrop.onDropFlintAsChipChanceModify(info, (float) 15 / 16);
             if (rand.nextFloat() < dropFlintAsChipChance) {

@@ -17,11 +17,10 @@ public class SmeltingRecipeRegisterEvent {
 
     public void registerSpecial(SmeltingHandler.SpecialRecipe specialRecipe, boolean shouldCheckHeatLevel) {
         Handlers.Smelting.addSpecialRecipe((input_item_stack, heat_level) -> {
-            SmeltingHandler.SmeltingResult smeltingResult = specialRecipe.getSmeltingResult(input_item_stack, heat_level);
             if (shouldCheckHeatLevel && heat_level < TileEntityFurnace.getHeatLevelRequired(input_item_stack.itemID)) {
                 return null;
             }
-            return smeltingResult;
+            return specialRecipe.getSmeltingResult(input_item_stack, heat_level);
         });
     }
 }

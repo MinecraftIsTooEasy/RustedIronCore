@@ -6,6 +6,7 @@ import net.minecraft.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.UnaryOperator;
 
 public class CraftingRecipeRegisterEvent {
     private final List<RecipeArgs> shaped = new ArrayList<>();
@@ -51,6 +52,8 @@ public class CraftingRecipeRegisterEvent {
 
         private boolean allowDamaged;
 
+        private final List<UnaryOperator<ItemStack>> consumeOverrides = new ArrayList<>();
+
         private RecipeArgs(ItemStack result, boolean include_in_lowest_crafting_difficulty_determination, Object... inputs) {
             this.result = result;
             this.inputs = inputs;
@@ -82,11 +85,19 @@ public class CraftingRecipeRegisterEvent {
             return this;
         }
 
+        public RecipeArgs consumeOverride(UnaryOperator<ItemStack> rule) {
+            this.consumeOverrides.add(rule);
+            return this;
+        }
+
         public void modifyRecipe(ShapedRecipes shapedRecipes) {
             if (this.extendsNBT) shapedRecipes.func_92100_c();
             if (this.difficulty != null) shapedRecipes.setDifficulty(this.difficulty);
             shapedRecipes.setSkillsets(this.skillsets);
             if (this.allowDamaged) ((IRecipeExtend) shapedRecipes).ric$SetAllowDamaged(true);
+            if (!this.consumeOverrides.isEmpty()) {
+                ((IRecipeExtend) shapedRecipes).ric$SetConsumeOverride(this.consumeOverrides);
+            }
         }
 
         public void modifyRecipe(ShapelessRecipes shapelessRecipes) {
@@ -94,6 +105,9 @@ public class CraftingRecipeRegisterEvent {
             if (this.difficulty != null) shapelessRecipes.setDifficulty(this.difficulty);
             shapelessRecipes.setSkillsets(this.skillsets);
             if (this.allowDamaged) ((IRecipeExtend) shapelessRecipes).ric$SetAllowDamaged(true);
+            if (!this.consumeOverrides.isEmpty()) {
+                ((IRecipeExtend) shapelessRecipes).ric$SetConsumeOverride(this.consumeOverrides);
+            }
         }
     }
 
