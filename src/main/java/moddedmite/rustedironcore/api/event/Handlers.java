@@ -21,4 +21,6 @@ public class Handlers {
     public static final CombatHandler Combat = new CombatHandler();
     public static final TickHandler Tick = new TickHandler();
     public static final LootTableHandler LootTable = new LootTableHandler();
+    public static final PlayerAttributeHandler PlayerAttribute = new PlayerAttributeHandler();
+    public static final EntityTrackerHandler EntityTracker = new EntityTrackerHandler();
 }

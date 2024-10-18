@@ -27,4 +27,9 @@ public class MinecraftServerMixin {
     private void onPlayerLoggedOut(ServerPlayer player, CallbackInfo ci) {
         Handlers.PlayerEvent.onPlayerLoggedOut(new PlayerLoggedOutEvent(player));
     }
+
+    @Inject(method = "tick", at = @At("HEAD"))
+    private void onTick(CallbackInfo ci) {
+        Handlers.Tick.onServerTick(MinecraftServer.getServer());
+    }
 }

@@ -1,6 +1,5 @@
 package moddedmite.rustedironcore.mixin.other.entity.player;
 
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import moddedmite.rustedironcore.api.event.Handlers;
@@ -11,6 +10,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -73,9 +73,9 @@ public abstract class EntityPlayerMixin extends EntityLivingBase implements Play
         return Handlers.Combat.onPlayerEntityReachModify((EntityPlayer) (Object) this, context, entity, original);
     }
 
-    @ModifyExpressionValue(method = "getCurrentPlayerStrVsBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/Item;getStrVsBlock(Lnet/minecraft/Block;I)F"))
-    private float modifyRawStrVsBlock(float original) {
-        return Handlers.Combat.onPlayerRawStrVsBlockModify((EntityPlayer) (Object) this, original);
+    @Redirect(method = "getCurrentPlayerStrVsBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/Item;getStrVsBlock(Lnet/minecraft/Block;I)F"))
+    private float modifyRawStrVsBlock(Item instance, Block block, int metadata) {
+        return Handlers.Combat.onPlayerRawStrVsBlockModify((EntityPlayer) (Object) this, instance, block, metadata, instance.getStrVsBlock(block, metadata));
     }
 
     @ModifyArg(method = "getCurrentPlayerStrVsBlock", at = @At(value = "INVOKE", target = "Ljava/lang/Math;max(FF)F"), index = 0)
@@ -87,6 +87,16 @@ public abstract class EntityPlayerMixin extends EntityLivingBase implements Play
     public boolean knockBack(Entity attacker, float amount) {
         amount = Handlers.Combat.onPlayerReceiveKnockBackModify((EntityPlayer) (Object) this, attacker, amount);
         return super.knockBack(attacker, amount);
+    }
+
+    @ModifyReturnValue(method = "getHealthLimit()F", at = @At("RETURN"))
+    private float modifyHealthLimit(float original) {
+        return Handlers.PlayerAttribute.onHealthLimitModify((EntityPlayer) (Object) this, original);
+    }
+
+    @ModifyReturnValue(method = "getHighestPossibleLevel", at = @At("RETURN"))
+    private static int modifyMaxLevel(int original) {
+        return Handlers.PlayerAttribute.onLevelLimitModify(original);
     }
 
 }

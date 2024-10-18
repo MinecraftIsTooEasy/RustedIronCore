@@ -4,6 +4,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import moddedmite.rustedironcore.api.event.Handlers;
 import moddedmite.rustedironcore.api.event.events.CraftingRecipeRegisterEvent;
+import moddedmite.rustedironcore.api.event.events.EntityTrackerRegisterEvent;
 import moddedmite.rustedironcore.api.event.events.SmeltingRecipeRegisterEvent;
 import moddedmite.rustedironcore.api.event.events.SpawnConditionRegisterEvent;
 import net.minecraft.*;
@@ -20,12 +21,11 @@ import java.util.List;
 
 @Mixin(CraftingManager.class)
 public abstract class CraftingManagerMixin {
+    @Shadow
+    public abstract ShapedRecipes addRecipe(ItemStack par1ItemStack, boolean include_in_lowest_crafting_difficulty_determination, Object... par2ArrayOfObj);
 
     @Shadow
-    abstract ShapedRecipes addRecipe(ItemStack par1ItemStack, boolean include_in_lowest_crafting_difficulty_determination, Object... par2ArrayOfObj);
-
-    @Shadow
-    abstract ShapelessRecipes addShapelessRecipe(ItemStack par1ItemStack, boolean include_in_lowest_crafting_difficulty_determination, Object... par2ArrayOfObj);
+    public abstract ShapelessRecipes addShapelessRecipe(ItemStack par1ItemStack, boolean include_in_lowest_crafting_difficulty_determination, Object... par2ArrayOfObj);
 
     @WrapOperation(method = "<init>", at = @At(value = "INVOKE", target = "Ljava/util/Collections;sort(Ljava/util/List;Ljava/util/Comparator;)V"))
     private <T> void postRecipes(List<T> list, Comparator<? super T> c, Operation<Void> original) {
@@ -47,6 +47,7 @@ public abstract class CraftingManagerMixin {
         Handlers.PropertiesRegistry.getListeners().forEach(Runnable::run);
         Handlers.Smelting.publish(new SmeltingRecipeRegisterEvent());
         Handlers.SpawnCondition.publish(new SpawnConditionRegisterEvent());
+        Handlers.EntityTracker.publish(new EntityTrackerRegisterEvent());
     }
 
     @Inject(method = "findMatchingRecipe", at = @At(value = "INVOKE", target = "Lnet/minecraft/InventoryCrafting;getEventHandler()Lnet/minecraft/Container;"), locals = LocalCapture.CAPTURE_FAILSOFT, cancellable = true)

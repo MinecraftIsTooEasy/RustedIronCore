@@ -1,5 +1,6 @@
 package moddedmite.rustedironcore.villager;
 
+import moddedmite.rustedironcore.api.util.StringUtil;
 import net.minecraft.ResourceLocation;
 
 import java.util.ArrayList;
@@ -7,23 +8,34 @@ import java.util.List;
 
 public class VillagerSettings {
     private final int profession;
+    private final String name;
     private final ResourceLocation texture;
     private final List<RecipeEntry> recipeEntries = new ArrayList<>();
     private boolean banned = false;
 
-    public static final ResourceLocation FarmerTexture = new ResourceLocation("textures/entity/villager/farmer");
-    public static final ResourceLocation LibrarianTexture = new ResourceLocation("textures/entity/villager/librarian");
-    public static final ResourceLocation PriestTexture = new ResourceLocation("textures/entity/villager/priest");
-    public static final ResourceLocation SmithTexture = new ResourceLocation("textures/entity/villager/smith");
-    public static final ResourceLocation ButcherTexture = new ResourceLocation("textures/entity/villager/butcher");
+    public static final ResourceLocation FoolTexture = new ResourceLocation("textures/entity/villager/villager.png");
+    public static final ResourceLocation FarmerTexture = new ResourceLocation("textures/entity/villager/farmer.png");
+    public static final ResourceLocation LibrarianTexture = new ResourceLocation("textures/entity/villager/librarian.png");
+    public static final ResourceLocation PriestTexture = new ResourceLocation("textures/entity/villager/priest.png");
+    public static final ResourceLocation SmithTexture = new ResourceLocation("textures/entity/villager/smith.png");
+    public static final ResourceLocation ButcherTexture = new ResourceLocation("textures/entity/villager/butcher.png");
 
-    public VillagerSettings(int profession, ResourceLocation texture) {
+    public VillagerSettings(int profession, String name, ResourceLocation texture) {
         this.profession = profession;
+        this.name = name;
         this.texture = texture;
     }
 
     public int getProfession() {
         return this.profession;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public String getTranslatedName() {
+        return StringUtil.translate(this.name);
     }
 
     public ResourceLocation getTexture() {

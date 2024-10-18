@@ -76,7 +76,7 @@ public abstract class SlotCraftingMixin extends Slot {
             }
             if (consumeOverride != null) {
                 Optional<ItemStack> optional1 = consumeOverride.stream().map(x -> x.apply(itemStackInSlot))
-                        .filter(Objects::nonNull).findAny();
+                        .filter(Objects::nonNull).findFirst();
                 if (optional1.isPresent() && this.craftMatrix.getStackInSlot(slotIndex) == null) {
                     this.craftMatrix.setInventorySlotContents(slotIndex, optional1.get());
                     continue;

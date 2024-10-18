@@ -1,6 +1,7 @@
 package moddedmite.rustedironcore.network;
 
 import net.minecraft.ItemStack;
+import net.minecraft.MerchantRecipeList;
 import net.minecraft.Packet;
 
 import java.io.DataInputStream;
@@ -24,6 +25,8 @@ public interface PacketByteBuf {
 
     float readFloat();
 
+    MerchantRecipeList readMerchantRecipeList();
+
     void writeByte(int paramInt);
 
     void writeItemStack(ItemStack paramItemStack);
@@ -37,6 +40,8 @@ public interface PacketByteBuf {
     void writeBoolean(boolean paramBoolean);
 
     void writeFloat(float paramFloat);
+
+    void writeMerchantRecipeList(MerchantRecipeList list);
 
     static PacketByteBuf out(final DataOutputStream out) {
         return new PacketByteBuf() {
@@ -90,6 +95,14 @@ public interface PacketByteBuf {
                 }
             }
 
+            public void writeMerchantRecipeList(MerchantRecipeList list) {
+                try {
+                    list.writeRecipiesToStream(out);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
             public void writeBoolean(boolean b) {
                 writeByte(b ? 1 : 0);
             }
@@ -119,6 +132,10 @@ public interface PacketByteBuf {
             }
 
             public float readFloat() {
+                throw new UnsupportedOperationException();
+            }
+
+            public MerchantRecipeList readMerchantRecipeList() {
                 throw new UnsupportedOperationException();
             }
         };
@@ -190,6 +207,14 @@ public interface PacketByteBuf {
                 }
             }
 
+            public MerchantRecipeList readMerchantRecipeList() {
+                try {
+                    return MerchantRecipeList.readRecipiesFromStream(in);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
             public void writeVarInt(int value) {
                 throw new UnsupportedOperationException();
             }
@@ -215,6 +240,10 @@ public interface PacketByteBuf {
             }
 
             public void writeFloat(float f) {
+                throw new UnsupportedOperationException();
+            }
+
+            public void writeMerchantRecipeList(MerchantRecipeList list) {
                 throw new UnsupportedOperationException();
             }
         };

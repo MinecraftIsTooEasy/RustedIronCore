@@ -16,6 +16,8 @@ public abstract class EntityClientPlayerMPMixin extends ClientPlayer implements 
     private int protein;
     @Unique
     private int essential_fats;
+    @Unique
+    private int nutrition_limit = 160000;
 
     public EntityClientPlayerMPMixin(Minecraft par1Minecraft, World par2World, Session par3Session, NetClientHandler par4NetClientHandler) {
         super(par1Minecraft, par2World, par3Session, 0);
@@ -65,5 +67,15 @@ public abstract class EntityClientPlayerMPMixin extends ClientPlayer implements 
     @Override
     public void setEssentialFats(int essential_fats) {
         this.essential_fats = essential_fats;
+    }
+
+    @Override
+    public int getNutritionLimit() {
+        return this.nutrition_limit;
+    }
+
+    @Override
+    public void setNutritionLimit(int nutrition_limit) {
+        this.nutrition_limit = nutrition_limit;
     }
 }

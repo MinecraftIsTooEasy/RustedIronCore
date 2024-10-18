@@ -1,1 +1,8 @@
 gui.change=下一页
+
+villager.profession.farmer=农民
+villager.profession.librarian=图书管理员
+villager.profession.priest=牧师
+villager.profession.smith=铁匠
+villager.profession.butcher=屠夫
+villager.profession.unknown=未知

@@ -22,10 +22,13 @@ public class NetServerHandlerMixin {
     public ServerPlayer playerEntity;
 
     @Inject(method = "handleCustomPayload", at = @At("RETURN"))
-    private void handleCustomPayload(Packet250CustomPayload par1Packet250CustomPayload, CallbackInfo ci) {
-        PacketSupplier packetSupplier = PacketReader.serverReaders.get(par1Packet250CustomPayload.channel);
+    private void handleCustomPayload(Packet250CustomPayload payload, CallbackInfo ci) {
+        PacketSupplier packetSupplier = PacketReader.serverReaders.get(payload.channel);
         if (packetSupplier != null) {
-            Packet packet = packetSupplier.readPacket(PacketByteBuf.in(new DataInputStream(new ByteArrayInputStream(par1Packet250CustomPayload.data))));
+            if (payload.data == null) {
+                payload.data = new byte[0];
+            }
+            Packet packet = packetSupplier.readPacket(PacketByteBuf.in(new DataInputStream(new ByteArrayInputStream(payload.data))));
             packet.apply(this.playerEntity);
         }
     }

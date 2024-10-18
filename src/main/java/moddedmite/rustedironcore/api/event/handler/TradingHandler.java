@@ -20,6 +20,7 @@ public class TradingHandler extends EventHandler<TradingRegisterEvent> {
 
     public int getRandomProfession(Random rand) {
         List<VillagerSettings> unbannedList = this.professionMap.values().stream().filter(x -> !x.isBanned()).toList();
+        if (unbannedList.isEmpty()) return 0;
         return RandomUtil.getRandom(unbannedList, rand).getProfession();
     }
 
@@ -40,11 +41,11 @@ public class TradingHandler extends EventHandler<TradingRegisterEvent> {
         }
     }
 
-    public static final VillagerSettings Farmer = new VillagerSettings(0, VillagerSettings.FarmerTexture);
-    public static final VillagerSettings Librarian = new VillagerSettings(1, VillagerSettings.LibrarianTexture);
-    public static final VillagerSettings Priest = new VillagerSettings(2, VillagerSettings.PriestTexture);
-    public static final VillagerSettings Smith = new VillagerSettings(3, VillagerSettings.SmithTexture);
-    public static final VillagerSettings Butcher = new VillagerSettings(4, VillagerSettings.ButcherTexture);
+    public static final VillagerSettings Farmer = new VillagerSettings(0,"villager.profession.farmer" ,VillagerSettings.FarmerTexture);
+    public static final VillagerSettings Librarian = new VillagerSettings(1,"villager.profession.librarian", VillagerSettings.LibrarianTexture);
+    public static final VillagerSettings Priest = new VillagerSettings(2,"villager.profession.priest", VillagerSettings.PriestTexture);
+    public static final VillagerSettings Smith = new VillagerSettings(3,"villager.profession.smith", VillagerSettings.SmithTexture);
+    public static final VillagerSettings Butcher = new VillagerSettings(4,"villager.profession.butcher", VillagerSettings.ButcherTexture);
 
     public static final Consumer<TradingRegisterEvent> VanillaListener = event -> {
 
@@ -54,7 +55,6 @@ public class TradingHandler extends EventHandler<TradingRegisterEvent> {
         event.registerProfession(3, Smith);
         event.registerProfession(4, Butcher);
 
-        Farmer.buyEntry(Item.wheat.itemID, 0.9F);
         Farmer.buyEntry(Item.wheat.itemID, 0.9F);
         Farmer.buyEntry(Block.cloth.blockID, 0.5F);
         Farmer.buyEntry(Item.chickenRaw.itemID, 0.5F);

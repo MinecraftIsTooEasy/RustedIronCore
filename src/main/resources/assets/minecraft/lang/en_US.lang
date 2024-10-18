@@ -1,1 +1,8 @@
 gui.change=Next Page
+
+villager.profession.farmer=Farmer
+villager.profession.librarian=Librarian
+villager.profession.priest=Priest
+villager.profession.smith=Smith
+villager.profession.butcher=Butcher
+villager.profession.unknown=Unknown

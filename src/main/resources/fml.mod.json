@@ -32,6 +32,9 @@
     "loom:injected_interfaces": {
       "net/minecraft/EntityClientPlayerMP": [
         "moddedmite/rustedironcore/api/player/ClientPlayerAPI"
+      ],
+      "net/minecraft/ServerPlayer": [
+        "moddedmite/rustedironcore/api/player/ServerPlayerAPI"
       ]
     }
   }

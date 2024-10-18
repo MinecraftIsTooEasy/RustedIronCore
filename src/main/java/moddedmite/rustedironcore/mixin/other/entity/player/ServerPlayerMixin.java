@@ -1,18 +1,25 @@
 package moddedmite.rustedironcore.mixin.other.entity.player;
 
 import moddedmite.rustedironcore.Constants;
+import moddedmite.rustedironcore.api.event.Handlers;
+import moddedmite.rustedironcore.api.player.ServerPlayerAPI;
 import moddedmite.rustedironcore.network.Network;
 import moddedmite.rustedironcore.network.packets.S2CUpdateNutrition;
+import net.minecraft.EntityPlayer;
+import net.minecraft.ItemInWorldManager;
 import net.minecraft.ServerPlayer;
+import net.minecraft.World;
+import net.minecraft.server.MinecraftServer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ServerPlayer.class)
-public abstract class ServerPlayerMixin {
+public abstract class ServerPlayerMixin implements ServerPlayerAPI {
     @Shadow
     private int phytonutrients;
     @Shadow
@@ -27,6 +34,20 @@ public abstract class ServerPlayerMixin {
     private int last_essential_fats;
     @Unique
     private int nutritionSyncCountDown = 0;
+    @Unique
+    private int nutritionLimit;
+    @Unique
+    private int insulinLimit;
+
+    @Inject(method = "<init>", at = @At("RETURN"))
+    private void onInit(MinecraftServer par1MinecraftServer, World par2World, String par3Str, ItemInWorldManager par4ItemInWorldManager, CallbackInfo ci) {
+        this.nutritionLimit = Handlers.PlayerAttribute.onNutritionLimitModify((EntityPlayer) (Object) this, 160000);
+        this.insulinLimit = Handlers.PlayerAttribute.onInsulinResistanceLimitModify((EntityPlayer) (Object) this, 192000);
+        int nutritionInit = Handlers.PlayerAttribute.onNutritionInitModify((EntityPlayer) (Object) this, 160000);
+        this.phytonutrients = nutritionInit;
+        this.essential_fats = nutritionInit;
+        this.protein = nutritionInit;
+    }
 
     @Inject(method = {"onUpdateEntity"}, at = {@At(value = "INVOKE", target = "Lnet/minecraft/FoodStats;getHunger()F")})
     private void updateNutrition(CallbackInfo ci) {
@@ -38,6 +59,11 @@ public abstract class ServerPlayerMixin {
         }
     }
 
+    @Override
+    public int getNutritionLimit() {
+        return this.nutritionLimit;
+    }
+
     @Unique
     private void syncNutrition() {
         if (this.phytonutrients != this.last_phytonutrients || this.protein != this.last_protein || this.essential_fats != this.last_essential_fats) {
@@ -46,6 +72,26 @@ public abstract class ServerPlayerMixin {
             this.last_protein = this.protein;
             this.last_essential_fats = this.essential_fats;
         }
+    }
+
+    @ModifyArg(method = "setProtein", at = @At(value = "INVOKE", target = "Lnet/minecraft/MathHelper;clamp_int(III)I"), index = 2)
+    private int widenProtein(int par0) {
+        return this.nutritionLimit;
+    }
+
+    @ModifyArg(method = "setEssentialFats", at = @At(value = "INVOKE", target = "Lnet/minecraft/MathHelper;clamp_int(III)I"), index = 2)
+    private int widenFat(int par0) {
+        return this.nutritionLimit;
+    }
+
+    @ModifyArg(method = "setPhytonutrients", at = @At(value = "INVOKE", target = "Lnet/minecraft/MathHelper;clamp_int(III)I"), index = 2)
+    private int widenPhytonutrients(int par0) {
+        return this.nutritionLimit;
+    }
+
+    @ModifyArg(method = "setInsulinResistance", at = @At(value = "INVOKE", target = "Lnet/minecraft/MathHelper;clamp_int(III)I"), index = 2)
+    private int widenInsulinResistance(int par0) {
+        return this.insulinLimit;
     }
 }
 

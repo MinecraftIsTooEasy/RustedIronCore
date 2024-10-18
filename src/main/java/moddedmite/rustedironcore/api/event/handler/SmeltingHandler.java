@@ -22,7 +22,7 @@ public class SmeltingHandler extends EventHandler<SmeltingRecipeRegisterEvent> {
                 .map(specialRecipe -> specialRecipe.getSmeltingResult(input_item_stack, heat_level))
                 .filter(Objects::nonNull)
                 .filter(x -> x.result != null)
-                .findAny();
+                .findFirst();
     }
 
     public static SmeltingResult result(int consumption, ItemStack result) {

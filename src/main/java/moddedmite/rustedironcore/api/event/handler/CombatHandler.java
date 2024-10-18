@@ -41,9 +41,9 @@ public class CombatHandler extends AbstractHandler<ICombatListener> {
         return original;
     }
 
-    public float onPlayerRawStrVsBlockModify(EntityPlayer player, float original) {
+    public float onPlayerRawStrVsBlockModify(EntityPlayer player, Item tool, Block block, int metadata, float original) {
         for (ICombatListener listener : this.listeners) {
-            original = listener.onPlayerRawStrVsBlockModify(player, original);
+            original = listener.onPlayerRawStrVsBlockModify(player, tool, block, metadata, original);
         }
         return original;
     }

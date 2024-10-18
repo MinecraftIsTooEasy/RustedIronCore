@@ -14,4 +14,7 @@ accessible method net/minecraft/CraftingManager addShapelessRecipe (Lnet/minecra
 accessible field net/minecraft/EntityVillager villagerStockList Ljava/util/Map;
 accessible method net/minecraft/EntityVillager adjustProbability (F)F
 accessible field net/minecraft/EntityVillager blacksmithSellingList Ljava/util/Map;
+
 accessible class net/minecraft/ComponentNetherBridgePiece
+
+accessible field net/minecraft/ServerPlayer currentWindowId I

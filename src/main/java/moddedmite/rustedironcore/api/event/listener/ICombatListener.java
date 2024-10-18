@@ -25,7 +25,7 @@ public interface ICombatListener {
         return original;
     }
 
-    default float onPlayerRawStrVsBlockModify(EntityPlayer player, float original) {
+    default float onPlayerRawStrVsBlockModify(EntityPlayer player,Item tool, Block block, int metadata, float original) {
         return original;
     }
 
