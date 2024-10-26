@@ -1,6 +1,5 @@
 package moddedmite.rustedironcore.api.util;
 
-import io.github.prospector.modmenu.util.LogUtils;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.Version;
 import net.fabricmc.loader.api.VersionParsingException;
@@ -13,7 +12,7 @@ import java.io.File;
 import java.util.Optional;
 
 public class FabricUtil {
-    private static final Logger LOGGER = LogUtils.getLogger();
+    private static final Logger LOGGER = LogUtil.getLogger();
 
     public static Optional<ModContainer> getModContainer(String modid) {
         return FishModLoader.getModContainer(modid);

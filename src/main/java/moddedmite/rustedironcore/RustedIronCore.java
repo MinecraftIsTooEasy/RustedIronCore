@@ -4,6 +4,7 @@ import moddedmite.rustedironcore.api.event.Handlers;
 import moddedmite.rustedironcore.api.event.events.PlayerLoggedInEvent;
 import moddedmite.rustedironcore.api.event.listener.IPlayerEventListener;
 import moddedmite.rustedironcore.api.event.listener.ITickListener;
+import moddedmite.rustedironcore.api.gui.GuiTips;
 import moddedmite.rustedironcore.api.player.ServerPlayerAPI;
 import moddedmite.rustedironcore.api.util.GuiUtil;
 import moddedmite.rustedironcore.api.util.StringUtil;
@@ -46,6 +47,7 @@ public class RustedIronCore implements ModInitializer {
                 Network.sendToClient(player, new S2CSyncNutritionLimit(((ServerPlayerAPI) player).getNutritionLimit()));
                 if (StringUtil.getCurrentLanguage().equals("en_US")) return;
                 player.addChatMessage("ric.statement");
+                Minecraft.getMinecraft().displayGuiScreen(new GuiTips());
             }
         });
         Handlers.Tick.register(new ITickListener() {
