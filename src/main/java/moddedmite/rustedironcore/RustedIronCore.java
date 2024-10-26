@@ -4,11 +4,11 @@ import moddedmite.rustedironcore.api.event.Handlers;
 import moddedmite.rustedironcore.api.event.events.PlayerLoggedInEvent;
 import moddedmite.rustedironcore.api.event.listener.IPlayerEventListener;
 import moddedmite.rustedironcore.api.event.listener.ITickListener;
-import moddedmite.rustedironcore.api.gui.GuiTips;
 import moddedmite.rustedironcore.api.player.ServerPlayerAPI;
 import moddedmite.rustedironcore.api.util.GuiUtil;
 import moddedmite.rustedironcore.api.util.StringUtil;
 import moddedmite.rustedironcore.network.Network;
+import moddedmite.rustedironcore.network.packets.S2COpenGuiTips;
 import moddedmite.rustedironcore.network.packets.S2CSyncNutritionLimit;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.Minecraft;
@@ -47,7 +47,9 @@ public class RustedIronCore implements ModInitializer {
                 Network.sendToClient(player, new S2CSyncNutritionLimit(((ServerPlayerAPI) player).getNutritionLimit()));
                 if (StringUtil.getCurrentLanguage().equals("en_US")) return;
                 player.addChatMessage("ric.statement");
-                Minecraft.getMinecraft().displayGuiScreen(new GuiTips());
+                if (event.firstLogin()) {
+                    Network.sendToClient(player, new S2COpenGuiTips());
+                }
             }
         });
         Handlers.Tick.register(new ITickListener() {
@@ -69,10 +71,13 @@ public class RustedIronCore implements ModInitializer {
                     }
                     changeTitleCounter = 0;
                 }
+//                Handlers.TimedTask.onTick();
             }
         });
     }
 
+    public static int tipsGuiCounter = 0;
+    public static boolean displayedTipsGui = false;
     public static int changeTitleCounter = 0;
     public static int changeTitlePeriod = 100;
     public static boolean isNowRICTitle = false;

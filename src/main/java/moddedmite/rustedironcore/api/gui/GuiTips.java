@@ -1,6 +1,9 @@
 package moddedmite.rustedironcore.api.gui;
 
-import net.minecraft.*;
+import net.minecraft.GuiButton;
+import net.minecraft.GuiScreen;
+import net.minecraft.I18n;
+import net.minecraft.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 
 public class GuiTips extends GuiScreen {

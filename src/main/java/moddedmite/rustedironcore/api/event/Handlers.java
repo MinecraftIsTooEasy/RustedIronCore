@@ -23,4 +23,5 @@ public class Handlers {
     public static final LootTableHandler LootTable = new LootTableHandler();
     public static final PlayerAttributeHandler PlayerAttribute = new PlayerAttributeHandler();
     public static final EntityTrackerHandler EntityTracker = new EntityTrackerHandler();
+    public static final TimedTaskHandler TimedTask = new TimedTaskHandler();
 }

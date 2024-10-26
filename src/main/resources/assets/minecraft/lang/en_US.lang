@@ -1,5 +1,3 @@
-gui.change=Next Page
-
 villager.profession.farmer=Farmer
 villager.profession.librarian=Librarian
 villager.profession.priest=Priest
@@ -8,4 +6,4 @@ villager.profession.butcher=Butcher
 villager.profession.unknown=Unknown
 
 ric.statement=[Rusted Iron Core]Loaded successfully, note that this mod is a compat bridge for other mods, rather than someone super mod supplies all the contents
-ric.gui.title=[Mite-1.6.4-Rusted Iron Core]This mod is a compat bridge for other mods, rather than someone super mod supplies all the contents
+ric.gui.title=Minecraft 1.6.4-MITE(Modded, Rusted Iron Core Loaded)This mod is a compat bridge for other mods, rather than someone super mod supplies all the contents
