@@ -6,6 +6,7 @@ import net.minecraft.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
 public class CraftingRecipeRegisterEvent {
@@ -52,7 +53,9 @@ public class CraftingRecipeRegisterEvent {
 
         private boolean allowDamaged;
 
-        private final List<UnaryOperator<ItemStack>> consumeOverrides = new ArrayList<>();
+        private final List<ConsumeRule> consumeRules = new ArrayList<>();
+
+        private boolean keepQuality;
 
         private RecipeArgs(ItemStack result, boolean include_in_lowest_crafting_difficulty_determination, Object... inputs) {
             this.result = result;
@@ -85,31 +88,58 @@ public class CraftingRecipeRegisterEvent {
             return this;
         }
 
+        @Deprecated(since = "1.3.4")
         public RecipeArgs consumeOverride(UnaryOperator<ItemStack> rule) {
-            this.consumeOverrides.add(rule);
+//            this.consumeOverrides.add(rule);
+//            return this;
+            return this.consumeRule(x -> rule.apply(x) != null, rule);// if result not null, apply rule
+        }
+
+        // if condition is satisfied, then apply special rule
+        public RecipeArgs consumeRule(Predicate<ItemStack> condition, UnaryOperator<ItemStack> rule) {
+            this.consumeRules.add(new ConsumeRule(condition, rule));
             return this;
         }
 
-        public void modifyRecipe(ShapedRecipes shapedRecipes) {
+        public RecipeArgs keepQuality() {
+            this.keepQuality = true;
+            return this;
+        }
+
+        public void modifyShapedRecipe(ShapedRecipes shapedRecipes) {
             if (this.extendsNBT) shapedRecipes.func_92100_c();
             if (this.difficulty != null) shapedRecipes.setDifficulty(this.difficulty);
             shapedRecipes.setSkillsets(this.skillsets);
             if (this.allowDamaged) ((IRecipeExtend) shapedRecipes).ric$SetAllowDamaged(true);
-            if (!this.consumeOverrides.isEmpty()) {
-                ((IRecipeExtend) shapedRecipes).ric$SetConsumeOverride(this.consumeOverrides);
+            if (!this.consumeRules.isEmpty()) {
+                ((IRecipeExtend) shapedRecipes).ric$SetConsumeRules(this.consumeRules);
+            }
+            if (this.keepQuality) {
+                ((IRecipeExtend) shapedRecipes).ric$SetKeepQuality();
             }
         }
 
-        public void modifyRecipe(ShapelessRecipes shapelessRecipes) {
+        public void modifyShapelessRecipe(ShapelessRecipes shapelessRecipes) {
             if (this.extendsNBT) shapelessRecipes.propagateTagCompound();
             if (this.difficulty != null) shapelessRecipes.setDifficulty(this.difficulty);
             shapelessRecipes.setSkillsets(this.skillsets);
             if (this.allowDamaged) ((IRecipeExtend) shapelessRecipes).ric$SetAllowDamaged(true);
-            if (!this.consumeOverrides.isEmpty()) {
-                ((IRecipeExtend) shapelessRecipes).ric$SetConsumeOverride(this.consumeOverrides);
+            if (!this.consumeRules.isEmpty()) {
+                ((IRecipeExtend) shapelessRecipes).ric$SetConsumeRules(this.consumeRules);
+            }
+            if (this.keepQuality) {
+                ((IRecipeExtend) shapelessRecipes).ric$SetKeepQuality();
             }
         }
     }
 
+    public record ConsumeRule(Predicate<ItemStack> condition, UnaryOperator<ItemStack> rule) {
+        public boolean matches(ItemStack itemStack) {
+            return this.condition.test(itemStack);
+        }
 
+        public ItemStack apply(ItemStack itemStack) {
+            return this.rule.apply(itemStack);
+        }
+    }
 }

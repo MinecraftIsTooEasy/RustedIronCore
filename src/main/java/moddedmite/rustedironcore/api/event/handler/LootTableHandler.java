@@ -2,9 +2,14 @@ package moddedmite.rustedironcore.api.event.handler;
 
 import moddedmite.rustedironcore.api.event.AbstractHandler;
 import moddedmite.rustedironcore.api.event.listener.ILootTableRegisterListener;
+import net.minecraft.Item;
+import net.minecraft.ItemStack;
+import net.minecraft.WeightedRandom;
 import net.minecraft.WeightedRandomChestContent;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class LootTableHandler extends AbstractHandler<ILootTableRegisterListener> {
     public void onDesertPyramidRegister(List<WeightedRandomChestContent> original) {
@@ -30,11 +35,29 @@ public class LootTableHandler extends AbstractHandler<ILootTableRegisterListener
     public void onStrongholdCrossingRegister(List<WeightedRandomChestContent> original) {
         this.listeners.forEach(x -> x.onStrongholdCrossingRegister(original));
     }
+
     public void onStrongholdLibraryRegister(List<WeightedRandomChestContent> original) {
         this.listeners.forEach(x -> x.onStrongholdLibraryRegister(original));
     }
 
     public void onSwampHutRegister(List<WeightedRandomChestContent> original) {
         this.listeners.forEach(x -> x.onSwampHutRegister(original));
+    }
+
+    public void onBlackSmithRegister(List<WeightedRandomChestContent> original) {
+        this.listeners.forEach(x -> x.onBlackSmithRegister(original));
+    }
+
+    private final List<WeightedRandomChestContent> fishingEntries = new ArrayList<>();
+
+    // I set the original weight as 80 fish and 20 large fish
+    public void onFishingRegister() {
+        this.fishingEntries.add(new WeightedRandomChestContent(Item.fishRaw.itemID, 0, 1, 1, 100));// this is dummy
+        this.listeners.forEach(x -> x.onFishingRegister(this.fishingEntries));
+    }
+
+    public ItemStack getFishingResult(Random rand) {
+        WeightedRandomChestContent randomItem = (WeightedRandomChestContent) WeightedRandom.getRandomItem(rand, this.fishingEntries);
+        return randomItem.theItemId;
     }
 }

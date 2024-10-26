@@ -29,4 +29,10 @@ public interface ILootTableRegisterListener {
 
     default void onSwampHutRegister(List<WeightedRandomChestContent> original) {
     }
+
+    default void onBlackSmithRegister(List<WeightedRandomChestContent> original){
+    }
+
+    default void onFishingRegister(List<WeightedRandomChestContent> original){
+    }
 }

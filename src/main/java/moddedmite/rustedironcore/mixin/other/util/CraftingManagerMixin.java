@@ -33,11 +33,11 @@ public abstract class CraftingManagerMixin {
         Handlers.Crafting.publish(craftingRecipeRegisterEvent);
         for (CraftingRecipeRegisterEvent.RecipeArgs shaped : craftingRecipeRegisterEvent.getShaped()) {
             ShapedRecipes shapedRecipes = this.addRecipe(shaped.result, shaped.include_in_lowest_crafting_difficulty_determination, shaped.inputs);
-            shaped.modifyRecipe(shapedRecipes);
+            shaped.modifyShapedRecipe(shapedRecipes);
         }
         for (CraftingRecipeRegisterEvent.RecipeArgs shapeless : craftingRecipeRegisterEvent.getShapeless()) {
             ShapelessRecipes shapelessRecipes = this.addShapelessRecipe(shapeless.result, shapeless.include_in_lowest_crafting_difficulty_determination, shapeless.inputs);
-            shapeless.modifyRecipe(shapelessRecipes);
+            shapeless.modifyShapelessRecipe(shapelessRecipes);
         }
         original.call(list, c);
     }
@@ -48,6 +48,7 @@ public abstract class CraftingManagerMixin {
         Handlers.Smelting.publish(new SmeltingRecipeRegisterEvent());
         Handlers.SpawnCondition.publish(new SpawnConditionRegisterEvent());
         Handlers.EntityTracker.publish(new EntityTrackerRegisterEvent());
+        Handlers.LootTable.onFishingRegister();
     }
 
     @Inject(method = "findMatchingRecipe", at = @At(value = "INVOKE", target = "Lnet/minecraft/InventoryCrafting;getEventHandler()Lnet/minecraft/Container;"), locals = LocalCapture.CAPTURE_FAILSOFT, cancellable = true)

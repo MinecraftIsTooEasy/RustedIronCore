@@ -27,6 +27,8 @@ public interface PacketByteBuf {
 
     MerchantRecipeList readMerchantRecipeList();
 
+    double readDouble();
+
     void writeByte(int paramInt);
 
     void writeItemStack(ItemStack paramItemStack);
@@ -42,6 +44,8 @@ public interface PacketByteBuf {
     void writeFloat(float paramFloat);
 
     void writeMerchantRecipeList(MerchantRecipeList list);
+
+    void writeDouble(double paramDouble);
 
     static PacketByteBuf out(final DataOutputStream out) {
         return new PacketByteBuf() {
@@ -95,6 +99,10 @@ public interface PacketByteBuf {
                 }
             }
 
+            public void writeBoolean(boolean b) {
+                writeByte(b ? 1 : 0);
+            }
+
             public void writeMerchantRecipeList(MerchantRecipeList list) {
                 try {
                     list.writeRecipiesToStream(out);
@@ -103,8 +111,13 @@ public interface PacketByteBuf {
                 }
             }
 
-            public void writeBoolean(boolean b) {
-                writeByte(b ? 1 : 0);
+            @Override
+            public void writeDouble(double paramDouble) {
+                try {
+                    out.writeDouble(paramDouble);
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
             }
 
             public int readVarInt() {
@@ -136,6 +149,11 @@ public interface PacketByteBuf {
             }
 
             public MerchantRecipeList readMerchantRecipeList() {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public double readDouble() {
                 throw new UnsupportedOperationException();
             }
         };
@@ -215,6 +233,15 @@ public interface PacketByteBuf {
                 }
             }
 
+            @Override
+            public double readDouble() {
+                try {
+                    return in.readDouble();
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+            }
+
             public void writeVarInt(int value) {
                 throw new UnsupportedOperationException();
             }
@@ -244,6 +271,11 @@ public interface PacketByteBuf {
             }
 
             public void writeMerchantRecipeList(MerchantRecipeList list) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public void writeDouble(double paramDouble) {
                 throw new UnsupportedOperationException();
             }
         };

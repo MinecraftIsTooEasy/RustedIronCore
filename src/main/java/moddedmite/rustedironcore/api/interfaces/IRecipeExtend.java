@@ -1,18 +1,19 @@
 package moddedmite.rustedironcore.api.interfaces;
 
-import net.minecraft.ItemStack;
+import moddedmite.rustedironcore.api.event.events.CraftingRecipeRegisterEvent;
 
 import javax.annotation.Nullable;
 import java.util.List;
-import java.util.function.UnaryOperator;
 
 public interface IRecipeExtend {
     void ric$SetAllowDamaged(boolean b);
 
     boolean ric$AllowDamaged();
 
-    void ric$SetConsumeOverride(List<UnaryOperator<ItemStack>> list);
+    void ric$SetConsumeRules(List<CraftingRecipeRegisterEvent.ConsumeRule> list);
 
     @Nullable
-    List<UnaryOperator<ItemStack>> ric$GetConsumeOverride();
+    List<CraftingRecipeRegisterEvent.ConsumeRule> ric$GetConsumeRules();
+
+    void ric$SetKeepQuality();
 }

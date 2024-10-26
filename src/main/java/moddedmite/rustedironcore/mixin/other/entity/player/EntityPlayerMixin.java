@@ -1,5 +1,6 @@
 package moddedmite.rustedironcore.mixin.other.entity.player;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import moddedmite.rustedironcore.api.event.Handlers;
@@ -10,7 +11,6 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -73,9 +73,9 @@ public abstract class EntityPlayerMixin extends EntityLivingBase implements Play
         return Handlers.Combat.onPlayerEntityReachModify((EntityPlayer) (Object) this, context, entity, original);
     }
 
-    @Redirect(method = "getCurrentPlayerStrVsBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/Item;getStrVsBlock(Lnet/minecraft/Block;I)F"))
-    private float modifyRawStrVsBlock(Item instance, Block block, int metadata) {
-        return Handlers.Combat.onPlayerRawStrVsBlockModify((EntityPlayer) (Object) this, instance, block, metadata, instance.getStrVsBlock(block, metadata));
+    @ModifyExpressionValue(method = "getCurrentPlayerStrVsBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/Item;getStrVsBlock(Lnet/minecraft/Block;I)F"))
+    private float modifyRawStrVsBlock(float original, @Local Block block, @Local(ordinal = 3) int metadata, @Local Item held_item) {
+        return Handlers.Combat.onPlayerRawStrVsBlockModify((EntityPlayer) (Object) this, held_item, block, metadata, original);
     }
 
     @ModifyArg(method = "getCurrentPlayerStrVsBlock", at = @At(value = "INVOKE", target = "Ljava/lang/Math;max(FF)F"), index = 0)

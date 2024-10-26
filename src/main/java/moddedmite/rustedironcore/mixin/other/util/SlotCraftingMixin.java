@@ -1,5 +1,6 @@
 package moddedmite.rustedironcore.mixin.other.util;
 
+import moddedmite.rustedironcore.api.event.events.CraftingRecipeRegisterEvent;
 import moddedmite.rustedironcore.api.interfaces.IRecipeExtend;
 import moddedmite.rustedironcore.property.ItemProperties;
 import net.minecraft.*;
@@ -7,7 +8,6 @@ import org.spongepowered.asm.mixin.*;
 
 import javax.annotation.Nullable;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.UnaryOperator;
 
@@ -44,7 +44,7 @@ public abstract class SlotCraftingMixin extends Slot {
         this.onCrafting(resultItemStack);
         par1EntityPlayer.inventory.addItemStackToInventoryOrDropIt(resultItemStack.copy());
         int xp_reclaimed = 0;
-        List<UnaryOperator<ItemStack>> consumeOverride = this.getConsumeOverride();
+        List<CraftingRecipeRegisterEvent.ConsumeRule> consumeOverride = this.getConsumeOverride();
         for (int slotIndex = 0; slotIndex < this.craftMatrix.getSizeInventory(); ++slotIndex) {
             ItemStack itemStackInSlot = this.craftMatrix.getStackInSlot(slotIndex);
             if (itemStackInSlot == null) continue;
@@ -75,10 +75,9 @@ public abstract class SlotCraftingMixin extends Slot {
                 continue;
             }
             if (consumeOverride != null) {
-                Optional<ItemStack> optional1 = consumeOverride.stream().map(x -> x.apply(itemStackInSlot))
-                        .filter(Objects::nonNull).findFirst();
+                Optional<CraftingRecipeRegisterEvent.ConsumeRule> optional1 = consumeOverride.stream().filter(x -> x.matches(itemStackInSlot)).findFirst();
                 if (optional1.isPresent() && this.craftMatrix.getStackInSlot(slotIndex) == null) {
-                    this.craftMatrix.setInventorySlotContents(slotIndex, optional1.get());
+                    this.craftMatrix.setInventorySlotContents(slotIndex, optional1.get().apply(itemStackInSlot));
                     continue;
                 }
             }
@@ -90,13 +89,13 @@ public abstract class SlotCraftingMixin extends Slot {
 
     @Nullable
     @Unique
-    private List<UnaryOperator<ItemStack>> getConsumeOverride() {
+    private List<CraftingRecipeRegisterEvent.ConsumeRule> getConsumeOverride() {
         IRecipe recipe = this.crafting_result.recipe;
         if (recipe instanceof ShapedRecipes shaped) {
-            return ((IRecipeExtend) shaped).ric$GetConsumeOverride();
+            return ((IRecipeExtend) shaped).ric$GetConsumeRules();
         }
         if (recipe instanceof ShapelessRecipes shapeless) {
-            return ((IRecipeExtend) shapeless).ric$GetConsumeOverride();
+            return ((IRecipeExtend) shapeless).ric$GetConsumeRules();
         }
         return null;
     }

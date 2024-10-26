@@ -1,8 +1,11 @@
 package moddedmite.rustedironcore.mixin.other.util;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+import com.llamalad7.mixinextras.sugar.Local;
+import moddedmite.rustedironcore.api.event.events.CraftingRecipeRegisterEvent;
 import moddedmite.rustedironcore.api.interfaces.IRecipeExtend;
 import net.minecraft.CraftingResult;
+import net.minecraft.InventoryCrafting;
 import net.minecraft.ItemStack;
 import net.minecraft.ShapedRecipes;
 import org.spongepowered.asm.mixin.Mixin;
@@ -10,7 +13,6 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 
 import java.util.List;
-import java.util.function.UnaryOperator;
 
 @Mixin(ShapedRecipes.class)
 public class ShapedRecipesMixin implements IRecipeExtend {
@@ -18,11 +20,14 @@ public class ShapedRecipesMixin implements IRecipeExtend {
     private boolean allowDamaged;
 
     @Unique
-    private List<UnaryOperator<ItemStack>> consumeOverrides;
+    private boolean keepQuality;
+
+    @Unique
+    private List<CraftingRecipeRegisterEvent.ConsumeRule> consumeOverrides;
 
     @ModifyReturnValue(method = "getCraftingResult", at = @At("RETURN"))
     private CraftingResult onReturn(CraftingResult original) {
-        if (this.allowDamaged) original.setRepair();
+        if (this.allowDamaged) original.setRepair();// to enable crafting and avoid wrong tooltip
         return original;
     }
 
@@ -37,12 +42,29 @@ public class ShapedRecipesMixin implements IRecipeExtend {
     }
 
     @Override
-    public void ric$SetConsumeOverride(List<UnaryOperator<ItemStack>> list) {
+    public void ric$SetConsumeRules(List<CraftingRecipeRegisterEvent.ConsumeRule> list) {
         this.consumeOverrides = list;
     }
 
     @Override
-    public List<UnaryOperator<ItemStack>> ric$GetConsumeOverride() {
+    public List<CraftingRecipeRegisterEvent.ConsumeRule> ric$GetConsumeRules() {
         return this.consumeOverrides;
+    }
+
+    @Override
+    public void ric$SetKeepQuality() {
+        this.keepQuality = true;
+    }
+
+    @ModifyReturnValue(method = "getCraftingResult", at = @At("RETURN"))
+    private CraftingResult modifyResult(CraftingResult original, @Local(argsOnly = true) InventoryCrafting par1InventoryCrafting) {
+        if (this.keepQuality) {
+            for (int var3 = 0; var3 < par1InventoryCrafting.getSizeInventory(); ++var3) {
+                ItemStack var4 = par1InventoryCrafting.getStackInSlot(var3);
+                if (var4 == null || !var4.getItem().hasQuality()) continue;
+                original.item_stack.setQuality(var4.getQuality());
+            }
+        }
+        return original;
     }
 }
