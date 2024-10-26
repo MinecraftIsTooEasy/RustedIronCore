@@ -63,6 +63,7 @@
     "other.world.GenLayerBiomeMixin",
     "other.world.GenLayerHillsMixin",
     "other.world.WorldServerMixin",
+    "other.world.decoration.WorldGenDungeonsMixin",
     "other.world.structure.ComponentDesertPyramidMixin",
     "other.world.structure.ComponentNetherBridgePieceMixin",
     "other.world.structure.ComponentSmithMixin",

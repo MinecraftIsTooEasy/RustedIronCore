@@ -48,6 +48,14 @@ public class LootTableHandler extends AbstractHandler<ILootTableRegisterListener
         this.listeners.forEach(x -> x.onBlackSmithRegister(original));
     }
 
+    public void onDungeonOverworldRegister(List<WeightedRandomChestContent> original) {
+        this.listeners.forEach(x -> x.onDungeonOverworldRegister(original));
+    }
+
+    public void onDungeonUnderworldRegister(List<WeightedRandomChestContent> original) {
+        this.listeners.forEach(x -> x.onDungeonUnderworldRegister(original));
+    }
+
     private final List<WeightedRandomChestContent> fishingEntries = new ArrayList<>();
 
     // I set the original weight as 80 fish and 20 large fish
