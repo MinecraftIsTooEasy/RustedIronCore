@@ -28,6 +28,7 @@ public class ShapelessRecipesMixin implements IRecipeExtend {
     @ModifyReturnValue(method = "getCraftingResult", at = @At("RETURN"))
     private CraftingResult onReturn(CraftingResult original) {
         if (this.allowDamaged) original.setRepair();// to enable crafting and avoid wrong tooltip
+        if (this.keepQuality) original.setExperienceCostExempt();
         return original;
     }
 

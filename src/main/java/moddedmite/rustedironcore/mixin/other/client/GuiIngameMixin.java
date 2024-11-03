@@ -51,6 +51,8 @@ public class GuiIngameMixin extends Gui {
 
     @Inject(method = "updateTick", at = @At("RETURN"))
     private void updateCounter(CallbackInfo ci) {
-        S2COpenGuiTips.firstEnterTipCounter--;
+        if (S2COpenGuiTips.firstEnterTipCounter > 0) {
+            S2COpenGuiTips.firstEnterTipCounter--;
+        }
     }
 }

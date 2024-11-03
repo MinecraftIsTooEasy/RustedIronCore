@@ -24,4 +24,5 @@ public class Handlers {
     public static final PlayerAttributeHandler PlayerAttribute = new PlayerAttributeHandler();
     public static final EntityTrackerHandler EntityTracker = new EntityTrackerHandler();
     public static final TimedTaskHandler TimedTask = new TimedTaskHandler();
+    public static final AbstractHandler<Runnable> PotionRegistry = new AbstractHandler<>();
 }
