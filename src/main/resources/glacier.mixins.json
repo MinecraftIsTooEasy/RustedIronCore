@@ -1,0 +1,29 @@
+{
+  "compatibilityLevel": "JAVA_17",
+  "package": "huix.glacier.mixin",
+  "required": true,
+  "target": "DEFAULT",
+  "minVersion": "0.8.3",
+  "mixins": [
+    "MinecraftServerMixin",
+    "SaveHandlerMixin",
+    "block.BlockMixin",
+    "block.tileentity.TileEntityFurnaceMixin",
+    "client.gui.GuiContainerCreativeMixin",
+    "client.render.RenderArrowMixin",
+    "creativetab.CreativeTabsMixin",
+    "entity.ServerConfigurationManagerMixin",
+    "item.ItemArmorMixin",
+    "item.ItemArrowMixin",
+    "item.ItemBowMixin",
+    "item.ItemCoinMixin",
+    "item.ItemMixin",
+    "item.ItemNuggetMixin",
+    "item.ItemToolMixin",
+    "stat.StatListMixin",
+    "util.ReferenceFileWriterMixin"
+  ],
+  "client": [
+    "client.MinecraftClientMixin"
+  ]
+}

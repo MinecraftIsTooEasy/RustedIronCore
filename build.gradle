@@ -46,8 +46,8 @@ dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	mappings loom.fmlMCPMappings()
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-//	implementation("org.spongepowered:mixin:0.8.5")
 
+	implementation files("libs\\PinIn-Lib-1.6.0.jar")
 	implementation files(loom.getFML().toPath())
 }
 
