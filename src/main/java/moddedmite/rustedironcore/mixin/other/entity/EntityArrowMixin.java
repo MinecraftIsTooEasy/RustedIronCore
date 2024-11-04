@@ -1,10 +1,8 @@
 package moddedmite.rustedironcore.mixin.other.entity;
 
+import huix.glacier.api.extension.material.IBowMaterial;
 import moddedmite.rustedironcore.api.item.BowItem;
-import net.minecraft.Entity;
-import net.minecraft.EntityArrow;
-import net.minecraft.EntityPlayer;
-import net.minecraft.ItemStack;
+import net.minecraft.*;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -22,8 +20,12 @@ public abstract class EntityArrowMixin {
     private float modifySpeed(float velocity) {
         ItemStack launcher = this.getLauncher();
         if (launcher == null) return velocity;
-        if (launcher.getItem() instanceof BowItem bowItem && this.shootingEntity instanceof EntityPlayer)
-            velocity *= 1.0F + (bowItem.getVelocityBonusPercentage() / 100.0F);
+        if (launcher.getItem() instanceof ItemBow itemBow && itemBow.getMaterialForRepairs() instanceof IBowMaterial iBowMaterial && this.shootingEntity instanceof EntityPlayer) {
+            velocity *= 1.0F + (iBowMaterial.velocityBonus() / 100.0F);
+        }
+        if (launcher.getItem() instanceof BowItem bowItem) {// this is for compat
+            velocity *= 1.0F + (bowItem.velocityBonus() / 100.0F);
+        }
         return velocity;
     }
 }

@@ -1,6 +1,7 @@
 package moddedmite.rustedironcore.mixin.other.item;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import huix.glacier.api.extension.material.IBucketMaterial;
 import moddedmite.rustedironcore.api.util.BucketUtil;
 import moddedmite.rustedironcore.property.MaterialProperties;
 import net.minecraft.ItemBucket;
@@ -37,6 +38,11 @@ public abstract class ItemBucketMixin extends ItemVessel {
 
     @Inject(method = "getChanceOfMeltingWhenFilledWithLava", at = @At("HEAD"), cancellable = true)
     private void modifyChance(CallbackInfoReturnable<Float> cir) {
-        MaterialProperties.BucketMeltingChance.getOptional(this.getVesselMaterial()).ifPresent(cir::setReturnValue);
+        Material vesselMaterial = this.getVesselMaterial();
+        if (vesselMaterial instanceof IBucketMaterial iBucketMaterial) {
+            cir.setReturnValue(iBucketMaterial.getMeltingChance());
+            return;
+        }
+        MaterialProperties.BucketMeltingChance.getOptional(vesselMaterial).ifPresent(cir::setReturnValue);
     }
 }

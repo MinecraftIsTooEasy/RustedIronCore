@@ -45,7 +45,6 @@ public class RustedIronCore implements ModInitializer {
             public void onPlayerLoggedIn(PlayerLoggedInEvent event) {
                 ServerPlayer player = event.player();
                 Network.sendToClient(player, new S2CSyncNutritionLimit(((ServerPlayerAPI) player).getNutritionLimit()));
-                if (StringUtil.getCurrentLanguage().equals("en_US")) return;
                 player.addChatMessage("ric.statement");
                 if (event.firstLogin()) {
                     Network.sendToClient(player, new S2COpenGuiTips());
@@ -76,8 +75,6 @@ public class RustedIronCore implements ModInitializer {
         });
     }
 
-    public static int tipsGuiCounter = 0;
-    public static boolean displayedTipsGui = false;
     public static int changeTitleCounter = 0;
     public static int changeTitlePeriod = 100;
     public static boolean isNowRICTitle = false;

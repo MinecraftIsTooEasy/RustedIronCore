@@ -3,6 +3,7 @@ package moddedmite.rustedironcore.api.item;
 import net.minecraft.ItemBow;
 import net.minecraft.Material;
 
+@Deprecated(since = "1.3.5")
 public class BowItem extends ItemBow {
     private final int velocityBonusPercentage;
 
@@ -12,7 +13,7 @@ public class BowItem extends ItemBow {
         this.setMaxDamage(maxDamage);
     }
 
-    public int getVelocityBonusPercentage() {
+    public int velocityBonus() {
         return this.velocityBonusPercentage;
     }
 }

@@ -1,21 +1,18 @@
 package moddedmite.rustedironcore.mixin.other.item;
 
+import huix.glacier.api.extension.material.IBowMaterial;
 import moddedmite.rustedironcore.api.event.Handlers;
 import moddedmite.rustedironcore.api.item.BowItem;
-import net.minecraft.ItemBow;
-import net.minecraft.Material;
+import net.minecraft.*;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Constant;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyConstant;
+import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ItemBow.class)
-public class ItemBowMixin {
+public abstract class ItemBowMixin extends Item implements IDamageableItem {
     @Mutable
     @Shadow
     @Final
@@ -26,7 +23,16 @@ public class ItemBowMixin {
     @Final
     public static String[] bow_pull_icon_name_array;
 
-    @Inject(method = "<clinit>", at = @At("TAIL"))
+    @Shadow private Material reinforcement_material;
+
+    @Inject(method = "<init>", at = @At("RETURN"))
+    private void onInit(int id, Material reinforcement_material, CallbackInfo ci) {
+        if (reinforcement_material instanceof IBowMaterial bowMaterial) {
+            this.setMaxDamage(bowMaterial.maxDamage());
+        }
+    }
+
+    @Inject(method = "<clinit>", at = @At("RETURN"))
     private static void addArrowMaterials(CallbackInfo ci) {
         Handlers.ArrowRegister.onRegister();
         Material[] original = possible_arrow_materials;
@@ -46,8 +52,8 @@ public class ItemBowMixin {
 
     @ModifyConstant(method = "addInformation", constant = @Constant(intValue = 10))
     private int modifyBonus(int bonus) {
-        if ((ItemBow) (Object) this instanceof BowItem bowItem) {
-            return bowItem.getVelocityBonusPercentage();
+        if (this.reinforcement_material instanceof IBowMaterial iBowMaterial) {
+            return iBowMaterial.velocityBonus();
         }
         return bonus;
     }

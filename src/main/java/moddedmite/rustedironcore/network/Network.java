@@ -4,6 +4,8 @@ import moddedmite.rustedironcore.network.packets.S2COpenGuiTips;
 import moddedmite.rustedironcore.network.packets.S2CSyncNutritionLimit;
 import moddedmite.rustedironcore.network.packets.S2CSyncTradeRecipe;
 import moddedmite.rustedironcore.network.packets.S2CUpdateNutrition;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.ResourceLocation;
 import net.minecraft.ServerPlayer;
 
@@ -32,10 +34,12 @@ public class Network {
         registerClientReaders();
     }
 
+    @Environment(EnvType.SERVER)
     public static void sendToClient(ServerPlayer player, Packet packet) {
         clientSender.accept(player, packet);
     }
 
+    @Environment(EnvType.CLIENT)
     public static void sendToServer(Packet packet) {
         serverSender.accept(packet);
     }

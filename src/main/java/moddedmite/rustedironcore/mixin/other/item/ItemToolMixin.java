@@ -1,5 +1,6 @@
 package moddedmite.rustedironcore.mixin.other.item;
 
+import huix.glacier.api.extension.material.IToolMaterial;
 import moddedmite.rustedironcore.property.MaterialProperties;
 import net.minecraft.Item;
 import net.minecraft.ItemTool;
@@ -17,6 +18,10 @@ public class ItemToolMixin extends Item {
 
     @Inject(method = "getMaterialHarvestEfficiency", at = @At(value = "INVOKE", target = "Lnet/minecraft/Minecraft;setErrorMessage(Ljava/lang/String;)V"), cancellable = true)
     private void addMaterial(CallbackInfoReturnable<Float> cir) {
+        if (this.effective_material instanceof IToolMaterial toolMaterial) {
+            cir.setReturnValue(toolMaterial.getHarvestEfficiency());
+            return;
+        }
         MaterialProperties.HarvestEfficiency.getOptional(this.effective_material).ifPresent(cir::setReturnValue);
     }
 }

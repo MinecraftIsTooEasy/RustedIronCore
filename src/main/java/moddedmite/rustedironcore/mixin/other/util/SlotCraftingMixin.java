@@ -1,5 +1,6 @@
 package moddedmite.rustedironcore.mixin.other.util;
 
+import huix.glacier.api.extension.item.IRetainableItem;
 import moddedmite.rustedironcore.api.event.events.CraftingRecipeRegisterEvent;
 import moddedmite.rustedironcore.api.interfaces.IRecipeExtend;
 import moddedmite.rustedironcore.property.ItemProperties;
@@ -68,6 +69,9 @@ public abstract class SlotCraftingMixin extends Slot {
             if (itemStackInSlot.itemID == Block.workbench.blockID) {
                 this.thePlayer.inventory.addItemStackToInventoryOrDropIt(BlockWorkbench.getBlockComponent(itemStackInSlot.getItemSubtype()));
                 continue;
+            }
+            if (itemStackInSlot.getItem() instanceof IRetainableItem iRetainableItem) {
+                this.craftMatrix.setInventorySlotContents(slotIndex, iRetainableItem.getItemStackAfterCrafting(itemStackInSlot));
             }
             Optional<UnaryOperator<ItemStack>> optional = ItemProperties.CraftConsumeOverride.getOptional(itemStackInSlot.getItem());
             if (optional.isPresent()) {

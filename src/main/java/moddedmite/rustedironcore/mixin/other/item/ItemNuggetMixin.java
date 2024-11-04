@@ -1,5 +1,6 @@
 package moddedmite.rustedironcore.mixin.other.item;
 
+import huix.glacier.api.extension.material.IComboMaterial;
 import moddedmite.rustedironcore.api.item.NuggetItem;
 import net.minecraft.ItemNugget;
 import net.minecraft.Material;
@@ -17,6 +18,9 @@ public class ItemNuggetMixin {
         Map<Material, ItemNugget> materialItemNuggetMap = NuggetItem.getMaterialItemNuggetMap();
         if (materialItemNuggetMap.containsKey(material)) {
             cir.setReturnValue(materialItemNuggetMap.get(material));
+        }
+        if (material instanceof IComboMaterial comboMaterial){
+            cir.setReturnValue(comboMaterial.getNugget());
         }
     }
 }
