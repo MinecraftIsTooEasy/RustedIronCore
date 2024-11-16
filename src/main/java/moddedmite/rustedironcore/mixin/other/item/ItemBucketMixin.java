@@ -2,7 +2,7 @@ package moddedmite.rustedironcore.mixin.other.item;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import huix.glacier.api.extension.material.IBucketMaterial;
-import moddedmite.rustedironcore.api.util.BucketUtil;
+import moddedmite.rustedironcore.api.util.VesselUtil;
 import moddedmite.rustedironcore.property.MaterialProperties;
 import net.minecraft.ItemBucket;
 import net.minecraft.ItemVessel;
@@ -22,7 +22,7 @@ public abstract class ItemBucketMixin extends ItemVessel {
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void register(int id, Material material, Material contents, CallbackInfo ci) {
-        BucketUtil.register(material, contents, (ItemBucket) (Object) this);
+        VesselUtil.registerBucket(material, contents, (ItemBucket) (Object) this);
     }
 
     @ModifyExpressionValue(method = "onItemRightClick", at = @At(value = "INVOKE", target = "Lnet/minecraft/ItemBucket;getPeerForContents(Lnet/minecraft/Material;)Lnet/minecraft/ItemVessel;"))
@@ -33,7 +33,7 @@ public abstract class ItemBucketMixin extends ItemVessel {
 
     @Inject(method = "getPeer", at = @At("HEAD"), cancellable = true)
     private static void makeSafe(Material vessel_material, Material contents, CallbackInfoReturnable<ItemVessel> cir) {
-        BucketUtil.getBucket(vessel_material, contents).ifPresent(cir::setReturnValue);
+        VesselUtil.getBucket(vessel_material, contents).ifPresent(cir::setReturnValue);
     }
 
     @Inject(method = "getChanceOfMeltingWhenFilledWithLava", at = @At("HEAD"), cancellable = true)

@@ -25,4 +25,6 @@ public class Handlers {
     public static final EntityTrackerHandler EntityTracker = new EntityTrackerHandler();
     public static final TimedTaskHandler TimedTask = new TimedTaskHandler();
     public static final AbstractHandler<Runnable> PotionRegistry = new AbstractHandler<>();
+    public static final AchievementHandler Achievement = new AchievementHandler();
+    public static final BarbecueHandler Barbecue = new BarbecueHandler();
 }

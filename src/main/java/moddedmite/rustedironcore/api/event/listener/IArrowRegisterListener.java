@@ -1,14 +1,15 @@
 package moddedmite.rustedironcore.api.event.listener;
 
-import huix.glacier.api.extension.material.IArrowMaterial;
 import moddedmite.rustedironcore.property.FloatProperty;
 import net.minecraft.Material;
 
 import java.util.function.Consumer;
 
 public interface IArrowRegisterListener {
-    void onRegister(FloatProperty<Material> arrowRecoveryChance);
+    @Deprecated(since = "1.3.6")
+    default void onRegister(FloatProperty<Material> registry) {
+    }
 
-    default <T extends Material & IArrowMaterial> void onRegister(Consumer<T> registry) {
+    default void onRegister(Consumer<Material> registry) {
     }
 }

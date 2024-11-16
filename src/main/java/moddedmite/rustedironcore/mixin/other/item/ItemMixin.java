@@ -36,6 +36,7 @@ public abstract class ItemMixin {
 
     @Inject(method = "getHeatLevel", at = @At("HEAD"), cancellable = true)
     private void injectHeatLevel(ItemStack item_stack, CallbackInfoReturnable<Integer> cir) {
+        if (item_stack == null) return;
         Item item = item_stack.getItem();
         if (item instanceof IFuelItem iFuelItem) {
             cir.setReturnValue(iFuelItem.getHeatLevel());
@@ -45,6 +46,7 @@ public abstract class ItemMixin {
 
     @Inject(method = "getBurnTime", at = @At("HEAD"), cancellable = true)
     private void injectBurnTime(ItemStack item_stack, CallbackInfoReturnable<Integer> cir) {
+        if (item_stack == null) return;
         Item item = item_stack.getItem();
         if (item instanceof IFuelItem iFuelItem) {
             cir.setReturnValue(iFuelItem.getBurnTime());

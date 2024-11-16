@@ -3,7 +3,6 @@
   "id": "rusted_iron_core",
   "version": "${version}",
   "depends": {
-    "mite": "1.6.4",
     "fishmodloader": ">=3.0.0"
   },
   "environment": "*",

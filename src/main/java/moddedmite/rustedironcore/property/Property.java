@@ -39,6 +39,10 @@ public class Property<T, VALUE> {
         return this.map.keySet();
     }
 
+    public Collection<VALUE> values() {
+        return this.map.values();
+    }
+
     public String getName() {
         return this.name;
     }

@@ -47,6 +47,7 @@ public class TradingHandler extends EventHandler<TradingRegisterEvent> {
     public static final VillagerSettings Smith = new VillagerSettings(3,"villager.profession.smith", VillagerSettings.SmithTexture);
     public static final VillagerSettings Butcher = new VillagerSettings(4,"villager.profession.butcher", VillagerSettings.ButcherTexture);
 
+    @SuppressWarnings("unchecked")
     public static final Consumer<TradingRegisterEvent> VanillaListener = event -> {
 
         event.registerProfession(0, Farmer);
