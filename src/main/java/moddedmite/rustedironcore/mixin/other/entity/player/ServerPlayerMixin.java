@@ -61,7 +61,7 @@ public abstract class ServerPlayerMixin extends EntityPlayer implements ServerPl
     }
 
     @Override
-    public int getNutritionLimit() {
+    public int ric$GetNutritionLimit() {
         return this.nutritionLimit;
     }
 

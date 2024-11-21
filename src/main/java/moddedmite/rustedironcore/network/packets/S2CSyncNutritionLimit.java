@@ -1,7 +1,7 @@
 package moddedmite.rustedironcore.network.packets;
 
 import moddedmite.rustedironcore.api.player.ClientPlayerAPI;
-import moddedmite.rustedironcore.network.Network;
+import moddedmite.rustedironcore.internal.network.Packets;
 import moddedmite.rustedironcore.network.Packet;
 import moddedmite.rustedironcore.network.PacketByteBuf;
 import net.minecraft.EntityClientPlayerMP;
@@ -26,11 +26,11 @@ public class S2CSyncNutritionLimit implements Packet {
 
     @Override
     public void apply(EntityPlayer entityPlayer) {
-        ((ClientPlayerAPI) (EntityClientPlayerMP) entityPlayer).setNutritionLimit(this.limit);
+        ((ClientPlayerAPI) (EntityClientPlayerMP) entityPlayer).ric$SetNutritionLimit(this.limit);
     }// this double cast is necessary
 
     @Override
     public ResourceLocation getChannel() {
-        return Network.SyncNutritionLimit;
+        return Packets.SyncNutritionLimit;
     }
 }

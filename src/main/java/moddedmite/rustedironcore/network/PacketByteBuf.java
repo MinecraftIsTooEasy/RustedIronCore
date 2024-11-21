@@ -13,6 +13,8 @@ import java.nio.charset.StandardCharsets;
 public interface PacketByteBuf {
     byte readByte();
 
+    short readShort();
+
     ItemStack readItemStack();
 
     String readString();
@@ -31,6 +33,8 @@ public interface PacketByteBuf {
 
     void writeByte(int paramInt);
 
+    void writeShort(int paramInt);
+
     void writeItemStack(ItemStack paramItemStack);
 
     void writeString(String paramString);
@@ -47,8 +51,21 @@ public interface PacketByteBuf {
 
     void writeDouble(double paramDouble);
 
+
+
+
+
     static PacketByteBuf out(final DataOutputStream out) {
         return new PacketByteBuf() {
+            @Override
+            public void writeShort(int paramInt) {
+                try {
+                    out.writeShort(paramInt);
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+            }
+
             public void writeVarInt(int value) {
                 while ((value & 0xFFFFFF80) != 0) {
                     writeByte(value & 0x7F | 0x80);
@@ -120,6 +137,11 @@ public interface PacketByteBuf {
                 }
             }
 
+            @Override
+            public short readShort() {
+                throw new UnsupportedOperationException();
+            }
+
             public int readVarInt() {
                 throw new UnsupportedOperationException();
             }
@@ -161,6 +183,15 @@ public interface PacketByteBuf {
 
     static PacketByteBuf in(final DataInputStream in) {
         return new PacketByteBuf() {
+            @Override
+            public short readShort() {
+                try{
+                    return in.readShort();
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+            }
+
             public int readVarInt() {
                 byte b;
                 int i = 0;
@@ -240,6 +271,11 @@ public interface PacketByteBuf {
                 } catch (IOException e) {
                     throw new UncheckedIOException(e);
                 }
+            }
+
+            @Override
+            public void writeShort(int paramInt) {
+                throw new UnsupportedOperationException();
             }
 
             public void writeVarInt(int value) {

@@ -1,6 +1,6 @@
 package moddedmite.rustedironcore.network.packets;
 
-import moddedmite.rustedironcore.network.Network;
+import moddedmite.rustedironcore.internal.network.Packets;
 import moddedmite.rustedironcore.network.Packet;
 import moddedmite.rustedironcore.network.PacketByteBuf;
 import net.minecraft.EntityClientPlayerMP;
@@ -32,14 +32,14 @@ public class S2CUpdateNutrition implements Packet {
     @Override
     public void apply(EntityPlayer entityPlayer) {
         EntityClientPlayerMP clientPlayer = (EntityClientPlayerMP) entityPlayer;
-        clientPlayer.setPhytonutrients(this.phytonutrients);
-        clientPlayer.setProtein(this.protein);
-        clientPlayer.setEssentialFats(this.essential_fats);
+        clientPlayer.ric$SetPhytonutrients(this.phytonutrients);
+        clientPlayer.ric$SetProtein(this.protein);
+        clientPlayer.ric$SetEssentialFats(this.essential_fats);
     }
 
     @Override
     public ResourceLocation getChannel() {
-        return Network.UpdateNutrition;
+        return Packets.UpdateNutrition;
     }
 }
 

@@ -1,7 +1,7 @@
 package moddedmite.rustedironcore.api.player;
 
 public interface PlayerAPI {
-    boolean firstLogin();
+    boolean ric$IsFirstLogin();
 
-    void setFirstLogin(boolean firstLogin);
+    void ric$SetFirstLogin(boolean firstLogin);
 }

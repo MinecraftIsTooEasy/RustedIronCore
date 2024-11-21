@@ -26,9 +26,9 @@ repositories {
 loom {
 	accessWidenerPath = file("src/main/resources/RustedIronCore.accesswidener")
 	mergedMinecraftJar()
-	setFML(new File("F:\\Projects\\IDEA\\Minecraft\\MITE\\FML3\\FishModLoader-v3.3.2.jar"))
+	setFML(new File("${lib_dir}/${fish_mod_loader}"))
 	mods {
-		"MITE-Creation" {
+		"${archives_base_name}" {
 			sourceSet sourceSets.main
 		}
 	}
@@ -36,8 +36,7 @@ loom {
 }
 
 runClient{
-	args("--username", "Xy_Lose", "--session", "a.a.a.a", "--width", 854, "--height", 480)
-//	jvmArgs.add("-Dminecraft.client.jar=F:\\\\MITE Plus R5\\\\.minecraft\\\\versions\\\\1.6.4-MITE\\\\1.6.4-MITE.jar")
+	args("--username", "${username}", "--session", "a.a.a.a", "--width", 854, "--height", 480)
 }
 
 dependencies {
@@ -47,8 +46,10 @@ dependencies {
 	mappings loom.fmlMCPMappings()
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-	implementation files("libs\\PinIn-Lib-1.6.0.jar")
+	// Compile needed
+	implementation files("${lib_dir}/PinIn-Lib-1.6.0.jar")
 	implementation files(loom.getFML().toPath())
+
 }
 
 processResources {

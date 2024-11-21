@@ -27,4 +27,8 @@ public class Handlers {
     public static final AbstractHandler<Runnable> PotionRegistry = new AbstractHandler<>();
     public static final AchievementHandler Achievement = new AchievementHandler();
     public static final BarbecueHandler Barbecue = new BarbecueHandler();
+    public static final InitializationHandler Initialization = new InitializationHandler();
+    public static final WorldLoadHandler WorldLoad = new WorldLoadHandler();
+    public static final ChunkLoadHandler ChunkLoad = new ChunkLoadHandler();
+    public static final ConnectionHandler Connection = new ConnectionHandler();
 }

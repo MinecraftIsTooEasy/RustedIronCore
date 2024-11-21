@@ -1,6 +1,6 @@
 package moddedmite.rustedironcore.network.packets;
 
-import moddedmite.rustedironcore.network.Network;
+import moddedmite.rustedironcore.internal.network.Packets;
 import moddedmite.rustedironcore.network.Packet;
 import moddedmite.rustedironcore.network.PacketByteBuf;
 import net.minecraft.EntityPlayer;
@@ -22,6 +22,6 @@ public class S2COpenGuiTips implements Packet {
 
     @Override
     public ResourceLocation getChannel() {
-        return Network.OpenGuiTips;
+        return Packets.OpenGuiTips;
     }
 }

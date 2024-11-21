@@ -16,10 +16,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MinecraftServerMixin {
     @Inject(method = "playerLoggedIn", at = @At("RETURN"))
     private void onPlayerLoggedIn(ServerPlayer player, CallbackInfo ci) {
-        boolean firstLogin = (((PlayerAPI) (EntityPlayer) player)).firstLogin();
+        boolean firstLogin = (((PlayerAPI) (EntityPlayer) player)).ric$IsFirstLogin();
         Handlers.PlayerEvent.onPlayerLoggedIn(new PlayerLoggedInEvent(player, firstLogin));
         if (firstLogin) {
-            ((PlayerAPI) ((EntityPlayer) player)).setFirstLogin(false);
+            ((PlayerAPI) ((EntityPlayer) player)).ric$SetFirstLogin(false);
         }
     }
 
@@ -28,7 +28,7 @@ public class MinecraftServerMixin {
         Handlers.PlayerEvent.onPlayerLoggedOut(new PlayerLoggedOutEvent(player));
     }
 
-    @Inject(method = "tick", at = @At("HEAD"))
+    @Inject(method = "tick", at = @At("RETURN"))
     private void onTick(CallbackInfo ci) {
         Handlers.Tick.onServerTick(MinecraftServer.getServer());
     }

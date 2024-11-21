@@ -1,6 +1,6 @@
 package moddedmite.rustedironcore.network.packets;
 
-import moddedmite.rustedironcore.network.Network;
+import moddedmite.rustedironcore.internal.network.Packets;
 import moddedmite.rustedironcore.network.Packet;
 import moddedmite.rustedironcore.network.PacketByteBuf;
 import net.minecraft.*;
@@ -37,6 +37,6 @@ public class S2CSyncTradeRecipe implements Packet {
 
     @Override
     public ResourceLocation getChannel() {
-        return Network.SyncTradeRecipe;
+        return Packets.SyncTradeRecipe;
     }
 }

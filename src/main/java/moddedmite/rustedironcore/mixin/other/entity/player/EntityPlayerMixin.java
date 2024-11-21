@@ -40,16 +40,16 @@ public abstract class EntityPlayerMixin extends EntityLivingBase implements Play
 
     @Inject(method = "clonePlayer", at = @At("RETURN"))
     private void onClone(EntityPlayer par1EntityPlayer, boolean par2, CallbackInfo ci) {
-        this.firstLogin = ((PlayerAPI) par1EntityPlayer).firstLogin();
+        this.firstLogin = ((PlayerAPI) par1EntityPlayer).ric$IsFirstLogin();
     }
 
     @Override
-    public boolean firstLogin() {
+    public boolean ric$IsFirstLogin() {
         return this.firstLogin;
     }
 
     @Override
-    public void setFirstLogin(boolean firstLogin) {
+    public void ric$SetFirstLogin(boolean firstLogin) {
         this.firstLogin = firstLogin;
     }
 

@@ -13,6 +13,6 @@ import org.spongepowered.asm.mixin.injection.At;
 public class BlockFireMixin {
     @WrapOperation(method = "tryExtinguishByItems", at = @At(value = "INVOKE", target = "Lnet/minecraft/ItemStack;getItem()Lnet/minecraft/Item;"))
     private Item redirectSoICanExtinguishFire(ItemStack instance, Operation<Item> original) {
-        return Handlers.Barbecue.getCookResult(instance) != null ? Item.porkRaw : original.call(instance);
+        return Handlers.Barbecue.getCookResult(instance).isPresent() ? Item.porkRaw : original.call(instance);
     }
 }

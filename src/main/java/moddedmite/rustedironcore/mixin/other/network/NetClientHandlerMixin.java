@@ -2,7 +2,6 @@ package moddedmite.rustedironcore.mixin.other.network;
 
 import moddedmite.rustedironcore.api.event.Handlers;
 import moddedmite.rustedironcore.api.event.handler.EntityTrackerHandler;
-import moddedmite.rustedironcore.network.Packet;
 import moddedmite.rustedironcore.network.PacketByteBuf;
 import moddedmite.rustedironcore.network.PacketReader;
 import moddedmite.rustedironcore.network.PacketSupplier;
@@ -35,11 +34,19 @@ public abstract class NetClientHandlerMixin {
             if (payload.data == null) {
                 payload.data = new byte[0];
             }
-            Packet packet = packetSupplier.readPacket(PacketByteBuf.in(new DataInputStream(new ByteArrayInputStream(payload.data))));
-            packet.apply(this.mc.thePlayer);
+            packetSupplier.readPacket(PacketByteBuf.in(new DataInputStream(new ByteArrayInputStream(payload.data)))).apply(this.mc.thePlayer);
         }
     }
 
+    @Inject(method = "handleLogin", at = @At("RETURN"))
+    private void onClientLoggedIn(Packet1Login par1Packet1Login, CallbackInfo ci) {
+        Handlers.Connection.onClientLoggedIn((NetClientHandler) (Object) this, par1Packet1Login);
+    }
+
+    @Inject(method = "quitWithPacket", at = @At(value = "INVOKE", target = "Lnet/minecraft/INetworkManager;addToSendQueue(Lnet/minecraft/Packet;)V"))
+    private void onClientQuit(Packet par1Packet, CallbackInfo ci) {
+        Handlers.Connection.onClientQuit((NetClientHandler) (Object) this,(Packet255KickDisconnect) par1Packet);
+    }
 
     @Inject(method = "handleVehicleSpawn", at = @At("HEAD"), cancellable = true)
     private void addEntityReaders(Packet23VehicleSpawn par1Packet23VehicleSpawn, CallbackInfo ci) {

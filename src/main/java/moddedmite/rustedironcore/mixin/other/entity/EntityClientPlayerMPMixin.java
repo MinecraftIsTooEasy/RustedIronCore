@@ -40,42 +40,42 @@ public abstract class EntityClientPlayerMPMixin extends ClientPlayer implements 
     }
 
     @Override
-    public int getPhytonutrients() {
+    public int ric$GetPhytonutrients() {
         return this.phytonutrients;
     }
 
     @Override
-    public void setPhytonutrients(int phytonutrients) {
+    public void ric$SetPhytonutrients(int phytonutrients) {
         this.phytonutrients = phytonutrients;
     }
 
     @Override
-    public int getProtein() {
+    public int ric$GetProtein() {
         return this.protein;
     }
 
     @Override
-    public void setProtein(int protein) {
+    public void ric$SetProtein(int protein) {
         this.protein = protein;
     }
 
     @Override
-    public int getEssentialFats() {
+    public int ric$GetEssentialFats() {
         return this.essential_fats;
     }
 
     @Override
-    public void setEssentialFats(int essential_fats) {
+    public void ric$SetEssentialFats(int essential_fats) {
         this.essential_fats = essential_fats;
     }
 
     @Override
-    public int getNutritionLimit() {
+    public int ric$GetNutritionLimit() {
         return this.nutrition_limit;
     }
 
     @Override
-    public void setNutritionLimit(int nutrition_limit) {
+    public void ric$SetNutritionLimit(int nutrition_limit) {
         this.nutrition_limit = nutrition_limit;
     }
 }
