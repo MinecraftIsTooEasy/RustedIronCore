@@ -3,6 +3,7 @@ package moddedmite.rustedironcore.internal.event.listeners;
 import moddedmite.rustedironcore.api.event.listener.ITickListener;
 import moddedmite.rustedironcore.api.util.GuiUtil;
 import moddedmite.rustedironcore.api.util.StringUtil;
+import moddedmite.rustedironcore.network.packets.S2COpenGuiTips;
 import net.minecraft.Minecraft;
 
 public class TickListener implements ITickListener {
@@ -13,6 +14,10 @@ public class TickListener implements ITickListener {
 
     @Override
     public void onClientTick(Minecraft client) {
+        if (S2COpenGuiTips.firstLoginStatementCounter > 0) {
+            S2COpenGuiTips.firstLoginStatementCounter--;
+        }
+
         if (StringUtil.getCurrentLanguage().equals("en_US")) return;
         changeTitleCounter++;
         if (changeTitleCounter >= changeTitlePeriod) {

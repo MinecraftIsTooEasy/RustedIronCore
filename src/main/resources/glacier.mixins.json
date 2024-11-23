@@ -7,10 +7,8 @@
   "mixins": [
     "MinecraftServerMixin",
     "block.BlockMixin",
-    "block.tileentity.TileEntityFurnaceMixin",
     "client.gui.GuiContainerCreativeMixin",
     "creativetab.CreativeTabsMixin",
-    "item.ItemCoinMixin",
     "stat.StatListMixin",
     "util.ReferenceFileWriterMixin"
   ],

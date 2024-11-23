@@ -6,7 +6,9 @@ import net.minecraft.ItemBowl;
 import net.minecraft.ItemBucket;
 import net.minecraft.Material;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 public class VesselUtil {
     // vessel, content, instance

@@ -2,13 +2,18 @@ package moddedmite.rustedironcore.mixin.other.item;
 
 import huix.glacier.api.extension.material.IBowMaterial;
 import moddedmite.rustedironcore.api.event.Handlers;
-import moddedmite.rustedironcore.api.item.BowItem;
-import net.minecraft.*;
+import net.minecraft.IDamageableItem;
+import net.minecraft.Item;
+import net.minecraft.ItemBow;
+import net.minecraft.Material;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.*;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Constant;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ItemBow.class)

@@ -1,6 +1,7 @@
 package moddedmite.rustedironcore.mixin.other.tileEntity;
 
 import huix.glacier.api.extension.item.IFusibleItem;
+import huix.glacier.api.registry.MinecraftRegistry;
 import moddedmite.rustedironcore.api.event.Handlers;
 import moddedmite.rustedironcore.api.event.handler.SmeltingHandler;
 import moddedmite.rustedironcore.property.ItemProperties;
@@ -152,6 +153,10 @@ public abstract class TileEntityFurnaceMixin extends TileEntity {
         }
         if (item.isBlock() && item.getAsItemBlock().getBlock() instanceof IFusibleItem iFusibleItem) {
             cir.setReturnValue(iFusibleItem.getHeatLevelRequired());
+            return;
+        }
+        if (MinecraftRegistry.instance != null && MinecraftRegistry.instance.itemHeatLevelMap.containsKey(item_id)) {
+            cir.setReturnValue(MinecraftRegistry.instance.itemHeatLevelMap.get(item_id));
             return;
         }
         ItemProperties.HeatLevelRequired.getOptional(item).ifPresent(cir::setReturnValue);
