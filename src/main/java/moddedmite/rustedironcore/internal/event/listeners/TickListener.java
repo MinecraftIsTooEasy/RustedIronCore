@@ -18,7 +18,7 @@ public class TickListener implements ITickListener {
             S2COpenGuiTips.firstLoginStatementCounter--;
         }
 
-        if (StringUtil.getCurrentLanguage().equals("en_US")) return;
+        if (!StringUtil.getCurrentLanguage().equals("zh_CN")) return;
         changeTitleCounter++;
         if (changeTitleCounter >= changeTitlePeriod) {
             if (isNowRICTitle) {
