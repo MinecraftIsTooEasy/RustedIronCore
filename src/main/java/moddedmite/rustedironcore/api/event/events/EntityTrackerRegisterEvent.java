@@ -10,6 +10,12 @@ import net.minecraft.Packet23VehicleSpawn;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+/*
+* you should always register a tracker and a packet as a pair.
+* the tracker let the server know what entity to sync with client.
+* the param, PacketSupplier, let the server know how to send the packet syncing the entity.
+* the param, EntitySupplier, let the client know how to decode the packet from the server.
+* */
 public class EntityTrackerRegisterEvent {
     public void registerEntityTracker(Predicate<Entity> predicate, int blocksDistanceThreshold, int updateFrequency) {
         registerEntityTracker(predicate, blocksDistanceThreshold, updateFrequency, false);

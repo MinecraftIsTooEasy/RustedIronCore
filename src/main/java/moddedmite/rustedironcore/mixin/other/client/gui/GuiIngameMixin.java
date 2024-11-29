@@ -1,5 +1,6 @@
 package moddedmite.rustedironcore.mixin.other.client.gui;
 
+import moddedmite.rustedironcore.api.event.Handlers;
 import moddedmite.rustedironcore.api.util.StringUtil;
 import moddedmite.rustedironcore.internal.config.RICConfig;
 import moddedmite.rustedironcore.network.packets.S2COpenGuiTips;
@@ -39,6 +40,7 @@ public class GuiIngameMixin extends Gui {
 //    }
     @Inject(method = "renderGameOverlay(FZII)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/Minecraft;inDevMode()Z"))
     private void renderStatement(float par1, boolean par2, int par3, int par4, CallbackInfo ci) {
+        Handlers.Tick.onRenderTick(par1);
         if (!this.shouldRenderStatement()) return;
         ScaledResolution scaledResolution = new ScaledResolution(this.mc.gameSettings, this.mc.displayWidth, this.mc.displayHeight);
         int x = scaledResolution.getScaledWidth() / 2;

@@ -32,5 +32,8 @@ public class EventHandler<T> extends AbstractHandler<Consumer<T>> {
         this.pre.forEach(x -> x.accept(t));
         this.listeners.forEach(x -> x.accept(t));
         this.post.forEach(x -> x.accept(t));
+        this.pre.clear();
+        this.listeners.clear();
+        this.post.clear();
     }
 }

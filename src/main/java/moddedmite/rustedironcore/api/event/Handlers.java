@@ -1,6 +1,8 @@
 package moddedmite.rustedironcore.api.event;
 
 import moddedmite.rustedironcore.api.event.handler.*;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 
 public class Handlers {
     public static final BeaconUpdateHandler BeaconUpdate = new BeaconUpdateHandler();
@@ -10,6 +12,7 @@ public class Handlers {
     public static final EntityMobMixinHandler EntityMobMixin = new EntityMobMixinHandler();
     public static final FurnaceUpdateHandler FurnaceUpdate = new FurnaceUpdateHandler();
     public static final GravelDropHandler GravelDrop = new GravelDropHandler();
+    @Environment(EnvType.SERVER)
     public static final PlayerEventHandler PlayerEvent = new PlayerEventHandler();
     public static final ArrowRegisterHandler ArrowRegister = new ArrowRegisterHandler();
     // this is called after items and blocks are registered
@@ -28,7 +31,12 @@ public class Handlers {
     public static final AchievementHandler Achievement = new AchievementHandler();
     public static final BarbecueHandler Barbecue = new BarbecueHandler();
     public static final InitializationHandler Initialization = new InitializationHandler();
+    @Environment(EnvType.CLIENT)
     public static final WorldLoadHandler WorldLoad = new WorldLoadHandler();
     public static final ChunkLoadHandler ChunkLoad = new ChunkLoadHandler();
     public static final ConnectionHandler Connection = new ConnectionHandler();
+    @Environment(EnvType.CLIENT)
+    public static final KeybindingHandler Keybinding = new KeybindingHandler();
+    @Environment(EnvType.CLIENT)
+    public static final ArmorModelHandler ArmorModel = new ArmorModelHandler();
 }

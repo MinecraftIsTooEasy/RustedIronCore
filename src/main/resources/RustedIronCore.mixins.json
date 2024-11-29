@@ -6,8 +6,11 @@
   "minVersion": "0.8.3",
   "mixins": [
     "api.client.audio.SoundsMITEMixin",
+    "api.client.render.RenderBipedMixin",
     "api.client.render.RenderMixin",
+    "api.client.render.RenderPlayerMixin",
     "api.client.render.RenderVillagerMixin",
+    "api.client.util.GameSettingsMixin",
     "other.block.BlockFireMixin",
     "other.block.BlockGravelMixin",
     "other.chunk.ChunkProviderClientMixin",
