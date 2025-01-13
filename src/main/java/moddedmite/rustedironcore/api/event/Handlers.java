@@ -39,4 +39,6 @@ public class Handlers {
     public static final KeybindingHandler Keybinding = new KeybindingHandler();
     @Environment(EnvType.CLIENT)
     public static final ArmorModelHandler ArmorModel = new ArmorModelHandler();
+    public static final WorldInfoHandler WorldInfo = new WorldInfoHandler();
+    public static final StructureHandler Structure = new StructureHandler();
 }
