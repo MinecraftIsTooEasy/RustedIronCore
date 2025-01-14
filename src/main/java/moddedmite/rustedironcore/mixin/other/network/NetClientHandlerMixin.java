@@ -7,6 +7,7 @@ import moddedmite.rustedironcore.network.PacketReader;
 import moddedmite.rustedironcore.network.PacketSupplier;
 import net.minecraft.*;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -45,7 +46,7 @@ public abstract class NetClientHandlerMixin {
 
     @Inject(method = "quitWithPacket", at = @At(value = "INVOKE", target = "Lnet/minecraft/INetworkManager;addToSendQueue(Lnet/minecraft/Packet;)V"))
     private void onClientQuit(Packet par1Packet, CallbackInfo ci) {
-        Handlers.Connection.onClientQuit((NetClientHandler) (Object) this,(Packet255KickDisconnect) par1Packet);
+        Handlers.Connection.onClientQuit((NetClientHandler) (Object) this, (Packet255KickDisconnect) par1Packet);
     }
 
     @Inject(method = "handleVehicleSpawn", at = @At("HEAD"), cancellable = true)
@@ -101,5 +102,27 @@ public abstract class NetClientHandlerMixin {
             var8.setVelocity(par1Packet23VehicleSpawn.approx_motion_x, par1Packet23VehicleSpawn.approx_motion_y, par1Packet23VehicleSpawn.approx_motion_z);
         }
 
+    }
+
+
+    /**
+     * @author Debris
+     * @reason api
+     */
+    @Overwrite
+    public void handleTileEntityData(Packet132TileEntityData par1Packet132TileEntityData) {
+        TileEntity var2;
+        if (this.mc.theWorld.blockExists(par1Packet132TileEntityData.xPosition, par1Packet132TileEntityData.yPosition, par1Packet132TileEntityData.zPosition) && (var2 = this.mc.theWorld.getBlockTileEntity(par1Packet132TileEntityData.xPosition, par1Packet132TileEntityData.yPosition, par1Packet132TileEntityData.zPosition)) != null) {
+            if (par1Packet132TileEntityData.actionType == 1 && var2 instanceof TileEntityMobSpawner) {
+                var2.readFromNBT(par1Packet132TileEntityData.data);
+            } else if (par1Packet132TileEntityData.actionType == 2 && var2 instanceof TileEntityCommandBlock) {
+                var2.readFromNBT(par1Packet132TileEntityData.data);
+            } else if (par1Packet132TileEntityData.actionType == 3 && var2 instanceof TileEntityBeacon) {
+                var2.readFromNBT(par1Packet132TileEntityData.data);
+            } else if (par1Packet132TileEntityData.actionType == 4 && var2 instanceof TileEntitySkull) {
+                var2.readFromNBT(par1Packet132TileEntityData.data);
+            } else if (Handlers.TileEntityData.shouldRead(par1Packet132TileEntityData.actionType, var2))
+                var2.readFromNBT(par1Packet132TileEntityData.data);
+        }
     }
 }

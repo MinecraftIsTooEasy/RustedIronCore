@@ -56,9 +56,10 @@ public class SpawnConditionHandler extends EventHandler<SpawnConditionRegisterEv
         };
     }
 
-    // if you want your monster to spawn without checking, just do not register
-    // the result can be different from your original class, for example creeper can become infernal
-    // returning null means try next loop
+    /**
+     * The spawn result can be different from your original class, for example creeper can become infernal.
+     * Returning null means try next loop.
+     */
     @FunctionalInterface
     public interface SpawnCondition {
         Class<? extends Entity> getResult(World world, int x, int y, int z);

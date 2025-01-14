@@ -3,10 +3,7 @@ package moddedmite.rustedironcore.mixin.other.util;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import moddedmite.rustedironcore.api.event.Handlers;
-import moddedmite.rustedironcore.api.event.events.CraftingRecipeRegisterEvent;
-import moddedmite.rustedironcore.api.event.events.EntityTrackerRegisterEvent;
-import moddedmite.rustedironcore.api.event.events.SmeltingRecipeRegisterEvent;
-import moddedmite.rustedironcore.api.event.events.SpawnConditionRegisterEvent;
+import moddedmite.rustedironcore.api.event.events.*;
 import net.minecraft.*;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -49,6 +46,7 @@ public abstract class CraftingManagerMixin {
         Handlers.SpawnCondition.publish(new SpawnConditionRegisterEvent());
         Handlers.EntityTracker.publish(new EntityTrackerRegisterEvent());
         Handlers.LootTable.onFishingRegister();
+        Handlers.TileEntityData.publish(new TileEntityDataTypeRegisterEvent());
     }
 
     @Inject(method = "findMatchingRecipe", at = @At(value = "INVOKE", target = "Lnet/minecraft/InventoryCrafting;getEventHandler()Lnet/minecraft/Container;"), locals = LocalCapture.CAPTURE_FAILSOFT, cancellable = true)
