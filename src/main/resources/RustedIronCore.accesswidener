@@ -1,6 +1,9 @@
 accessWidener v2 named
 
+accessible method net/minecraft/BiomeDecorator genMinable (ILnet/minecraft/WorldGenMinable;Z)V
+
 extendable class net/minecraft/BlockDoor
+
 accessible field net/minecraft/NetClientHandler mc Lnet/minecraft/Minecraft;
 accessible field net/minecraft/Material name Ljava/lang/String;
 

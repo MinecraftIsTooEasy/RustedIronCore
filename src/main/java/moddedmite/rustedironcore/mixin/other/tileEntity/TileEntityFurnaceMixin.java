@@ -147,14 +147,7 @@ public abstract class TileEntityFurnaceMixin extends TileEntity {
     @Inject(method = "getHeatLevelRequired", at = @At("HEAD"), cancellable = true)
     private static void injectHeatLevel(int item_id, CallbackInfoReturnable<Integer> cir) {
         Item item = Item.getItem(item_id);
-        if (item instanceof IFusibleItem iFusibleItem) {
-            cir.setReturnValue(iFusibleItem.getHeatLevelRequired());
-            return;
-        }
-        if (item.isBlock() && item.getAsItemBlock().getBlock() instanceof IFusibleItem iFusibleItem) {
-            cir.setReturnValue(iFusibleItem.getHeatLevelRequired());
-            return;
-        }
+        IFusibleItem.cast(item).ifPresent(x -> cir.setReturnValue(x.getHeatLevelRequired()));
         if (MinecraftRegistry.instance != null && MinecraftRegistry.instance.itemHeatLevelMap.containsKey(item_id)) {
             cir.setReturnValue(MinecraftRegistry.instance.itemHeatLevelMap.get(item_id));
             return;

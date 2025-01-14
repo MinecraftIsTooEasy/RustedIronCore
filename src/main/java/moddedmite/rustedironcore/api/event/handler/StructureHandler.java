@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Random;
 
 public class StructureHandler extends EventHandler<StructureRegisterEvent> {
-    public Map<Dimension, List<MapGenStructure>> STRUCTURE_MAP = new HashMap<>();
+    public final Map<Dimension, List<MapGenStructure>> STRUCTURE_MAP = new HashMap<>();
 
     /**
      * The bytes are called ChunkPrimer in 1.12, contains the data of the chunk.

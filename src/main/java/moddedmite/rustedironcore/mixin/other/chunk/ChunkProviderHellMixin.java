@@ -2,6 +2,7 @@ package moddedmite.rustedironcore.mixin.other.chunk;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import moddedmite.rustedironcore.api.event.Handlers;
+import moddedmite.rustedironcore.api.event.handler.BiomeDecorationHandler;
 import moddedmite.rustedironcore.api.world.Dimension;
 import net.minecraft.Chunk;
 import net.minecraft.ChunkProviderHell;
@@ -37,5 +38,16 @@ public abstract class ChunkProviderHellMixin implements IChunkProvider {
     @Inject(method = "recreateStructures", at = @At(value = "INVOKE", target = "Lnet/minecraft/MapGenNetherBridge;generate(Lnet/minecraft/IChunkProvider;Lnet/minecraft/World;II[B)V", shift = At.Shift.AFTER))
     private void recreateStructures$onStructureGenerate(int par1, int par2, CallbackInfo ci) {
         Handlers.Structure.onStructureGenerate1(Dimension.NETHER, this, this.worldObj, par1, par2, null);
+    }
+
+    @Inject(method = "populate", at = @At(value = "INVOKE", target = "Lnet/minecraft/WorldInfo;getEarliestMITEReleaseRunIn()I", ordinal = 0))
+    private void onDecoration(IChunkProvider par1IChunkProvider, int par2, int par3, CallbackInfo ci) {
+        int blockX = par2 * 16;
+        int blockZ = par3 * 16;
+        Handlers.BiomeDecoration.onDecorate(
+                BiomeDecorationHandler.context(
+                        this.worldObj, this.hellRNG,
+                        blockX, blockZ
+                ));
     }
 }

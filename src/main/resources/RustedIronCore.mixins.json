@@ -76,6 +76,7 @@
     "other.util.ShapelessRecipesMixin",
     "other.util.SlotCraftingMixin",
     "other.world.BiomeDecoratorMixin",
+    "other.world.BiomeGenBaseMixin",
     "other.world.GenLayerAddIslandMixin",
     "other.world.GenLayerAddSnowMixin",
     "other.world.GenLayerBiomeMixin",

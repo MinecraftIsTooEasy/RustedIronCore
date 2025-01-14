@@ -9,7 +9,12 @@ public class Handlers {
      * Register valid block base and item activators
      */
     public static final BeaconUpdateHandler BeaconUpdate = new BeaconUpdateHandler();
-    public static final BiomeDecorateHandler BiomeDecorate = new BiomeDecorateHandler();
+    /**
+     * Features of the biome. Registering here will affect the base method {@code BiomeDecorator.decorate()}.
+     * If you want to add features for your special biome, just override {@code BiomeGenBase.decorate}.
+     *
+     */
+    public static final BiomeDecorationHandler BiomeDecoration = new BiomeDecorationHandler();
     public static final BiomeGenerateHandler BiomeGenerate = new BiomeGenerateHandler();
     /**
      * Modify max enchantment num and enchanting level
@@ -128,4 +133,8 @@ public class Handlers {
      * Take over the Packet132TileEntityData reading.
      */
     public static final TileEntityDataHandler TileEntityData = new TileEntityDataHandler();
+    /**
+     * Easy way to register ore generation.
+     */
+    public static final OreGenerationHandler OreGeneration = new OreGenerationHandler();
 }

@@ -23,11 +23,11 @@ public abstract class ItemMixin {
 
     @Inject(method = "getRepairItem", at = @At("HEAD"), cancellable = true)
     private void addRepairItem(CallbackInfoReturnable<Item> cir) {
-        if (this.getMaterialForRepairs() instanceof IRepairableMaterial repairableMaterial) {
+        Material material_for_repairs = this.getMaterialForRepairs();
+        if (material_for_repairs instanceof IRepairableMaterial repairableMaterial) {
             cir.setReturnValue(repairableMaterial.getRepairItem());
             return;
         }
-        Material material_for_repairs = this.getMaterialForRepairs();
         Item item = MaterialProperties.RepairItem.get(material_for_repairs);
         if (item != null) {
             cir.setReturnValue(item);
@@ -38,9 +38,7 @@ public abstract class ItemMixin {
     private void injectHeatLevel(ItemStack item_stack, CallbackInfoReturnable<Integer> cir) {
         if (item_stack == null) return;
         Item item = item_stack.getItem();
-        if (item instanceof IFuelItem iFuelItem) {
-            cir.setReturnValue(iFuelItem.getHeatLevel());
-        }
+        IFuelItem.cast(item).ifPresent(x -> cir.setReturnValue(x.getHeatLevel()));
         ItemProperties.HeatLevel.getOptional(item).ifPresent(cir::setReturnValue);
     }
 
@@ -48,9 +46,7 @@ public abstract class ItemMixin {
     private void injectBurnTime(ItemStack item_stack, CallbackInfoReturnable<Integer> cir) {
         if (item_stack == null) return;
         Item item = item_stack.getItem();
-        if (item instanceof IFuelItem iFuelItem) {
-            cir.setReturnValue(iFuelItem.getBurnTime());
-        }
+        IFuelItem.cast(item).ifPresent(x -> cir.setReturnValue(x.getBurnTime()));
         ItemProperties.BurnTime.getOptional(item_stack.getItem()).ifPresent(cir::setReturnValue);
     }
 

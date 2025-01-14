@@ -1,5 +1,7 @@
 package moddedmite.rustedironcore.api.world;
 
+import net.minecraft.World;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,6 +24,11 @@ public record Dimension(String name, int id) {
         return ID_TO_DIMENSION.get(id);
     }
 
+    public boolean isOf(World world) {
+        return world.getDimensionId() == this.id;
+    }
+
+    @Override
     public String toString() {
         return this.name;
     }

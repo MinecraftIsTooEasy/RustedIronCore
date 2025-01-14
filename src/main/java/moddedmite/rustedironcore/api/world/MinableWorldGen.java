@@ -5,6 +5,9 @@ import net.minecraft.WorldGenMinable;
 
 import java.util.Random;
 
+/**
+ * This class solves the problem of vein height hardcoded in the super class.
+ */
 public class MinableWorldGen extends WorldGenMinable {
     VeinHeightSupplier maxVeinHeight;
     VeinHeightSupplier minVeinHeight;
