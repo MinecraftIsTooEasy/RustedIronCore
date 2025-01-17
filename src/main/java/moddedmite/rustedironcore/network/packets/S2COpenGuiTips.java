@@ -15,7 +15,7 @@ public class S2COpenGuiTips implements Packet {
 
     @Override
     public void apply(EntityPlayer entityPlayer) {
-        firstLoginStatementCounter = 1200;
+        firstLoginStatementCounter = 600;
     }
 
     @Override

@@ -62,7 +62,7 @@ public class GuiIngameMixin extends Gui {
     @Unique
     private boolean shouldRenderStatement() {
         if (S2COpenGuiTips.firstLoginStatementCounter == 0) return false;// the time is over
-        if (StringUtil.getCurrentLanguage().equals("zh_CN")) return true;// Chinese always render
+        if (!StringUtil.getCurrentLanguage().equals("zh_CN")) return false;// Non-Chinese skip
         if (RICConfig.StatementOnLogin.get()) return true;// config is true then render
         return false;
     }

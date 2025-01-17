@@ -11,24 +11,6 @@ import java.util.Map;
 public class SpawnConditionHandler extends EventHandler<SpawnConditionRegisterEvent> {
     private final Map<Class<? extends Entity>, SpawnCondition> ConditionMap = new HashMap<>();
 
-//    static {
-//        conditionMap.put(EntityCreeper.class, (world, x, y, z) -> {
-//            if (world.hasSkylight() && !world.isDaytime() && world.rand.nextInt(4) != 0 && world.isOutdoors(x, y, z)) {
-//                return null;
-//            }
-//            if (world.rand.nextInt(40) >= y && world.rand.nextFloat() < 0.5f) {
-//                return EntityInfernalCreeper.class;
-//            }
-//            return EntityCreeper.class;
-//        });
-//        conditionMap.put(EntitySlime.class, (world, x, y, z) -> {
-//            if (world.blockTypeIsAbove(Block.stone, x, y, z)) {
-//                return null;
-//            }
-//            return EntitySlime.class;
-//        });
-//    }
-
     public boolean has(Class<?> clazz) {
         return ConditionMap.containsKey(clazz);
     }
@@ -58,6 +40,7 @@ public class SpawnConditionHandler extends EventHandler<SpawnConditionRegisterEv
 
     /**
      * The spawn result can be different from your original class, for example creeper can become infernal.
+     * <br>
      * Returning null means try next loop.
      */
     @FunctionalInterface
