@@ -3,7 +3,7 @@ package moddedmite.rustedironcore.api.util;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import net.minecraft.ItemBowl;
-import net.minecraft.ItemBucket;
+import net.minecraft.ItemVessel;
 import net.minecraft.Material;
 
 import java.util.HashMap;
@@ -12,22 +12,18 @@ import java.util.Optional;
 
 public class VesselUtil {
     // vessel, content, instance
-    private static final Table<Material, Material, ItemBucket> BucketTable = HashBasedTable.create();
+    private static final Table<Material, Material, ItemVessel> BucketTable = HashBasedTable.create();
     // vessel, instance
-    private static final Map<Material, ItemBucket> EmptyBucketMap = new HashMap<>();
+    private static final Map<Material, ItemVessel> EmptyBucketMap = new HashMap<>();
 
-    public static Optional<ItemBucket> getBucket(Material vessel_material, Material contents) {
+    public static Optional<ItemVessel> getBucket(Material vessel_material, Material contents) {
         if (contents == null) {
             return Optional.ofNullable(EmptyBucketMap.get(vessel_material));
         }
         return Optional.ofNullable(BucketTable.get(vessel_material, contents));
     }
 
-    public static void registerBucket(ItemBucket itemBucket) {
-        registerBucket(itemBucket.getVesselMaterial(), itemBucket.getContents(), itemBucket);
-    }
-
-    public static void registerBucket(Material vessel_material, Material contents, ItemBucket itemBucket) {
+    public static void registerBucket(Material vessel_material, Material contents, ItemVessel itemBucket) {
         if (contents == null) {
             EmptyBucketMap.put(vessel_material, itemBucket);
         } else {

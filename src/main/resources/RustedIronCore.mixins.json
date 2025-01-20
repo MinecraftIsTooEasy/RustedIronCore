@@ -49,6 +49,7 @@
     "other.item.ItemBlockMixin",
     "other.item.ItemBowlMixin",
     "other.item.ItemBowMixin",
+    "other.item.ItemBucketMilkMixin",
     "other.item.ItemBucketMixin",
     "other.item.ItemCarrotOnAStickMixin",
     "other.item.ItemCoinMixin",
