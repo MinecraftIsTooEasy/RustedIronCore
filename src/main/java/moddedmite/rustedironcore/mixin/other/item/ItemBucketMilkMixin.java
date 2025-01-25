@@ -5,6 +5,7 @@ import net.minecraft.ItemBucket;
 import net.minecraft.ItemBucketMilk;
 import net.minecraft.ItemVessel;
 import net.minecraft.Material;
+import net.xiaoyu233.fml.util.ReflectHelper;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -18,6 +19,6 @@ public abstract class ItemBucketMilkMixin extends ItemVessel {
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void register(int id, Material material, CallbackInfo ci) {
-        VesselUtil.registerBucket(material, Material.milk, (ItemBucket) (Object) this);
+        VesselUtil.registerBucket(material, Material.milk, ReflectHelper.dyCast(this));
     }
 }

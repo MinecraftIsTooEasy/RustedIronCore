@@ -11,6 +11,10 @@ public interface IPlayerAttributeListener {
         return original;
     }
 
+    default int onLevelMinLimitModify(int original) {
+        return original;
+    }
+
     default int onHungerLimitModify(EntityPlayer player, int original) {
         return original;
     }

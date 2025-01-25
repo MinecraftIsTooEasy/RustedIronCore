@@ -1,5 +1,6 @@
 package moddedmite.rustedironcore.mixin.other.client.gui;
 
+import moddedmite.rustedironcore.RustedIronCore;
 import moddedmite.rustedironcore.api.event.Handlers;
 import moddedmite.rustedironcore.api.util.StringUtil;
 import moddedmite.rustedironcore.internal.config.RICConfig;
@@ -8,6 +9,7 @@ import net.minecraft.Gui;
 import net.minecraft.GuiIngame;
 import net.minecraft.Minecraft;
 import net.minecraft.ScaledResolution;
+import net.xiaoyu233.fml.FishModLoader;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -41,7 +43,7 @@ public class GuiIngameMixin extends Gui {
     @Inject(method = "renderGameOverlay(FZII)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/Minecraft;inDevMode()Z"))
     private void renderStatement(float par1, boolean par2, int par3, int par4, CallbackInfo ci) {
         Handlers.Tick.onRenderTick(par1);
-        if (!this.shouldRenderStatement()) return;
+        if (!RustedIronCore.shouldRenderStatement()) return;
         ScaledResolution scaledResolution = new ScaledResolution(this.mc.gameSettings, this.mc.displayWidth, this.mc.displayHeight);
         int x = scaledResolution.getScaledWidth() / 2;
         int y = scaledResolution.getScaledHeight() / 2;
@@ -57,13 +59,5 @@ public class GuiIngameMixin extends Gui {
         }
         String countdown = StringUtil.translateF("ric.statement.countdown", S2COpenGuiTips.firstLoginStatementCounter / 20);
         this.mc.fontRenderer.drawString(countdown, stringX, stringY, 0xE0E0E0);
-    }
-
-    @Unique
-    private boolean shouldRenderStatement() {
-        if (S2COpenGuiTips.firstLoginStatementCounter == 0) return false;// the time is over
-        if (!StringUtil.getCurrentLanguage().equals("zh_CN")) return false;// Non-Chinese skip
-        if (RICConfig.StatementOnLogin.get()) return true;// config is true then render
-        return false;
     }
 }

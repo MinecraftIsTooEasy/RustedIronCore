@@ -1,6 +1,7 @@
 package moddedmite.rustedironcore.mixin.api.client.util;
 
 import moddedmite.rustedironcore.api.event.Handlers;
+import moddedmite.rustedironcore.keybinding.KeyBindingExtra;
 import net.minecraft.GameSettings;
 import net.minecraft.KeyBinding;
 import org.apache.commons.lang3.ArrayUtils;
@@ -15,11 +16,13 @@ import java.util.List;
 
 @Mixin(GameSettings.class)
 public class GameSettingsMixin {
-    @Shadow
-    public KeyBinding[] keyBindings;
+    @Shadow public KeyBinding[] keyBindings;
+
 
     @Inject(method = "initKeybindings", at = @At("RETURN"))
     private void onKeybindingsInit(CallbackInfo ci) {
+
+
         List<KeyBinding> list = new ArrayList<>();
         Handlers.Keybinding.onKeybindingRegister(list::add);
         this.keyBindings = ArrayUtils.addAll(this.keyBindings, list.toArray(KeyBinding[]::new));

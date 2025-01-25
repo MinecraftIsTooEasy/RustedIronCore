@@ -1,9 +1,11 @@
 package moddedmite.rustedironcore.internal.event.listeners;
 
+import moddedmite.rustedironcore.RustedIronCore;
 import moddedmite.rustedironcore.api.event.events.PlayerLoggedInEvent;
 import moddedmite.rustedironcore.api.event.listener.IPlayerEventListener;
 import moddedmite.rustedironcore.api.player.ServerPlayerAPI;
 import moddedmite.rustedironcore.internal.config.RICConfig;
+import moddedmite.rustedironcore.mixin.other.client.gui.GuiIngameMixin;
 import moddedmite.rustedironcore.network.Network;
 import moddedmite.rustedironcore.network.packets.S2COpenGuiTips;
 import moddedmite.rustedironcore.network.packets.S2CSyncNutritionLimit;
@@ -15,6 +17,7 @@ public class PlayerEventListener implements IPlayerEventListener {
     public void onPlayerLoggedIn(PlayerLoggedInEvent event) {
         ServerPlayer player = event.player();
         Network.sendToClient(player, new S2CSyncNutritionLimit(((ServerPlayerAPI) player).ric$GetNutritionLimit()));
+        if (!RustedIronCore.shouldRenderStatement()) return;
         player.addChatMessage("ric.statement");
         if (this.shouldSendPacket(event.firstLogin())) {
             Network.sendToClient(player, new S2COpenGuiTips());

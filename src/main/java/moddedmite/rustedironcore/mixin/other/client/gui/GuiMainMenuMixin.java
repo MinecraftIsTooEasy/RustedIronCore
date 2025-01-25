@@ -37,6 +37,6 @@ public class GuiMainMenuMixin {
 
     @Inject(method = "<clinit>", at = @At("TAIL"))
     private static void translate_1(CallbackInfo ci) {
-        field_96138_a_MITE = I18n.getString("ric.gui.resourcepacks.info.website.1") + " " + (EnumChatFormatting.UNDERLINE) + "https://ysesiq.github.io/modded-mite/" + (EnumChatFormatting.RESET) + " " + I18n.getString("ric.gui.resourcepacks.info.website.2");
+        field_96138_a_MITE = I18n.getString("ric.gui.resourcepacks.info.website.1") + " " + (EnumChatFormatting.UNDERLINE) + "https://minecraftistooeasy.github.io/" + (EnumChatFormatting.RESET) + " " + I18n.getString("ric.gui.resourcepacks.info.website.2");
     }
 }

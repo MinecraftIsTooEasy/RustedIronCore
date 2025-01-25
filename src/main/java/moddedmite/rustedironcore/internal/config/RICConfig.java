@@ -13,5 +13,5 @@ public class RICConfig {
     public static final ConfigRoot ROOT = ConfigRoot.create(1)
             .addEntry(ConfigEntry.of("第一次进入世界时显示锈铁核心声明", StatementOnLogin));
 
-    public static final File CONFIG_FILE = new File(RustedIronCore.MOD_ID + ".json");
+    public static final File CONFIG_FILE = new File(RustedIronCore.MOD_NAME + ".json");
 }

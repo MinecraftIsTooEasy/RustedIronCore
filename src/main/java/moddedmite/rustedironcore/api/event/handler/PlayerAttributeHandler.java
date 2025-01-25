@@ -23,6 +23,14 @@ public class PlayerAttributeHandler extends AbstractHandler<IPlayerAttributeList
     }
 
     @Override
+    public int onLevelMinLimitModify(int original) {
+        for (IPlayerAttributeListener listener : this.listeners) {
+            original = listener.onLevelMinLimitModify(original);
+        }
+        return original;
+    }
+
+    @Override
     public int onHungerLimitModify(EntityPlayer player, int original) {
         for (IPlayerAttributeListener listener : this.listeners) {
             original = listener.onHungerLimitModify(player, original);

@@ -8,9 +8,7 @@ import moddedmite.rustedironcore.api.player.PlayerAPI;
 import net.minecraft.*;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -99,4 +97,13 @@ public abstract class EntityPlayerMixin extends EntityLivingBase implements Play
         return Handlers.PlayerAttribute.onLevelLimitModify(original);
     }
 
+    @ModifyConstant(method = "getExperienceLevel(I)I", constant = @Constant(intValue = -40))
+    private int modifyMinLevel(int original) {
+        return Handlers.PlayerAttribute.onLevelMinLimitModify(original);
+    }
+
+    @ModifyConstant(method = "addExperience(IZZ)V", constant = @Constant(intValue = -40))
+    private int modifyMinLevel_1(int original) {
+        return Handlers.PlayerAttribute.onLevelMinLimitModify(original);
+    }
 }
