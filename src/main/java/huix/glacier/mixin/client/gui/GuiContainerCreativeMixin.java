@@ -1,13 +1,8 @@
 package huix.glacier.mixin.client.gui;
 
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import com.llamalad7.mixinextras.sugar.Local;
 import huix.glacier.api.extension.creativetab.GlacierCreativeTabs;
-import moddedmite.rustedironcore.api.util.StringUtil;
-import moddedmite.rustedironcore.compat.PinyinHandler;
+import moddedmite.rustedironcore.api.util.PinyinSupport;
 import net.minecraft.*;
-import net.xiaoyu233.fml.FishModLoader;
 import net.xiaoyu233.fml.util.ReflectHelper;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -15,11 +10,9 @@ import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 @Mixin( GuiContainerCreative.class )
@@ -127,12 +120,11 @@ public class GuiContainerCreativeMixin extends InventoryEffectRenderer {
 
             for (Object o : var11.getTooltip(this.mc.thePlayer, true, null)) {
                 String var7 = (String) o;
-                PinyinHandler pinyinHandler = PinyinHandler.getInstance();
                 if (var7.toLowerCase().contains(var10)) {
                     var13 = true;
                     break;
                 }
-                if (pinyinHandler.isValid() && pinyinHandler.contains(var7, var10)) {
+                if (PinyinSupport.isValid() && PinyinSupport.contains(var7, var10)) {
                     var13 = true;
                     break;
                 }

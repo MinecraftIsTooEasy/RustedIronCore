@@ -13,7 +13,9 @@ public class MinableWorldGen extends WorldGenMinable {
     VeinHeightSupplier minVeinHeight;
     RandomVeinHeightSupplier randomVeinHeight;
 
-    public static final RandomVeinHeightSupplier Common = (world, rand, minable) -> {
+    public static final VeinHeightSupplier BOTTOM_HEIGHT = (world, minable) -> 0;
+    public static final VeinHeightSupplier ROOF_HEIGHT = (world, minable) -> 255;
+    public static final RandomVeinHeightSupplier STANDARD_RANDOM_HEIGHT = (world, rand, minable) -> {
         float relative_height;
         do {
             relative_height = rand.nextFloat();
@@ -22,6 +24,8 @@ public class MinableWorldGen extends WorldGenMinable {
         int height_range = minable.getMaxVeinHeight(world) - min_height + 1;
         return min_height + (int) (relative_height * (float) height_range);
     };
+    @Deprecated
+    public static final RandomVeinHeightSupplier Common = STANDARD_RANDOM_HEIGHT;
 
     public MinableWorldGen(int minableBlockId, int numberOfBlocks) {
         super(minableBlockId, numberOfBlocks);

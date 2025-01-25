@@ -62,4 +62,8 @@ public class FabricUtil {
     public static String getConfigDirectory() {
         return "config" + File.separator;
     }
+
+    public static boolean isDevelopmentEnvironment() {
+        return FishModLoader.isDevelopmentEnvironment();
+    }
 }

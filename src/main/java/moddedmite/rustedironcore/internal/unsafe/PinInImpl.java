@@ -1,4 +1,4 @@
-package moddedmite.rustedironcore.compat;
+package moddedmite.rustedironcore.internal.unsafe;
 
 import me.towdium.pinin.DictLoader;
 import me.towdium.pinin.PinIn;

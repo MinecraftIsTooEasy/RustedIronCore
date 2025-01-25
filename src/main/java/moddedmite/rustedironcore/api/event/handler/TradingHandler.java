@@ -1,17 +1,18 @@
 package moddedmite.rustedironcore.api.event.handler;
 
-import moddedmite.rustedironcore.RustedIronCore;
 import moddedmite.rustedironcore.api.event.EventHandler;
 import moddedmite.rustedironcore.api.event.events.TradingRegisterEvent;
+import moddedmite.rustedironcore.api.util.LogUtil;
 import moddedmite.rustedironcore.random.RandomUtil;
 import moddedmite.rustedironcore.villager.VillagerSettings;
 import net.minecraft.*;
+import org.apache.logging.log4j.Logger;
 
 import java.util.*;
 import java.util.function.Consumer;
 
 public class TradingHandler extends EventHandler<TradingRegisterEvent> {
-
+    private static final Logger LOGGER = LogUtil.getLogger();
     private final Map<Integer, VillagerSettings> professionMap = new HashMap<>();
 
     public TradingHandler() {
@@ -35,17 +36,17 @@ public class TradingHandler extends EventHandler<TradingRegisterEvent> {
     public void addRecipeToList(MerchantRecipeList recipeList, EntityVillager villager, Random rand) {
         VillagerSettings villagerSettings = this.professionMap.get(villager.getProfession());
         if (villagerSettings == null) {
-            RustedIronCore.logger.warn("unhandled villager profession: '{}'", villager.getProfession());
+            LOGGER.warn("unhandled villager profession: '{}'", villager.getProfession());
         } else {
             villagerSettings.getRecipeEntries().forEach(x -> x.apply(recipeList, villager, rand));
         }
     }
 
-    public static final VillagerSettings Farmer = new VillagerSettings(0,"villager.profession.farmer" ,VillagerSettings.FarmerTexture);
-    public static final VillagerSettings Librarian = new VillagerSettings(1,"villager.profession.librarian", VillagerSettings.LibrarianTexture);
-    public static final VillagerSettings Priest = new VillagerSettings(2,"villager.profession.priest", VillagerSettings.PriestTexture);
-    public static final VillagerSettings Smith = new VillagerSettings(3,"villager.profession.smith", VillagerSettings.SmithTexture);
-    public static final VillagerSettings Butcher = new VillagerSettings(4,"villager.profession.butcher", VillagerSettings.ButcherTexture);
+    public static final VillagerSettings Farmer = new VillagerSettings(0, "villager.profession.farmer", VillagerSettings.FarmerTexture);
+    public static final VillagerSettings Librarian = new VillagerSettings(1, "villager.profession.librarian", VillagerSettings.LibrarianTexture);
+    public static final VillagerSettings Priest = new VillagerSettings(2, "villager.profession.priest", VillagerSettings.PriestTexture);
+    public static final VillagerSettings Smith = new VillagerSettings(3, "villager.profession.smith", VillagerSettings.SmithTexture);
+    public static final VillagerSettings Butcher = new VillagerSettings(4, "villager.profession.butcher", VillagerSettings.ButcherTexture);
 
     @SuppressWarnings("unchecked")
     public static final Consumer<TradingRegisterEvent> VanillaListener = event -> {
