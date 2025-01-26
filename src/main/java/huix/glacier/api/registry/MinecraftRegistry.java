@@ -21,6 +21,10 @@ public class MinecraftRegistry implements IRegistryInstance {
 
     public HashMap<Integer, Integer> itemHeatLevelMap = new HashMap<>();
 
+    /**
+     * Use {@link moddedmite.rustedironcore.property.ItemProperties} instead.
+     */
+    @Deprecated(since = "1.3.9")
     public void registerItemHeatLevel(int itemId, int heatLevel) {
         this.itemHeatLevelMap.put(itemId, heatLevel);
     }
