@@ -91,6 +91,7 @@
     "other.world.structure.ComponentStrongholdLibraryMixin",
     "other.world.structure.ComponentStrongholdRoomCrossingMixin",
     "other.world.structure.MapGenStrongholdMixin",
+    "other.world.structure.MapGenStructureIOMixin",
     "other.world.structure.WorldGenJungleTempleMixin",
     "other.world.structure.WorldGenMineshaftPiecesMixin",
     "other.world.structure.WorldGenStrongholdChestCorridorMixin",

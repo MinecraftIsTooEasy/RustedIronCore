@@ -141,4 +141,8 @@ public class Handlers {
      * Easy way to register ore generation.
      */
     public static final OreGenerationHandler OreGeneration = new OreGenerationHandler();
+    /**
+     * Handles structures nbt.
+     */
+    public static final StructureNBTHandler StructureNBT = new StructureNBTHandler();
 }
