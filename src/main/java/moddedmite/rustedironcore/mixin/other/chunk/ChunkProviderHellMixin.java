@@ -4,10 +4,7 @@ import com.llamalad7.mixinextras.sugar.Local;
 import moddedmite.rustedironcore.api.event.Handlers;
 import moddedmite.rustedironcore.api.event.handler.BiomeDecorationHandler;
 import moddedmite.rustedironcore.api.world.Dimension;
-import net.minecraft.Chunk;
-import net.minecraft.ChunkProviderHell;
-import net.minecraft.IChunkProvider;
-import net.minecraft.World;
+import net.minecraft.*;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -46,8 +43,8 @@ public abstract class ChunkProviderHellMixin implements IChunkProvider {
         int blockZ = par3 * 16;
         Handlers.BiomeDecoration.onDecorate(
                 BiomeDecorationHandler.context(
-                        this.worldObj, this.hellRNG,
-                        blockX, blockZ
+                        this.worldObj, BiomeGenBase.hell, BiomeGenBase.hell.theBiomeDecorator,
+                        this.hellRNG, blockX, blockZ
                 ));
     }
 }

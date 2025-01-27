@@ -4,6 +4,7 @@ import moddedmite.rustedironcore.api.event.Handlers;
 import moddedmite.rustedironcore.api.event.handler.BiomeDecorationHandler;
 import moddedmite.rustedironcore.api.event.handler.OreGenerationHandler;
 import net.minecraft.BiomeDecorator;
+import net.minecraft.BiomeGenBase;
 import net.minecraft.World;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
@@ -28,6 +29,9 @@ public class BiomeDecoratorMixin {
     @Shadow
     protected Random randomGenerator;
 
+    @Shadow
+    protected BiomeGenBase biome;
+
     @Inject(method = "generateOres", at = @At("HEAD"))
     private void onOresGeneration(CallbackInfo ci) {
         Handlers.OreGeneration.onOresGeneration(
@@ -39,7 +43,7 @@ public class BiomeDecoratorMixin {
     private void onDecorate(CallbackInfo ci) {
         Handlers.BiomeDecoration.onDecorate(
                 BiomeDecorationHandler.context(
-                        this.currentWorld, this.randomGenerator,
-                        this.chunk_X, this.chunk_Z));
+                        this.currentWorld, this.biome, (BiomeDecorator) (Object) this,
+                        this.randomGenerator, this.chunk_X, this.chunk_Z));
     }
 }

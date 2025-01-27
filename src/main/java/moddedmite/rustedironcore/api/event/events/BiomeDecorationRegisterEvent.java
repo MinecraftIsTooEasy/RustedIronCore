@@ -1,26 +1,35 @@
 package moddedmite.rustedironcore.api.event.events;
 
-import moddedmite.rustedironcore.api.event.Handlers;
 import moddedmite.rustedironcore.api.event.handler.BiomeDecorationHandler;
 import moddedmite.rustedironcore.api.world.Dimension;
 import net.minecraft.WorldGenerator;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class BiomeDecorationRegisterEvent {
-    public void register(Dimension dimension, WorldGenerator decoration) {
-        register(dimension, decoration, 1);
+    private final Map<Dimension, List<BiomeDecorationHandler.SettingBuilder>> map = new HashMap<>();
+
+    public Map<Dimension, List<BiomeDecorationHandler.SettingBuilder>> getMap() {
+        return this.map;
     }
 
-    public void register(Dimension dimension, WorldGenerator decoration, int attempts) {
-        register(dimension, decoration, attempts, BiomeDecorationHandler.HeightSupplier.COMMON);
+    public BiomeDecorationHandler.SettingBuilder register(Dimension dimension, WorldGenerator decoration) {
+        this.map.computeIfAbsent(dimension, k -> new ArrayList<>());
+        BiomeDecorationHandler.SettingBuilder args = new BiomeDecorationHandler.SettingBuilder(decoration);
+        this.map.get(dimension).add(args);
+        return args;
     }
 
-    public void register(Dimension dimension, WorldGenerator decoration, int attempts, BiomeDecorationHandler.HeightSupplier height) {
-        Map<Dimension, List<BiomeDecorationHandler.Setting>> map = Handlers.BiomeDecoration.DECORATION_MAP;
-        map.computeIfAbsent(dimension, k -> new ArrayList<>());
-        map.get(dimension).add(BiomeDecorationHandler.setting(decoration, attempts, height));
+    @Deprecated
+    public BiomeDecorationHandler.SettingBuilder register(Dimension dimension, WorldGenerator decoration, int attempts) {
+        return register(dimension, decoration).setAttempts(attempts);
+    }
+
+    @Deprecated
+    public BiomeDecorationHandler.SettingBuilder register(Dimension dimension, WorldGenerator decoration, int attempts, BiomeDecorationHandler.HeightSupplier height) {
+        return register(dimension, decoration).setAttempts(attempts).setHeightSupplier(height);
     }
 }

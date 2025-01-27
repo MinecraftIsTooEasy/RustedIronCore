@@ -13,11 +13,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(BiomeGenBase.class)
 public class BiomeGenBaseMixin implements BiomeAPI {
-    @Unique public String biomeUnlocalizedName;
+    @Unique
+    public String biomeUnlocalizedName;
 
     @Inject(method = "<clinit>", at = @At("HEAD"))
     private static void onStaticHead(CallbackInfo ci) {
-        Handlers.BiomeDecoration.publish(new BiomeDecorationRegisterEvent());
+        BiomeDecorationRegisterEvent biomeDecorationRegisterEvent = new BiomeDecorationRegisterEvent();
+        Handlers.BiomeDecoration.publish(biomeDecorationRegisterEvent);
+        Handlers.BiomeDecoration.buildMap(biomeDecorationRegisterEvent.getMap());
         Handlers.OreGeneration.publish(new OreGenerationRegisterEvent());
     }
 
