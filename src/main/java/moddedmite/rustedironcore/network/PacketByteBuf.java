@@ -31,6 +31,8 @@ public interface PacketByteBuf {
 
     double readDouble();
 
+    long readLong();
+
     void writeByte(int paramInt);
 
     void writeShort(int paramInt);
@@ -51,7 +53,7 @@ public interface PacketByteBuf {
 
     void writeDouble(double paramDouble);
 
-
+    void writeLong(long paramLong);
 
 
 
@@ -138,6 +140,15 @@ public interface PacketByteBuf {
             }
 
             @Override
+            public void writeLong(long paramLong) {
+                try {
+                    out.writeLong(paramLong);
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+            }
+
+            @Override
             public short readShort() {
                 throw new UnsupportedOperationException();
             }
@@ -176,6 +187,11 @@ public interface PacketByteBuf {
 
             @Override
             public double readDouble() {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public long readLong() {
                 throw new UnsupportedOperationException();
             }
         };
@@ -274,6 +290,15 @@ public interface PacketByteBuf {
             }
 
             @Override
+            public long readLong() {
+                try {
+                    return in.readLong();
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+            }
+
+            @Override
             public void writeShort(int paramInt) {
                 throw new UnsupportedOperationException();
             }
@@ -312,6 +337,11 @@ public interface PacketByteBuf {
 
             @Override
             public void writeDouble(double paramDouble) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public void writeLong(long paramLong) {
                 throw new UnsupportedOperationException();
             }
         };

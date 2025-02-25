@@ -1,6 +1,7 @@
 package moddedmite.rustedironcore.api.event;
 
 import moddedmite.rustedironcore.api.event.handler.*;
+import moddedmite.rustedironcore.api.event.handler.CommandHandler;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.*;
@@ -16,6 +17,11 @@ public class Handlers {
      * If you want to add features for your special biome, just override {@link BiomeGenBase#decorate}.
      */
     public static final BiomeDecorationHandler BiomeDecoration = new BiomeDecorationHandler();
+    /**
+     * The handler do many thing:
+     * <li>Modify the process of biome generation, see {@link GenLayer}.</li>
+     * <li>Register biomes for structures, like stronghold, village.</li>
+     */
     public static final BiomeGenerateHandler BiomeGenerate = new BiomeGenerateHandler();
     /**
      * Modify max enchantment num and enchanting level
@@ -45,7 +51,7 @@ public class Handlers {
     /**
      * This is called after items and blocks are registered.
      */
-    public static final AbstractHandler<Runnable> PropertiesRegistry = new AbstractHandler<>();
+    public static final StagedHandler PropertiesRegistry = new StagedHandler();
     /**
      * Realize special recipes.
      * <br>
@@ -89,7 +95,7 @@ public class Handlers {
     /**
      * Registering the potion is buggy. You must construct your own potion instances here, DO NOT call too early.
      */
-    public static final AbstractHandler<Runnable> PotionRegistry = new AbstractHandler<>();
+    public static final StagedHandler PotionRegistry = new StagedHandler();
     /**
      * This provides some commons hooks for achievements. Like picking up, crafting, smelting some item.
      */
@@ -145,4 +151,17 @@ public class Handlers {
      * Handles structures nbt.
      */
     public static final StructureNBTHandler StructureNBT = new StructureNBTHandler();
+    /**
+     * The hover info when your cursor on an item.
+     */
+    @Environment(EnvType.CLIENT)
+    public static final TooltipHandler Tooltip = new TooltipHandler();
+    /**
+     * Handles custom dimensions.
+     */
+    public static final DimensionHandler Dimension = new DimensionHandler();
+    /**
+     * Can register commands.
+     */
+    public static final CommandHandler Command = new CommandHandler();
 }

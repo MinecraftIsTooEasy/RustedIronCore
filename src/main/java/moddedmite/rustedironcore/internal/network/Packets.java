@@ -1,5 +1,7 @@
 package moddedmite.rustedironcore.internal.network;
 
+import moddedmite.rustedironcore.delegate.network.Packet4UpdateTimeDelegate;
+import moddedmite.rustedironcore.delegate.network.Packet92UpdateTimeSmallDelegate;
 import moddedmite.rustedironcore.network.PacketReader;
 import moddedmite.rustedironcore.network.packets.S2COpenGuiTips;
 import moddedmite.rustedironcore.network.packets.S2CSyncNutritionLimit;
@@ -13,6 +15,8 @@ public class Packets {
     public static final ResourceLocation SyncTradeRecipe = new ResourceLocation(CompactID, "sync_trade_recipe");
     public static final ResourceLocation SyncNutritionLimit = new ResourceLocation(CompactID, "sync_nutrition_limit");
     public static final ResourceLocation UpdateNutrition = new ResourceLocation(CompactID, "update_nutrition");
+    public static final ResourceLocation UpdateTime = new ResourceLocation(CompactID, "update_time");
+    public static final ResourceLocation UpdateTimeSmall = new ResourceLocation(CompactID, "update_time_small");
 
     public static void registerServerReaders() {
     }
@@ -22,5 +26,7 @@ public class Packets {
         PacketReader.registerClientPacketReader(SyncNutritionLimit, S2CSyncNutritionLimit::new);
         PacketReader.registerClientPacketReader(SyncTradeRecipe, S2CSyncTradeRecipe::new);
         PacketReader.registerClientPacketReader(OpenGuiTips, packetByteBuf -> new S2COpenGuiTips());
+        PacketReader.registerClientPacketReader(UpdateTime, Packet4UpdateTimeDelegate::new);
+        PacketReader.registerClientPacketReader(UpdateTimeSmall, Packet92UpdateTimeSmallDelegate::new);
     }
 }

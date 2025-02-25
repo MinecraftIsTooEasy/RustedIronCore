@@ -6,7 +6,7 @@ import java.util.List;
 public class AbstractHandler<T> {
     protected final List<T> listeners = new ArrayList<>();
 
-    public AbstractHandler() {
+    protected AbstractHandler() {
     }
 
     public void register(T t) {

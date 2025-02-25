@@ -50,7 +50,7 @@ public class KeyBindingExtra extends KeyBinding {
 //            case "key.drop", "key.attack", "key.use", "key.zoom", "key.pickItem" ->
 //                    I18n.getString("key.categories.gameplay");
 //            case "key.chat", "key.command", "key.playerlist" -> I18n.getString("key.categories.multiplayer");
-//            case "key.redrawChunks" -> I18n.getString("key.categories.misc");
+//            case "key.redrawChunks" -> I18n.getString("key.categories.util");
 //            default -> I18n.getString("key.categories.uncategorized");
 //        };
 //    }
@@ -119,5 +119,5 @@ public class KeyBindingExtra extends KeyBinding {
 //    keyBindCommand = new KeyBindingExtra("key.command", 53, "key.categories.multiplayer");
 //    keyBindToggleRun = new KeyBindingExtra("key.toggleRun", 15, "key.categories.movement");
 //    keyBindZoom = new KeyBindingExtra("key.zoom", 44, "key.categories.gameplay");
-//    keyBindRedrawChunks = new KeyBindingExtra("key.redrawChunks", 19, "key.categories.misc");
+//    keyBindRedrawChunks = new KeyBindingExtra("key.redrawChunks", 19, "key.categories.util");
 }

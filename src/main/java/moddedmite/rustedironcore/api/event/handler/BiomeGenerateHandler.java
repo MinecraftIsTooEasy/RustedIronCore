@@ -36,4 +36,12 @@ public class BiomeGenerateHandler extends AbstractHandler<IBiomeGenerateListener
     public void onStrongholdAllowedRegister(List<BiomeGenBase> original) {
         this.listeners.forEach(x -> x.onStrongholdAllowedRegister(original));
     }
+
+    public void onVillageAllowedRegister(List<BiomeGenBase> original) {
+        this.listeners.forEach(x -> x.onVillageAllowedRegister(original));
+    }
+
+    public void onUnderworldBiomesRegister(List<BiomeGenBase> original) {
+        this.listeners.forEach(x -> x.onUnderworldBiomesRegister(original));
+    }
 }

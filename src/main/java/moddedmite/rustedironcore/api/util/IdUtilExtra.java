@@ -7,6 +7,7 @@ public class IdUtilExtra extends IdUtil {
     private static int nextVillagerProfessionID = 5;
     private static int nextPacket23Type = 800;
     private static int nextTileEntityDataType = 5;
+    private static int nextDimensionID = 2;
 
     public IdUtilExtra() {
     }
@@ -25,5 +26,9 @@ public class IdUtilExtra extends IdUtil {
 
     public static int getNextTileEntityDataType() {
         return nextTileEntityDataType++;
+    }
+
+    public static int getNextDimensionID() {
+        return nextDimensionID++;
     }
 }
