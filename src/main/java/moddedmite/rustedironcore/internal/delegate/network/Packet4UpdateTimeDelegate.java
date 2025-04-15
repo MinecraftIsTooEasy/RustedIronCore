@@ -1,4 +1,4 @@
-package moddedmite.rustedironcore.delegate.network;
+package moddedmite.rustedironcore.internal.delegate.network;
 
 import moddedmite.rustedironcore.api.event.Handlers;
 import moddedmite.rustedironcore.internal.network.Packets;
@@ -7,33 +7,36 @@ import moddedmite.rustedironcore.network.PacketByteBuf;
 import net.minecraft.*;
 import net.minecraft.server.MinecraftServer;
 
-public class Packet92UpdateTimeSmallDelegate implements Packet {
+public class Packet4UpdateTimeDelegate implements Packet {
     private final long[] array;
 
-    public Packet92UpdateTimeSmallDelegate(long[] array) {
+    public Packet4UpdateTimeDelegate(long[] array) {
         this.array = array;
     }
 
-    public Packet92UpdateTimeSmallDelegate(MinecraftServer server) {
+    public Packet4UpdateTimeDelegate(MinecraftServer server) {
         this(createArray(server));
     }
 
-    public Packet92UpdateTimeSmallDelegate(PacketByteBuf packetByteBuf) {
+    public Packet4UpdateTimeDelegate(PacketByteBuf packetByteBuf) {
         this(createArray(packetByteBuf));
     }
 
     private static long[] createArray(MinecraftServer server) {
+        boolean use_small_packet_instead = true;
         WorldServer[] worlds = server.worldServers;
         int length = worlds.length;
         long[] array = new long[length];
         for (int i = 0; i < length; i++) {
             long time = worlds[i].getTotalWorldTime();
-            if (Packet92UpdateTimeSmall.isTimeSuitable(time)) {
-                array[i] = time;
-                continue;
+            if (!Packet92UpdateTimeSmall.isTimeSuitable(time)) {
+                use_small_packet_instead = false;
             }
-            Minecraft.setErrorMessage("Packet92UpdateTimeSmall: time is too large!");
-            array[i] = Packet92UpdateTimeSmall.getLargestSuitableTime();
+            array[i] = time;
+        }
+        if (use_small_packet_instead) {
+            Minecraft.setErrorMessage("Packet4UpdateTime: use Packet92UpdateTimeSmall instead");
+            new Exception().printStackTrace();
         }
         return array;
     }
@@ -50,7 +53,7 @@ public class Packet92UpdateTimeSmallDelegate implements Packet {
     @Override
     public void write(PacketByteBuf packetByteBuf) {
         for (int i = 0; i < this.array.length; i++) {
-            packetByteBuf.writeInt(((int) this.array[i]));
+            packetByteBuf.writeLong(this.array[i]);
         }
     }
 
@@ -62,6 +65,6 @@ public class Packet92UpdateTimeSmallDelegate implements Packet {
 
     @Override
     public ResourceLocation getChannel() {
-        return Packets.UpdateTimeSmall;
+        return Packets.UpdateTime;
     }
 }

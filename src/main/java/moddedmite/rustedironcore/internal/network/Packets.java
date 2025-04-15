@@ -1,12 +1,12 @@
 package moddedmite.rustedironcore.internal.network;
 
-import moddedmite.rustedironcore.delegate.network.Packet4UpdateTimeDelegate;
-import moddedmite.rustedironcore.delegate.network.Packet92UpdateTimeSmallDelegate;
+import moddedmite.rustedironcore.internal.delegate.network.Packet4UpdateTimeDelegate;
+import moddedmite.rustedironcore.internal.delegate.network.Packet92UpdateTimeSmallDelegate;
 import moddedmite.rustedironcore.network.PacketReader;
-import moddedmite.rustedironcore.network.packets.S2COpenGuiTips;
-import moddedmite.rustedironcore.network.packets.S2CSyncNutritionLimit;
-import moddedmite.rustedironcore.network.packets.S2CSyncTradeRecipe;
-import moddedmite.rustedironcore.network.packets.S2CUpdateNutrition;
+import moddedmite.rustedironcore.internal.network.packets.S2COpenGuiTips;
+import moddedmite.rustedironcore.internal.network.packets.S2CSyncNutritionLimit;
+import moddedmite.rustedironcore.internal.network.packets.S2CSyncTradeRecipe;
+import moddedmite.rustedironcore.internal.network.packets.S2CUpdateNutrition;
 import net.minecraft.ResourceLocation;
 
 public class Packets {

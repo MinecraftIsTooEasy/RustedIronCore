@@ -6,8 +6,8 @@ import moddedmite.rustedironcore.api.player.ServerPlayerAPI;
 import moddedmite.rustedironcore.api.util.FabricUtil;
 import moddedmite.rustedironcore.internal.config.RICConfig;
 import moddedmite.rustedironcore.network.Network;
-import moddedmite.rustedironcore.network.packets.S2COpenGuiTips;
-import moddedmite.rustedironcore.network.packets.S2CSyncNutritionLimit;
+import moddedmite.rustedironcore.internal.network.packets.S2COpenGuiTips;
+import moddedmite.rustedironcore.internal.network.packets.S2CSyncNutritionLimit;
 import net.minecraft.ServerPlayer;
 import net.minecraft.server.MinecraftServer;
 

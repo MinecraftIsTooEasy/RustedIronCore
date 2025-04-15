@@ -1,4 +1,4 @@
-package moddedmite.rustedironcore.delegate.world.biome;
+package moddedmite.rustedironcore.internal.delegate.world.biome;
 
 import moddedmite.rustedironcore.api.event.Handlers;
 import net.minecraft.*;

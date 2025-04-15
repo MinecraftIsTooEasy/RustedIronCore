@@ -1,6 +1,6 @@
 package moddedmite.rustedironcore.mixin.network;
 
-import moddedmite.rustedironcore.delegate.network.Packet23VehicleSpawnDelegate;
+import moddedmite.rustedironcore.internal.delegate.network.Packet23VehicleSpawnDelegate;
 import net.minecraft.Packet23VehicleSpawn;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;

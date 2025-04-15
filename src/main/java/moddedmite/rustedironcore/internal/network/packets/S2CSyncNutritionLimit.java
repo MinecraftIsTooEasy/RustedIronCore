@@ -1,4 +1,4 @@
-package moddedmite.rustedironcore.network.packets;
+package moddedmite.rustedironcore.internal.network.packets;
 
 import moddedmite.rustedironcore.api.player.ClientPlayerAPI;
 import moddedmite.rustedironcore.internal.network.Packets;

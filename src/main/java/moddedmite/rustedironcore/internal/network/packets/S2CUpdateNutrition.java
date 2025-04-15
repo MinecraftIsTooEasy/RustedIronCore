@@ -1,4 +1,4 @@
-package moddedmite.rustedironcore.network.packets;
+package moddedmite.rustedironcore.internal.network.packets;
 
 import moddedmite.rustedironcore.internal.network.Packets;
 import moddedmite.rustedironcore.network.Packet;

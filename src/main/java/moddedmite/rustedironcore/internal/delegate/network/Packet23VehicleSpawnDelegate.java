@@ -1,4 +1,4 @@
-package moddedmite.rustedironcore.delegate.network;
+package moddedmite.rustedironcore.internal.delegate.network;
 
 import net.minecraft.Packet23VehicleSpawn;
 

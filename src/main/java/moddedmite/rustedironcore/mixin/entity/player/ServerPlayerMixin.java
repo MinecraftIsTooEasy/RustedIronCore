@@ -4,7 +4,7 @@ import moddedmite.rustedironcore.Constants;
 import moddedmite.rustedironcore.api.event.Handlers;
 import moddedmite.rustedironcore.api.player.ServerPlayerAPI;
 import moddedmite.rustedironcore.network.Network;
-import moddedmite.rustedironcore.network.packets.S2CUpdateNutrition;
+import moddedmite.rustedironcore.internal.network.packets.S2CUpdateNutrition;
 import net.minecraft.*;
 import net.minecraft.server.MinecraftServer;
 import org.spongepowered.asm.mixin.Mixin;

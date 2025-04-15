@@ -21,7 +21,7 @@ public class BiomeGenBaseMixin implements BiomeAPI {
         BiomeDecorationRegisterEvent biomeDecorationRegisterEvent = new BiomeDecorationRegisterEvent();
         Handlers.BiomeDecoration.publish(biomeDecorationRegisterEvent);
         Handlers.BiomeDecoration.buildMap(biomeDecorationRegisterEvent.getMap());
-        Handlers.OreGeneration.publish(new OreGenerationRegisterEvent());
+        Handlers.OreGeneration.publish(new OreGenerationRegisterEvent(Handlers.OreGeneration));
     }
 
     @Inject(method = "<clinit>", at = @At("TAIL"))

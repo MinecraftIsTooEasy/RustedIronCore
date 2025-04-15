@@ -3,7 +3,7 @@ package moddedmite.rustedironcore.internal.event.listeners;
 import moddedmite.rustedironcore.api.event.listener.ITickListener;
 import moddedmite.rustedironcore.api.util.GuiUtil;
 import moddedmite.rustedironcore.api.util.StringUtil;
-import moddedmite.rustedironcore.network.packets.S2COpenGuiTips;
+import moddedmite.rustedironcore.internal.network.packets.S2COpenGuiTips;
 import net.minecraft.Minecraft;
 
 public class TickListener implements ITickListener {

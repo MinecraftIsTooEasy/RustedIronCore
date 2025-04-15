@@ -1,7 +1,7 @@
 package moddedmite.rustedironcore.mixin.container;
 
 import moddedmite.rustedironcore.network.Network;
-import moddedmite.rustedironcore.network.packets.S2CSyncTradeRecipe;
+import moddedmite.rustedironcore.internal.network.packets.S2CSyncTradeRecipe;
 import net.minecraft.*;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;

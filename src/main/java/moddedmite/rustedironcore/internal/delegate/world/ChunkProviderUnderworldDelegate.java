@@ -1,4 +1,4 @@
-package moddedmite.rustedironcore.delegate.world;
+package moddedmite.rustedironcore.internal.delegate.world;
 
 import net.minecraft.*;
 

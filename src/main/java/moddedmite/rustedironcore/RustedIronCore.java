@@ -6,8 +6,8 @@ import moddedmite.rustedironcore.api.util.StringUtil;
 import moddedmite.rustedironcore.internal.config.RICConfig;
 import moddedmite.rustedironcore.internal.event.listeners.*;
 import moddedmite.rustedironcore.internal.network.Packets;
+import moddedmite.rustedironcore.internal.network.packets.S2COpenGuiTips;
 import moddedmite.rustedironcore.network.Network;
-import moddedmite.rustedironcore.network.packets.S2COpenGuiTips;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.api.ModInitializer;
@@ -48,8 +48,10 @@ public class RustedIronCore implements ModInitializer {
         Handlers.PlayerEvent.register(new PlayerEventListener());
         Handlers.Tick.register(new TickListener());
         Handlers.BiomeGenerate.register(new BiomeListener());
-        Handlers.Dimension.register(new DimensionRegistry());
-        Handlers.Command.register(new CommandRegistry());
+        if (RICConfig.UseCustomDimension.get()) {
+            Handlers.Dimension.register(new DimensionRegistry());
+            Handlers.Command.register(new CommandRegistry());
+        }
     }
 
     @Environment(EnvType.CLIENT)

@@ -1,6 +1,6 @@
-package moddedmite.rustedironcore.delegate.world;
+package moddedmite.rustedironcore.internal.delegate.world;
 
-import moddedmite.rustedironcore.delegate.world.biome.GenLayerUnderbiome;
+import moddedmite.rustedironcore.internal.delegate.world.biome.GenLayerUnderbiome;
 import net.minecraft.*;
 
 import java.util.Arrays;

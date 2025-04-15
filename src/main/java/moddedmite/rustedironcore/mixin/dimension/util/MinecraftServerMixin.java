@@ -2,8 +2,8 @@ package moddedmite.rustedironcore.mixin.dimension.util;
 
 import moddedmite.rustedironcore.api.event.Handlers;
 import moddedmite.rustedironcore.api.event.handler.DimensionHandler;
-import moddedmite.rustedironcore.delegate.network.Packet4UpdateTimeDelegate;
-import moddedmite.rustedironcore.delegate.network.Packet92UpdateTimeSmallDelegate;
+import moddedmite.rustedironcore.internal.delegate.network.Packet4UpdateTimeDelegate;
+import moddedmite.rustedironcore.internal.delegate.network.Packet92UpdateTimeSmallDelegate;
 import moddedmite.rustedironcore.network.Network;
 import net.minecraft.Packet92UpdateTimeSmall;
 import net.minecraft.ServerPlayer;

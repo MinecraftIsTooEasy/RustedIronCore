@@ -1,7 +1,7 @@
 package moddedmite.rustedironcore.mixin.world;
 
-import moddedmite.rustedironcore.delegate.world.ChunkProviderUnderworldDelegate;
-import moddedmite.rustedironcore.delegate.world.WorldChunkManagerUnderworldDelegate;
+import moddedmite.rustedironcore.internal.delegate.world.ChunkProviderUnderworldDelegate;
+import moddedmite.rustedironcore.internal.delegate.world.WorldChunkManagerUnderworldDelegate;
 import net.minecraft.IChunkProvider;
 import net.minecraft.WorldProvider;
 import net.minecraft.WorldProviderUnderworld;

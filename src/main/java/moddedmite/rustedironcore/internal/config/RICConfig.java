@@ -9,8 +9,8 @@ import java.io.File;
 
 public class RICConfig {
     public static final FieldReference<Boolean> StatementOnLogin = new FieldReference<>(true);
-    public static final FieldReference<Boolean> WorldGenDelegate = new FieldReference<>(true);
-    public static final FieldReference<Boolean> UseCustomDimension = new FieldReference<>(true);
+    public static final FieldReference<Boolean> WorldGenDelegate = new FieldReference<>(false);
+    public static final FieldReference<Boolean> UseCustomDimension = new FieldReference<>(false);
 
     public static final ConfigRoot ROOT = ConfigRoot.create(1)
             .addEntry(ConfigEntry.of("第一次进入世界时显示锈铁核心声明", StatementOnLogin))
