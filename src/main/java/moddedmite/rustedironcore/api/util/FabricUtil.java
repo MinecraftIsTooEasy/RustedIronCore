@@ -8,11 +8,12 @@ import net.fabricmc.loader.impl.util.version.SemanticVersionImpl;
 import net.xiaoyu233.fml.FishModLoader;
 import org.apache.logging.log4j.Logger;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Optional;
 
 public class FabricUtil {
     private static final Logger LOGGER = LogUtil.getLogger();
+    private static final Path GAME_DIR = Path.of("");
 
     public static Optional<ModContainer> getModContainer(String modid) {
         return FishModLoader.getModContainer(modid);
@@ -51,16 +52,16 @@ public class FabricUtil {
         return FishModLoader.isServer();
     }
 
-    public static String getGameDirectory() {
-        return "";
+    public static Path getGameDirectory() {
+        return GAME_DIR;
     }
 
-    public static File getModsDirectory() {
-        return FishModLoader.MOD_DIR;
+    public static Path getModsDirectory() {
+        return GAME_DIR.resolve("mods");
     }
 
-    public static String getConfigDirectory() {
-        return "config" + File.separator;
+    public static Path getConfigDirectory() {
+        return GAME_DIR.resolve("config");
     }
 
     public static boolean isDevelopmentEnvironment() {

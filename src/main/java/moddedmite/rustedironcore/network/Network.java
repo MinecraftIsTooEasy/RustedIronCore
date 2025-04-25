@@ -1,5 +1,6 @@
 package moddedmite.rustedironcore.network;
 
+import moddedmite.rustedironcore.api.util.FabricUtil;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.ServerPlayer;
@@ -39,6 +40,9 @@ public class Network {
 
     @Environment(EnvType.CLIENT)
     public static void sendToServer(Packet packet) {
+        if (FabricUtil.isServer()) {
+            throw new IllegalCallerException("don't let the server send packet to itself: " + packet.getChannel());
+        }
         serverSender.accept(packet);
     }
 }

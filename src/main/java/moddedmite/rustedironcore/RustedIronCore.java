@@ -12,7 +12,6 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.Minecraft;
-import net.xiaoyu233.fml.FishModLoader;
 import net.xiaoyu233.fml.config.ConfigRegistry;
 
 import java.util.Optional;
@@ -27,7 +26,7 @@ public class RustedIronCore implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        if (!FishModLoader.isServer()) {
+        if (!FabricUtil.isServer()) {
             this.initClient();
         }
         this.initServer();

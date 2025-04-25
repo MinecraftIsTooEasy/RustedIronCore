@@ -3,8 +3,8 @@ package moddedmite.rustedironcore.mixin.util;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import moddedmite.rustedironcore.api.event.Handlers;
-import moddedmite.rustedironcore.api.event.events.*;
-import moddedmite.rustedironcore.internal.config.RICConfig;
+import moddedmite.rustedironcore.api.event.events.CraftingRecipeRegisterEvent;
+import moddedmite.rustedironcore.internal.event.Hooks;
 import net.minecraft.*;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -42,13 +42,7 @@ public abstract class CraftingManagerMixin {
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void onInit(CallbackInfo ci) {
-        Handlers.PropertiesRegistry.publish();
-        Handlers.Smelting.publish(new SmeltingRecipeRegisterEvent());
-        Handlers.SpawnCondition.publish(new SpawnConditionRegisterEvent());
-        Handlers.EntityTracker.publish(new EntityTrackerRegisterEvent());
-        Handlers.LootTable.onFishingRegister();
-        Handlers.TileEntityData.publish(new TileEntityDataTypeRegisterEvent());
-        if (RICConfig.UseCustomDimension.get()) Handlers.Dimension.publish(new DimensionRegisterEvent(Handlers.Dimension));
+        Hooks.postCraftingRecipeRegister();
     }
 
     @Inject(method = "findMatchingRecipe", at = @At(value = "INVOKE", target = "Lnet/minecraft/InventoryCrafting;getEventHandler()Lnet/minecraft/Container;"), locals = LocalCapture.CAPTURE_FAILSOFT, cancellable = true)
