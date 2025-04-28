@@ -25,7 +25,7 @@ public interface ICombatListener {
         return original;
     }
 
-    default float onPlayerRawStrVsBlockModify(EntityPlayer player,Item tool, Block block, int metadata, float original) {
+    default float onPlayerRawStrVsBlockModify(EntityPlayer player, Item tool, Block block, int metadata, float original) {
         return original;
     }
 
@@ -34,6 +34,13 @@ public interface ICombatListener {
     }
 
     default float onPlayerReceiveKnockBackModify(EntityPlayer player, Entity attacker, float original) {
+        return original;
+    }
+
+    /**
+     * This goes after the entity spider check. See {@link EntityLivingBase#fall(float)}.
+     */
+    default float onEntityLivingFallDamageModify(EntityLivingBase instance, float fall_distance, BlockInfo block_landed_on_info, float original) {
         return original;
     }
 

@@ -58,9 +58,13 @@ public class LootTableHandler extends AbstractHandler<ILootTableRegisterListener
 
     private final List<WeightedRandomChestContent> fishingEntries = new ArrayList<>();
 
-    // I set the original weight as 80 fish and 20 large fish
+    /**
+     * Treat the original weight as 80 fish and 20 large fish.
+     * <br>
+     * The entry I added is dummy, because if this entry is selected, I will cancel injecting.
+     */
     public void onFishingRegister() {
-        this.fishingEntries.add(new WeightedRandomChestContent(Item.fishRaw.itemID, 0, 1, 1, 100));// this is dummy
+        this.fishingEntries.add(new WeightedRandomChestContent(Item.fishRaw.itemID, 0, 1, 1, 100));
         this.listeners.forEach(x -> x.onFishingRegister(this.fishingEntries));
     }
 

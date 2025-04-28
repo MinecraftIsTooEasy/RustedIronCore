@@ -39,6 +39,9 @@ public interface ILootTableRegisterListener {
     default void onDungeonUnderworldRegister(List<WeightedRandomChestContent> original) {
     }
 
+    /**
+     * Treat the original weight as 80 fish and 20 large fish, and fill in your custom weights.
+     */
     default void onFishingRegister(List<WeightedRandomChestContent> original) {
     }
 }

@@ -61,4 +61,11 @@ public class CombatHandler extends AbstractHandler<ICombatListener> {
         }
         return original;
     }
+
+    public float onEntityLivingFallDamageModify(EntityLivingBase instance, float fall_distance, BlockInfo block_landed_on_info, float original) {
+        for (ICombatListener listener : this.listeners) {
+            original = listener.onEntityLivingFallDamageModify(instance, fall_distance, block_landed_on_info, original);
+        }
+        return original;
+    }
 }

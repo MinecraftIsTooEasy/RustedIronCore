@@ -1,4 +1,4 @@
-package moddedmite.rustedironcore.mixin.entity.ai;
+package moddedmite.rustedironcore.mixin.entity.sync;
 
 import moddedmite.rustedironcore.api.event.Handlers;
 import net.minecraft.Entity;
