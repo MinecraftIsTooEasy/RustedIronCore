@@ -1,6 +1,7 @@
 package moddedmite.rustedironcore.mixin.util;
 
 import moddedmite.rustedironcore.api.event.Handlers;
+import moddedmite.rustedironcore.api.event.StagedHandler;
 import moddedmite.rustedironcore.api.interfaces.IPotion;
 import net.minecraft.Potion;
 import net.minecraft.ResourceLocation;
@@ -23,7 +24,7 @@ public abstract class PotionMixin implements IPotion {
 
     @Inject(method = "<clinit>", at = @At("RETURN"))
     private static void onClinit(CallbackInfo ci) {
-        Handlers.PotionRegistry.publish();
+        ((StagedHandler) Handlers.PotionRegistry).publish();
     }
 
     @Override

@@ -1,12 +1,13 @@
 package moddedmite.rustedironcore.internal.event;
 
 import moddedmite.rustedironcore.api.event.Handlers;
+import moddedmite.rustedironcore.api.event.StagedHandler;
 import moddedmite.rustedironcore.api.event.events.*;
 import moddedmite.rustedironcore.internal.config.RICConfig;
 
 public class Hooks {
     public static void postCraftingRecipeRegister() {
-        Handlers.PropertiesRegistry.publish();
+        ((StagedHandler) Handlers.PropertiesRegistry).publish();
         Handlers.Smelting.publish(new SmeltingRecipeRegisterEvent());
         Handlers.SpawnCondition.publish(new SpawnConditionRegisterEvent());
         Handlers.EntityTracker.publish(new EntityTrackerRegisterEvent());

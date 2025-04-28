@@ -51,7 +51,8 @@ public class Handlers {
     /**
      * This is called after items and blocks are registered.
      */
-    public static final StagedHandler PropertiesRegistry = new StagedHandler();
+//    public static final StagedHandler PropertiesRegistry = new StagedHandler();
+    public static final AbstractHandler<Runnable> PropertiesRegistry = new StagedHandler();// TODO for compat
     /**
      * Realize special recipes.
      * <br>
@@ -95,7 +96,8 @@ public class Handlers {
     /**
      * Registering the potion is buggy. You must construct your own potion instances here, DO NOT call too early.
      */
-    public static final StagedHandler PotionRegistry = new StagedHandler();
+//    public static final StagedHandler PotionRegistry = new StagedHandler();
+    public static final AbstractHandler<Runnable> PotionRegistry = new StagedHandler();// TODO for compat
     /**
      * This provides some commons hooks for achievements. Like picking up, crafting, smelting some item.
      */
