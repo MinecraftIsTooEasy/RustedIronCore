@@ -22,6 +22,7 @@ public class MixinConfig implements IMixinConfigPlugin {
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
         if (mixinClassName.contains("WorldProviderUnderworldMixin")) return RICConfig.WorldGenDelegate.get();
         if (mixinClassName.contains("mixin.dimension")) return RICConfig.UseCustomDimension.get();
+        if (mixinClassName.contains("Packet")) return RICConfig.ApplyPacketPatches.get();
         return true;
     }
 

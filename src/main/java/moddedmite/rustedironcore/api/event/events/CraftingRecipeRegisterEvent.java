@@ -10,8 +10,21 @@ import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
 public class CraftingRecipeRegisterEvent {
+    private final List<IRecipe> vanilla;
+
+    /**
+     * Unbaked recipes registered by mods, they will get baked after the event is done
+     */
     private final List<RecipeArgs> shaped = new ArrayList<>();
     private final List<RecipeArgs> shapeless = new ArrayList<>();
+
+    public CraftingRecipeRegisterEvent(List<IRecipe> recipes) {
+        this.vanilla = recipes;
+    }
+
+    public List<IRecipe> getVanilla() {
+        return this.vanilla;
+    }
 
     public List<RecipeArgs> getShaped() {
         return this.shaped;
@@ -36,7 +49,6 @@ public class CraftingRecipeRegisterEvent {
     public void registerArmorRepairRecipe(Item repairItem, Material materialForArmor) {
         Handlers.Crafting.registerArmorRepairRecipe(repairItem, materialForArmor);
     }
-
 
     public static class RecipeArgs {
         public final ItemStack result;

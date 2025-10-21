@@ -35,4 +35,8 @@ public class EntityTrackerRegisterEvent {
         Handlers.EntityTracker.packetReaderMap.put(type, supplier);
     }
 
+    public void registerEntityPacket(Predicate<Entity> predicate, Function<Entity, moddedmite.rustedironcore.network.Packet> encoder) {
+        Handlers.EntityTracker.packetWriterMap.put(predicate, entity -> encoder.apply(entity).toVanilla());
+    }
+
 }

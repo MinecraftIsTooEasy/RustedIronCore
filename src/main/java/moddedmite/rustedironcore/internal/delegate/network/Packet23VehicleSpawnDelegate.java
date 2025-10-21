@@ -6,6 +6,9 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
+/**
+ * The rewriting is mainly for type extension and carrying custom data.
+ */
 public class Packet23VehicleSpawnDelegate {
     public static void write(Packet23VehicleSpawn packet, DataOutput par1DataOutput) throws IOException {
         par1DataOutput.writeInt(packet.entityId);

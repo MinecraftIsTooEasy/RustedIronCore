@@ -68,6 +68,8 @@ public class Handlers {
     public static final SpawnConditionHandler SpawnCondition = new SpawnConditionHandler();
     /**
      * This provides crafting registry with more arguments, and also provides armor fixing recipes, like silk fixing leather armor.
+     * <br>
+     * Also allow deleting or modifying recipes
      */
     public static final CraftingHandler Crafting = new CraftingHandler();
     /**

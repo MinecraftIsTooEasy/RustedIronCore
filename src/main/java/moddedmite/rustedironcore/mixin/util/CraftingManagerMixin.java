@@ -25,9 +25,11 @@ public abstract class CraftingManagerMixin {
     @Shadow
     public abstract ShapelessRecipes addShapelessRecipe(ItemStack par1ItemStack, boolean include_in_lowest_crafting_difficulty_determination, Object... par2ArrayOfObj);
 
+    @Shadow private List recipes;
+
     @WrapOperation(method = "<init>", at = @At(value = "INVOKE", target = "Ljava/util/Collections;sort(Ljava/util/List;Ljava/util/Comparator;)V"))
     private <T> void postRecipes(List<T> list, Comparator<? super T> c, Operation<Void> original) {
-        CraftingRecipeRegisterEvent craftingRecipeRegisterEvent = new CraftingRecipeRegisterEvent();
+        CraftingRecipeRegisterEvent craftingRecipeRegisterEvent = new CraftingRecipeRegisterEvent(this.recipes);
         Handlers.Crafting.publish(craftingRecipeRegisterEvent);
         for (CraftingRecipeRegisterEvent.RecipeArgs shaped : craftingRecipeRegisterEvent.getShaped()) {
             ShapedRecipes shapedRecipes = this.addRecipe(shaped.result, shaped.include_in_lowest_crafting_difficulty_determination, shaped.inputs);
