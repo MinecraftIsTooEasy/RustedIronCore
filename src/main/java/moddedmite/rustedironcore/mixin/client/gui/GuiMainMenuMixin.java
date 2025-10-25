@@ -1,5 +1,7 @@
 package moddedmite.rustedironcore.mixin.client.gui;
 
+import moddedmite.rustedironcore.api.util.StringUtil;
+import net.minecraft.ChatMessageComponent;
 import net.minecraft.EnumChatFormatting;
 import net.minecraft.GuiMainMenu;
 import net.minecraft.I18n;
@@ -32,11 +34,11 @@ public class GuiMainMenuMixin {
 
     @ModifyConstant(method = "drawScreen", constant = @Constant(stringValue = "MITE Resource Pack 1.6.4 needs to be installed!"))
     private String translate(String constant) {
-        return I18n.getString("ric.gui.resourcepacks.info");
+        return ChatMessageComponent.createFromTranslationKey("ric.gui.resourcepacks.info").toString();
     }
 
     @Inject(method = "<clinit>", at = @At("TAIL"))
     private static void translate_1(CallbackInfo ci) {
-        field_96138_a_MITE = I18n.getString("ric.gui.resourcepacks.info.website.1") + " " + (EnumChatFormatting.UNDERLINE) + "https://minecraftistooeasy.github.io/" + (EnumChatFormatting.RESET) + " " + I18n.getString("ric.gui.resourcepacks.info.website.2");
+        field_96138_a_MITE = ChatMessageComponent.createFromTranslationKey("ric.gui.resourcepacks.info.website.1") + " " + (EnumChatFormatting.UNDERLINE) + "https://minecraftistooeasy.github.io/" + (EnumChatFormatting.RESET) + " " + ChatMessageComponent.createFromTranslationKey("ric.gui.resourcepacks.info.website.2");
     }
 }

@@ -16,8 +16,8 @@
     "Huix"
   ],
   "contact": {
-    "homepage": "https://github.com/ysesiq/RustedIronCore-RustRemoval",
-    "issues": "https://github.com/ysesiq/RustedIronCore-RustRemoval/issues"
+    "homepage": "https://github.com/MinecraftIsTooEasy/RustedIronCore",
+    "issues": "https://github.com/MinecraftIsTooEasy/RustedIronCore/issues"
   },
   "entrypoints": {
     "registry": [

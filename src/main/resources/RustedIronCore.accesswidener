@@ -25,6 +25,7 @@ accessible method net/minecraft/SaveHandler getWorldDirectory ()Ljava/io/File;
 accessible field net/minecraft/ServerPlayer currentWindowId I
 
 accessible field net/minecraft/WeightedRandomChestContent theItemId Lnet/minecraft/ItemStack;
+accessible method net/minecraft/WorldType <init> (ILjava/lang/String;)V
 
 accessible method net/minecraft/Block setHardness (F)Lnet/minecraft/Block;
 accessible method net/minecraft/Block setStepSound (Lnet/minecraft/StepSound;)Lnet/minecraft/Block;

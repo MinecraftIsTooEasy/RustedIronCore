@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(TileEntityFurnace.class)
+@Mixin(value = TileEntityFurnace.class, priority = 1001)
 public abstract class TileEntityFurnaceMixin extends TileEntity {
     @Shadow
     public abstract ItemStack getInputItemStack();

@@ -5,6 +5,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import moddedmite.rustedironcore.api.event.Handlers;
 import moddedmite.rustedironcore.api.event.events.CraftingRecipeRegisterEvent;
 import moddedmite.rustedironcore.internal.event.Hooks;
+import moddedmite.rustedironcore.internal.unsafe.ExperimentalReleaseUtil;
 import net.minecraft.*;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -19,11 +20,9 @@ import java.util.List;
 
 @Mixin(CraftingManager.class)
 public abstract class CraftingManagerMixin {
-    @Shadow
-    public abstract ShapedRecipes addRecipe(ItemStack par1ItemStack, boolean include_in_lowest_crafting_difficulty_determination, Object... par2ArrayOfObj);
+    @Shadow public abstract ShapedRecipes addRecipe(ItemStack par1ItemStack, boolean include_in_lowest_crafting_difficulty_determination, Object... par2ArrayOfObj);
 
-    @Shadow
-    public abstract ShapelessRecipes addShapelessRecipe(ItemStack par1ItemStack, boolean include_in_lowest_crafting_difficulty_determination, Object... par2ArrayOfObj);
+    @Shadow public abstract ShapelessRecipes addShapelessRecipe(ItemStack par1ItemStack, boolean include_in_lowest_crafting_difficulty_determination, Object... par2ArrayOfObj);
 
     @Shadow private List recipes;
 
@@ -55,7 +54,7 @@ public abstract class CraftingManagerMixin {
             cir.setReturnValue(null);
             return;
         }
-        if (match.isRepair()) {
+        if (ExperimentalReleaseUtil.isRepairResult(match)) {
             cir.setReturnValue(match);
         }
     }

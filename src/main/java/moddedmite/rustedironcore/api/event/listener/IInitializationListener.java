@@ -7,6 +7,6 @@ public interface IInitializationListener {
     default void onClientStarted(Minecraft client) {
     }
 
-    default void onServerStarted(MinecraftServer server){
+    default void onServerStarted(MinecraftServer server) {
     }
 }
