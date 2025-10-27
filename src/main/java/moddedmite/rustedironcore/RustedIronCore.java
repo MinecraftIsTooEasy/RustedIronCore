@@ -21,7 +21,7 @@ public class RustedIronCore implements ModInitializer {
 
     @Override
     public Optional<ConfigRegistry> createConfig() {
-        return Optional.of(new ConfigRegistry(RICConfig.ROOT, RICConfig.CONFIG_FILE));
+        return Optional.of(RICConfig.INSTANCE);
     }
 
     @Override
