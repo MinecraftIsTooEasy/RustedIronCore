@@ -4,7 +4,10 @@ import moddedmite.rustedironcore.api.event.Handlers;
 import moddedmite.rustedironcore.api.util.FabricUtil;
 import moddedmite.rustedironcore.api.util.StringUtil;
 import moddedmite.rustedironcore.internal.config.RICConfig;
-import moddedmite.rustedironcore.internal.event.listeners.*;
+import moddedmite.rustedironcore.internal.event.listeners.CommandRegistry;
+import moddedmite.rustedironcore.internal.event.listeners.DimensionRegistry;
+import moddedmite.rustedironcore.internal.event.listeners.PlayerEventListener;
+import moddedmite.rustedironcore.internal.event.listeners.TickListener;
 import moddedmite.rustedironcore.internal.network.Packets;
 import moddedmite.rustedironcore.internal.network.packets.S2COpenGuiTips;
 import moddedmite.rustedironcore.network.Network;
@@ -30,7 +33,7 @@ public class RustedIronCore implements ModInitializer {
             this.initClient();
         }
         this.initServer();
-        this.registerVanillaEvents();
+        this.registerInternals();
     }
 
     private void initClient() {
@@ -43,10 +46,9 @@ public class RustedIronCore implements ModInitializer {
         Packets.registerServerReaders();
     }
 
-    private void registerVanillaEvents() {
+    private void registerInternals() {
         Handlers.PlayerEvent.register(new PlayerEventListener());
         Handlers.Tick.register(new TickListener());
-        Handlers.BiomeGenerate.register(new BiomeListener());
         if (RICConfig.UseCustomDimension.get()) {
             Handlers.Dimension.register(new DimensionRegistry());
             Handlers.Command.register(new CommandRegistry());

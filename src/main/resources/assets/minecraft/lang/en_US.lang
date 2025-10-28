@@ -6,8 +6,8 @@ villager.profession.butcher=Butcher
 villager.profession.unknown=Unknown
 
 ric.statement=[Rusted Iron Core]Loaded successfully, note that this mod is a compat bridge for other mods, rather than someone super mod supplies all the contents
-ric.gui.title=Minecraft 1.6.4-MITE(Modded, Rusted Iron Core Loaded)This mod is a compat bridge for other mods, rather than someone super mod supplies all the contents
-ric.statement.countdown=This window will disappear after %d seconds
+ric.gui_title=Minecraft 1.6.4-MITE(Modded, Rusted Iron Core Loaded)This mod is a compat bridge for other mods, rather than someone super mod supplies all the contents
+ric.statement_countdown=This window will disappear after %d seconds
 
 ric.gui.resourcepacks.info=MITE Resource Pack 1.6.4 needs to be installed!
 ric.gui.resourcepacks.info.website.1=Visit

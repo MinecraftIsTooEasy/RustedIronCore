@@ -1,5 +1,6 @@
 package moddedmite.rustedironcore.api.gui;
 
+import moddedmite.rustedironcore.localization.internal.RICText;
 import net.minecraft.GuiButton;
 import net.minecraft.GuiScreen;
 import net.minecraft.I18n;
@@ -41,7 +42,7 @@ public class GuiTips extends GuiScreen {
     public void drawScreen(int par1, int par2, float par3) {
         int x = (this.width - 248) / 2 + 10;
         int y = (this.height - 166) / 2 + 8;
-        this.fontRenderer.drawString(I18n.getString("ric.statement"), x, y, 2039583);
+        this.fontRenderer.drawString(RICText.Statement.translate(), x, y, 2039583);
         counter--;
     }
 }
