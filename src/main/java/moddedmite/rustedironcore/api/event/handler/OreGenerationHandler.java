@@ -18,16 +18,14 @@ public class OreGenerationHandler extends EventHandler<OreGenerationRegisterEven
         World world = context.world;
         Optional<Dimension> optional = ORE_MAP.keySet().stream().filter(x -> x.isOf(world)).findFirst();
         if (optional.isEmpty()) return;
-        List<Setting> ores = ORE_MAP.get(optional.get());
         BiomeDecorator biomeDecorator = context.biomeDecorator;
-        ores.forEach(x -> x.generate(biomeDecorator));
+        ORE_MAP.get(optional.get()).forEach(x -> x.generate(biomeDecorator));
     }
 
     @ApiStatus.Internal
     public void registerOre(Dimension dimension, WorldGenMinable ore, int frequency, boolean increasesWithDepth) {
-        Map<Dimension, List<Setting>> map = this.ORE_MAP;
-        map.computeIfAbsent(dimension, k -> new ArrayList<>());
-        map.get(dimension).add(setting(ore, frequency, increasesWithDepth));
+        this.ORE_MAP.computeIfAbsent(dimension, k -> new ArrayList<>())
+                .add(setting(ore, frequency, increasesWithDepth));
     }
 
     @ApiStatus.Internal

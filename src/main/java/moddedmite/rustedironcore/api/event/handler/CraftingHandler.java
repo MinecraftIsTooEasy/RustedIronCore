@@ -2,7 +2,7 @@ package moddedmite.rustedironcore.api.event.handler;
 
 import moddedmite.rustedironcore.api.event.EventHandler;
 import moddedmite.rustedironcore.api.event.events.CraftingRecipeRegisterEvent;
-import moddedmite.rustedironcore.internal.unsafe.ExperimentalReleaseUtil;
+import moddedmite.rustedironcore.internal.unsafe.CraftingResultAccess;
 import net.minecraft.*;
 
 import java.util.HashMap;
@@ -21,7 +21,9 @@ public class CraftingHandler extends EventHandler<CraftingRecipeRegisterEvent> {
         for (Item item : this.RepairArmorMap.keySet()) {
             CraftingResult craftingResult = this.repairArmorInternal(player, var4, var5, item, this.RepairArmorMap.get(item));
             if (craftingResult == null) return null;// fail
-            if (ExperimentalReleaseUtil.isRepairResult(craftingResult)) return craftingResult;// success
+            if (CraftingResultAccess.isRepair(craftingResult)) {
+                return craftingResult;// success
+            }
         }
         return WaitForNextRecipe;
     }
