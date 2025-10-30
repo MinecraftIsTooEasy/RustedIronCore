@@ -1,5 +1,7 @@
 package moddedmite.rustedironcore.internal.delegate.world;
 
+import moddedmite.rustedironcore.api.event.Handlers;
+import moddedmite.rustedironcore.api.world.Dimension;
 import net.minecraft.*;
 
 import java.util.List;
@@ -121,7 +123,7 @@ public class ChunkProviderUnderworldDelegate implements IChunkProvider {
 
 
                     if (var15 < 127 - this.hellRNG.nextInt(5) && var15 > 0 + this.hellRNG.nextInt(5)) continue;
-                    blocks[var16] = (byte)Block.bedrock.blockID;
+                    blocks[var16] = (byte) Block.bedrock.blockID;
 //                    if (blocks[var16] == 1)
 //                        blocks[var16] = (byte) (biomegenbase == BiomeGenBase.hell ? Block.netherrack.blockID : Block.whiteStone.blockID);
                 }
@@ -138,25 +140,25 @@ public class ChunkProviderUnderworldDelegate implements IChunkProvider {
             Chunk chunk = new Chunk(this.worldObj, par1, par2);
             chunk.generateHeightMap(false);
             return chunk;
-        } else {
-            this.hellRNG.setSeed((long) par1 * 341873128712L + (long) par2 * 132897987541L);
-            byte[] var3 = new byte['耀'];
-            this.generateNetherTerrain(par1, par2, var3);
-            biomesForGeneration = worldObj.getWorldChunkManager().loadBlockGeneratorData(biomesForGeneration, par1 * 16, par2 * 16, 16, 16);
-            this.replaceBlocksForBiome(par1, par2, var3);
-            ChunkProviderGenerate.placeRandomCobwebs(par1, par2, var3, this.hellRNG);
-            Chunk var4 = new Chunk(this.worldObj, var3, par1, par2);
-            BiomeGenBase[] var5 = this.worldObj.getWorldChunkManager().loadBlockGeneratorData(null, par1 * 16, par2 * 16, 16, 16);
-            byte[] var6 = var4.getBiomeArray();
-
-            for (int var7 = 0; var7 < var6.length; ++var7) {
-                var6[var7] = (byte) var5[var7].biomeID;
-            }
-
-            var4.generateHeightMap(false);
-            var4.resetRelightChecks();
-            return var4;
         }
+        this.hellRNG.setSeed((long) par1 * 341873128712L + (long) par2 * 132897987541L);
+        byte[] var3 = new byte['耀'];
+        this.generateNetherTerrain(par1, par2, var3);
+        biomesForGeneration = worldObj.getWorldChunkManager().loadBlockGeneratorData(biomesForGeneration, par1 * 16, par2 * 16, 16, 16);
+        this.replaceBlocksForBiome(par1, par2, var3);
+        Handlers.Structure.onStructureGenerate1(Dimension.UNDERWORLD, this, this.worldObj, par1, par2, var3);
+        ChunkProviderGenerate.placeRandomCobwebs(par1, par2, var3, this.hellRNG);
+        Chunk var4 = new Chunk(this.worldObj, var3, par1, par2);
+        BiomeGenBase[] var5 = this.worldObj.getWorldChunkManager().loadBlockGeneratorData(null, par1 * 16, par2 * 16, 16, 16);
+        byte[] var6 = var4.getBiomeArray();
+
+        for (int var7 = 0; var7 < var6.length; ++var7) {
+            var6[var7] = (byte) var5[var7].biomeID;
+        }
+
+        var4.generateHeightMap(false);
+        var4.resetRelightChecks();
+        return var4;
     }
 
     private double[] initializeNoiseField(double[] par1ArrayOfDouble, int par2, int par3, int par4, int par5, int par6, int par7) {
@@ -244,6 +246,7 @@ public class ChunkProviderUnderworldDelegate implements IChunkProvider {
 
     public void populate(IChunkProvider par1IChunkProvider, int par2, int par3) {
         BlockFalling.fallInstantly = true;
+        Handlers.Structure.onStructureGenerate2(Dimension.UNDERWORLD, this.worldObj, this.hellRNG, par2, par3);
         int var4 = par2 * 16;
         int var5 = par3 * 16;
         if (this.worldObj.underworld_y_offset != 0) {
@@ -293,5 +296,6 @@ public class ChunkProviderUnderworldDelegate implements IChunkProvider {
     }
 
     public void recreateStructures(int par1, int par2) {
+        Handlers.Structure.onStructureGenerate1(Dimension.UNDERWORLD, this, this.worldObj, par1, par2, null);
     }
 }
