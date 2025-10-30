@@ -141,7 +141,10 @@ public class Handlers {
     public static final WorldInfoHandler WorldInfo = new WorldInfoHandler();
     /**
      * Register structures, so they can generate in the world.
+     * <br>
+     * Turn to {@link Handlers#MapGen}
      */
+    @Deprecated(since = "1.4.1")
     public static final StructureHandler Structure = new StructureHandler();
     /**
      * Take over the {@link Packet132TileEntityData} reading.
@@ -168,4 +171,8 @@ public class Handlers {
      * Can register commands.
      */
     public static final CommandHandler Command = new CommandHandler();
+    /**
+     * Register map-gen elements, including structures
+     */
+    public static final MapGenHandler MapGen = new MapGenHandler();
 }

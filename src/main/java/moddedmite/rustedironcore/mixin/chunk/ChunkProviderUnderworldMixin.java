@@ -24,19 +24,23 @@ public abstract class ChunkProviderUnderworldMixin implements IChunkProvider {
     @Shadow
     private Random hellRNG;
 
+    @Inject(method = "provideChunk", at = @At(value = "INVOKE", target = "Lnet/minecraft/ChunkProviderGenerate;placeRandomCobwebs(II[BLjava/util/Random;)V"))
+    private void provideChunk$onMapGen(int par1, int par2, CallbackInfoReturnable<Chunk> cir, @Local byte[] bytes) {
+        Handlers.MapGen.onChunkProvideMapGen(Dimension.UNDERWORLD, this, this.worldObj, par1, par2, bytes);
+    }
+
     @Inject(method = "provideChunk", at = @At(value = "INVOKE", target = "Lnet/minecraft/ChunkProviderGenerate;placeRandomCobwebs(II[BLjava/util/Random;)V", shift = At.Shift.AFTER))
     private void provideChunk$onStructureGenerate(int par1, int par2, CallbackInfoReturnable<Chunk> cir, @Local byte[] bytes) {
-        Handlers.Structure.onStructureGenerate1(Dimension.UNDERWORLD, this, this.worldObj, par1, par2, bytes);
+        Handlers.MapGen.onChunkProvideStructures(Dimension.UNDERWORLD, this, this.worldObj, par1, par2, bytes);
     }
 
     @Inject(method = "populate", at = @At(value = "FIELD", target = "Lnet/minecraft/BlockFalling;fallInstantly:Z", ordinal = 0, shift = At.Shift.AFTER))
     private void populate$onStructureGenerate(IChunkProvider par1IChunkProvider, int par2, int par3, CallbackInfo ci) {
-        Handlers.Structure.onStructureGenerate2(Dimension.UNDERWORLD, this.worldObj, this.hellRNG, par2, par3);
+        Handlers.MapGen.onChunkPopulateStructures(Dimension.UNDERWORLD, this.worldObj, this.hellRNG, par2, par3);
     }
 
     @Inject(method = "recreateStructures", at = @At(value = "RETURN"))
     private void recreateStructures$onStructureGenerate(int par1, int par2, CallbackInfo ci) {
-        Handlers.Structure.onStructureGenerate1(Dimension.UNDERWORLD, this, this.worldObj, par1, par2, null);
-
+        Handlers.MapGen.onRecreateStructures(Dimension.UNDERWORLD, this, this.worldObj, par1, par2);
     }
 }

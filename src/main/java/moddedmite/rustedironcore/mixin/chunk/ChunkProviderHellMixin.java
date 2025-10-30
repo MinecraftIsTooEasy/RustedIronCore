@@ -22,19 +22,24 @@ public abstract class ChunkProviderHellMixin implements IChunkProvider {
     @Shadow
     private Random hellRNG;
 
+    @Inject(method = "provideChunk", at = @At(value = "INVOKE", target = "Lnet/minecraft/MapGenNetherBridge;generate(Lnet/minecraft/IChunkProvider;Lnet/minecraft/World;II[B)V"))
+    private void provideChunk$onMapGen(int par1, int par2, CallbackInfoReturnable<Chunk> cir, @Local byte[] bytes) {
+        Handlers.MapGen.onChunkProvideMapGen(Dimension.NETHER, this, this.worldObj, par1, par2, bytes);
+    }
+
     @Inject(method = "provideChunk", at = @At(value = "INVOKE", target = "Lnet/minecraft/MapGenNetherBridge;generate(Lnet/minecraft/IChunkProvider;Lnet/minecraft/World;II[B)V", shift = At.Shift.AFTER))
     private void provideChunk$onStructureGenerate(int par1, int par2, CallbackInfoReturnable<Chunk> cir, @Local byte[] bytes) {
-        Handlers.Structure.onStructureGenerate1(Dimension.NETHER, this, this.worldObj, par1, par2, bytes);
+        Handlers.MapGen.onChunkProvideStructures(Dimension.NETHER, this, this.worldObj, par1, par2, bytes);
     }
 
     @Inject(method = "populate", at = @At(value = "INVOKE", target = "Lnet/minecraft/MapGenNetherBridge;generateStructuresInChunk(Lnet/minecraft/World;Ljava/util/Random;II)Z", shift = At.Shift.AFTER))
     private void populate$onStructureGenerate(IChunkProvider par1IChunkProvider, int par2, int par3, CallbackInfo ci) {
-        Handlers.Structure.onStructureGenerate2(Dimension.NETHER, this.worldObj, this.hellRNG, par2, par3);
+        Handlers.MapGen.onChunkPopulateStructures(Dimension.NETHER, this.worldObj, this.hellRNG, par2, par3);
     }
 
     @Inject(method = "recreateStructures", at = @At(value = "INVOKE", target = "Lnet/minecraft/MapGenNetherBridge;generate(Lnet/minecraft/IChunkProvider;Lnet/minecraft/World;II[B)V", shift = At.Shift.AFTER))
     private void recreateStructures$onStructureGenerate(int par1, int par2, CallbackInfo ci) {
-        Handlers.Structure.onStructureGenerate1(Dimension.NETHER, this, this.worldObj, par1, par2, null);
+        Handlers.MapGen.onRecreateStructures(Dimension.NETHER, this, this.worldObj, par1, par2);
     }
 
     @Inject(method = "populate", at = @At(value = "INVOKE", target = "Lnet/minecraft/WorldInfo;getEarliestMITEReleaseRunIn()I", ordinal = 0))

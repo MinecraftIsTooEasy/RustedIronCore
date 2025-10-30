@@ -146,8 +146,9 @@ public class ChunkProviderUnderworldDelegate implements IChunkProvider {
         this.generateNetherTerrain(par1, par2, var3);
         biomesForGeneration = worldObj.getWorldChunkManager().loadBlockGeneratorData(biomesForGeneration, par1 * 16, par2 * 16, 16, 16);
         this.replaceBlocksForBiome(par1, par2, var3);
-        Handlers.Structure.onStructureGenerate1(Dimension.UNDERWORLD, this, this.worldObj, par1, par2, var3);
+        Handlers.MapGen.onChunkProvideMapGen(Dimension.UNDERWORLD, this, this.worldObj, par1, par2, var3);
         ChunkProviderGenerate.placeRandomCobwebs(par1, par2, var3, this.hellRNG);
+        Handlers.MapGen.onChunkProvideStructures(Dimension.UNDERWORLD, this, this.worldObj, par1, par2, var3);
         Chunk var4 = new Chunk(this.worldObj, var3, par1, par2);
         BiomeGenBase[] var5 = this.worldObj.getWorldChunkManager().loadBlockGeneratorData(null, par1 * 16, par2 * 16, 16, 16);
         byte[] var6 = var4.getBiomeArray();
@@ -246,7 +247,7 @@ public class ChunkProviderUnderworldDelegate implements IChunkProvider {
 
     public void populate(IChunkProvider par1IChunkProvider, int par2, int par3) {
         BlockFalling.fallInstantly = true;
-        Handlers.Structure.onStructureGenerate2(Dimension.UNDERWORLD, this.worldObj, this.hellRNG, par2, par3);
+        Handlers.MapGen.onChunkPopulateStructures(Dimension.UNDERWORLD, this.worldObj, this.hellRNG, par2, par3);
         int var4 = par2 * 16;
         int var5 = par3 * 16;
         if (this.worldObj.underworld_y_offset != 0) {
@@ -296,6 +297,6 @@ public class ChunkProviderUnderworldDelegate implements IChunkProvider {
     }
 
     public void recreateStructures(int par1, int par2) {
-        Handlers.Structure.onStructureGenerate1(Dimension.UNDERWORLD, this, this.worldObj, par1, par2, null);
+        Handlers.MapGen.onRecreateStructures(Dimension.UNDERWORLD, this, this.worldObj, par1, par2);
     }
 }
