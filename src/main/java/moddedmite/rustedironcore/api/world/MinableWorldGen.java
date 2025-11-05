@@ -9,12 +9,12 @@ import java.util.Random;
  * This class solves the problem of vein height hardcoded in the super class.
  */
 public class MinableWorldGen extends WorldGenMinable {
-    VeinHeightSupplier maxVeinHeight;
-    VeinHeightSupplier minVeinHeight;
-    RandomVeinHeightSupplier randomVeinHeight;
+    private VeinHeightSupplier maxVeinHeight;
+    private VeinHeightSupplier minVeinHeight;
+    private RandomVeinHeightSupplier randomVeinHeight;
 
-    public static final VeinHeightSupplier BOTTOM_HEIGHT = (world, minable) -> 0;
-    public static final VeinHeightSupplier ROOF_HEIGHT = (world, minable) -> 255;
+    public static final VeinHeightSupplier BOTTOM_HEIGHT = constant(0);
+    public static final VeinHeightSupplier ROOF_HEIGHT = constant(255);
     public static final RandomVeinHeightSupplier STANDARD_RANDOM_HEIGHT = (world, rand, minable) -> {
         float relative_height;
         do {
@@ -40,6 +40,11 @@ public class MinableWorldGen extends WorldGenMinable {
         return this;
     }
 
+    public MinableWorldGen setMaxVeinHeight(int height) {
+        this.maxVeinHeight = constant(height);
+        return this;
+    }
+
     @Override
     public int getMaxVeinHeight(World world) {
         return this.maxVeinHeight.getVeinHeight(world, this);
@@ -47,6 +52,11 @@ public class MinableWorldGen extends WorldGenMinable {
 
     public MinableWorldGen setMinVeinHeight(VeinHeightSupplier minVeinHeight) {
         this.minVeinHeight = minVeinHeight;
+        return this;
+    }
+
+    public MinableWorldGen setMinVeinHeight(int height) {
+        this.minVeinHeight = constant(height);
         return this;
     }
 
@@ -63,6 +73,10 @@ public class MinableWorldGen extends WorldGenMinable {
     @Override
     public int getRandomVeinHeight(World world, Random rand) {
         return this.randomVeinHeight.getVeinHeight(world, rand, this);
+    }
+
+    private static VeinHeightSupplier constant(int height) {
+        return (world, minable) -> height;
     }
 
     @FunctionalInterface

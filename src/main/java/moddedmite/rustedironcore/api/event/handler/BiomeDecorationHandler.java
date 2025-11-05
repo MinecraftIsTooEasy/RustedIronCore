@@ -1,5 +1,6 @@
 package moddedmite.rustedironcore.api.event.handler;
 
+import com.google.common.base.Predicates;
 import moddedmite.rustedironcore.api.event.EventHandler;
 import moddedmite.rustedironcore.api.event.events.BiomeDecorationRegisterEvent;
 import moddedmite.rustedironcore.api.world.Dimension;
@@ -9,6 +10,7 @@ import net.minecraft.World;
 import net.minecraft.WorldGenerator;
 
 import java.util.*;
+import java.util.function.Predicate;
 
 public class BiomeDecorationHandler extends EventHandler<BiomeDecorationRegisterEvent> {
     private final Map<Dimension, List<Setting>> DECORATION_MAP = new HashMap<>();
@@ -35,12 +37,24 @@ public class BiomeDecorationHandler extends EventHandler<BiomeDecorationRegister
      * @param blockX The west-north corner of the chunk.
      * @param blockZ The west-north corner of the chunk.
      */
-    public record Context(World world, BiomeGenBase biome, BiomeDecorator biomeDecorator, Random rand, int blockX,
-                          int blockZ) {
+    public record Context(
+            World world,
+            BiomeGenBase biome,
+            BiomeDecorator biomeDecorator,
+            Random rand,
+            int blockX,
+            int blockZ
+    ) {
     }
 
-    public record Setting(WorldGenerator decoration, Frequency frequency, HeightSupplier height) {
-        public void decorate(Context context) {
+    private record Setting(
+            WorldGenerator decoration,
+            Frequency frequency,
+            HeightSupplier height,
+            Predicate<BiomeGenBase> biomePredicate
+    ) {
+        private void decorate(Context context) {
+            if (!this.biomePredicate.test(context.biome)) return;
             int blockX = context.blockX;
             int blockZ = context.blockZ;
             Random rand = context.rand;
@@ -55,10 +69,9 @@ public class BiomeDecorationHandler extends EventHandler<BiomeDecorationRegister
 
     public static class SettingBuilder {
         private final WorldGenerator decoration;
-
         private Frequency frequency = Frequency.ONCE;
-
         private HeightSupplier heightSupplier = HeightSupplier.COMMON;
+        private Predicate<BiomeGenBase> biomePredicate = Predicates.alwaysTrue();
 
         public SettingBuilder(WorldGenerator decoration) {
             this.decoration = decoration;
@@ -89,8 +102,13 @@ public class BiomeDecorationHandler extends EventHandler<BiomeDecorationRegister
             return this;
         }
 
-        public Setting build() {
-            return new Setting(decoration, frequency, heightSupplier);
+        public SettingBuilder requiresBiome(Predicate<BiomeGenBase> biomePredicate) {
+            this.biomePredicate = this.biomePredicate.and(biomePredicate);
+            return this;
+        }
+
+        private Setting build() {
+            return new Setting(decoration, frequency, heightSupplier, this.biomePredicate);
         }
     }
 

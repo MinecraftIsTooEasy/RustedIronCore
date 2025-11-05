@@ -18,7 +18,7 @@ public class Handlers {
      */
     public static final BiomeDecorationHandler BiomeDecoration = new BiomeDecorationHandler();
     /**
-     * The handler do many thing:
+     * This handler do many things:
      * <li>Modify the process of biome generation, see {@link GenLayer}.</li>
      * <li>Register biomes for structures, like stronghold, village.</li>
      */

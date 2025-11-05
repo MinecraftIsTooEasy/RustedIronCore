@@ -17,9 +17,8 @@ public class BiomeDecorationRegisterEvent {
     }
 
     public BiomeDecorationHandler.SettingBuilder register(Dimension dimension, WorldGenerator decoration) {
-        this.map.computeIfAbsent(dimension, k -> new ArrayList<>());
         BiomeDecorationHandler.SettingBuilder args = new BiomeDecorationHandler.SettingBuilder(decoration);
-        this.map.get(dimension).add(args);
+        this.map.computeIfAbsent(dimension, k -> new ArrayList<>()).add(args);
         return args;
     }
 
