@@ -44,4 +44,8 @@ public class BiomeGenerateHandler extends AbstractHandler<IBiomeGenerateListener
     public void onUnderworldBiomesRegister(List<BiomeGenBase> original) {
         this.listeners.forEach(x -> x.onUnderworldBiomesRegister(original));
     }
+
+    public void onPlayerSpawnableRegister(List<BiomeGenBase> original) {
+        this.listeners.forEach(x -> x.onPlayerSpawnableRegister(original));
+    }
 }

@@ -43,6 +43,7 @@ public interface IBiomeGenerateListener {
      */
     default void onStrongholdAllowedRegister(List<BiomeGenBase> original) {
     }
+
     /**
      * Modifies the list: {@link MapGenVillage#villageSpawnBiomes}
      */
@@ -50,5 +51,8 @@ public interface IBiomeGenerateListener {
     }
 
     default void onUnderworldBiomesRegister(List<BiomeGenBase> original) {
+    }
+
+    default void onPlayerSpawnableRegister(List<BiomeGenBase> original) {
     }
 }

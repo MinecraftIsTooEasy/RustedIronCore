@@ -92,6 +92,7 @@
     "world.GenLayerAddSnowMixin",
     "world.GenLayerBiomeMixin",
     "world.GenLayerHillsMixin",
+    "world.WorldChunkManagerMixin",
     "world.WorldInfoSharedMixin",
     "world.WorldProviderUnderworldMixin",
     "world.WorldServerMixin",
