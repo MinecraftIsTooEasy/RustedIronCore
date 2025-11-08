@@ -6,6 +6,9 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(EntityLivingBase.class)
 public abstract class EntityLivingBaseMixin extends Entity {
@@ -93,5 +96,15 @@ public abstract class EntityLivingBaseMixin extends Entity {
                 this.makeSound("step." + block_landed_on_info.block.stepSound.stepSoundName, Math.min(fall_distance * 0.2f, 2.0f), 1.0f);
             }
         }
+    }
+
+    @Inject(method = "onDeath", at = @At(value = "INVOKE", target = "Lnet/minecraft/EntityLivingBase;dropContainedItems()V"))
+    private void onLoot(DamageSource par1DamageSource, CallbackInfo ci) {
+        Handlers.EntityEvent.onLoot(this.instance, par1DamageSource);
+    }
+
+    @Inject(method = "onDeath", at = @At(value = "HEAD"))
+    private void onDeath(DamageSource par1DamageSource, CallbackInfo ci) {
+        Handlers.EntityEvent.onDeath(this.instance, par1DamageSource);
     }
 }

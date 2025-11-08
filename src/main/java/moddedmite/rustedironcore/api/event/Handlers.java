@@ -80,6 +80,9 @@ public class Handlers {
      * Some useful hooks for players combating with mobs.
      */
     public static final CombatHandler Combat = new CombatHandler();
+    /**
+     * Tick events for client, server, render, entity, etc.
+     */
     public static final TickHandler Tick = new TickHandler();
     /**
      * You can register loot for almost every structure and feature through this.
@@ -175,4 +178,8 @@ public class Handlers {
      * Register map-gen elements, including structures
      */
     public static final MapGenHandler MapGen = new MapGenHandler();
+    /**
+     * Entity spawn, death, loot.
+     */
+    public static final EntityEventHandler EntityEvent = new EntityEventHandler();
 }
