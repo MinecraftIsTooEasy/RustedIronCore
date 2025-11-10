@@ -15,6 +15,6 @@ import java.util.List;
 public class ItemStackMixin {
     @Inject(method = "getTooltip", at = @At("RETURN"))
     private void onTooltip(EntityPlayer par1EntityPlayer, boolean par2, Slot slot, CallbackInfoReturnable<List<String>> cir) {
-        Handlers.Tooltip.onTooltip(cir.getReturnValue(), par1EntityPlayer, par2, slot);
+        Handlers.Tooltip.onTooltip((ItemStack) (Object) this, cir.getReturnValue(), par1EntityPlayer, par2, slot);
     }
 }
