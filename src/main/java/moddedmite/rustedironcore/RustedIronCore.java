@@ -1,6 +1,7 @@
 package moddedmite.rustedironcore;
 
 import moddedmite.rustedironcore.api.event.Handlers;
+import moddedmite.rustedironcore.api.event.listener.ITooltipListener;
 import moddedmite.rustedironcore.api.util.FabricUtil;
 import moddedmite.rustedironcore.api.util.StringUtil;
 import moddedmite.rustedironcore.internal.config.RICConfig;
@@ -14,9 +15,10 @@ import moddedmite.rustedironcore.network.Network;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.api.ModInitializer;
-import net.minecraft.Minecraft;
+import net.minecraft.*;
 import net.xiaoyu233.fml.config.ConfigRegistry;
 
+import java.util.List;
 import java.util.Optional;
 
 public class RustedIronCore implements ModInitializer {
