@@ -33,6 +33,8 @@ public interface PacketByteBuf {
 
     long readLong();
 
+    String readUTF();
+
     void writeByte(int paramInt);
 
     void writeShort(int paramInt);
@@ -54,6 +56,8 @@ public interface PacketByteBuf {
     void writeDouble(double paramDouble);
 
     void writeLong(long paramLong);
+
+    void writeUTF(String paramUTF);
 
 
 
@@ -149,6 +153,15 @@ public interface PacketByteBuf {
             }
 
             @Override
+            public void writeUTF(String paramUTF) {
+                try {
+                    out.writeUTF(paramUTF);
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+            }
+
+            @Override
             public short readShort() {
                 throw new UnsupportedOperationException();
             }
@@ -192,6 +205,11 @@ public interface PacketByteBuf {
 
             @Override
             public long readLong() {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public String readUTF() {
                 throw new UnsupportedOperationException();
             }
         };
@@ -299,6 +317,15 @@ public interface PacketByteBuf {
             }
 
             @Override
+            public String readUTF() {
+                try {
+                    return in.readUTF();
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+            }
+
+            @Override
             public void writeShort(int paramInt) {
                 throw new UnsupportedOperationException();
             }
@@ -342,6 +369,11 @@ public interface PacketByteBuf {
 
             @Override
             public void writeLong(long paramLong) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public void writeUTF(String paramUTF) {
                 throw new UnsupportedOperationException();
             }
         };
