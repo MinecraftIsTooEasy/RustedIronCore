@@ -35,6 +35,10 @@ public interface PacketByteBuf {
 
     String readUTF();
 
+    int readUnsignedByte();
+
+    int readUnsignedShort();
+
     void writeByte(int paramInt);
 
     void writeShort(int paramInt);
@@ -212,6 +216,16 @@ public interface PacketByteBuf {
             public String readUTF() {
                 throw new UnsupportedOperationException();
             }
+
+            @Override
+            public int readUnsignedByte() {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public int readUnsignedShort() {
+                throw new UnsupportedOperationException();
+            }
         };
     }
 
@@ -320,6 +334,24 @@ public interface PacketByteBuf {
             public String readUTF() {
                 try {
                     return in.readUTF();
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+            }
+
+            @Override
+            public int readUnsignedByte() {
+                try {
+                    return in.readUnsignedByte();
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+            }
+
+            @Override
+            public int readUnsignedShort() {
+                try {
+                    return in.readUnsignedShort();
                 } catch (IOException e) {
                     throw new UncheckedIOException(e);
                 }
