@@ -39,6 +39,14 @@ public interface PacketByteBuf {
 
     int readUnsignedShort();
 
+    int read(byte[] b);
+
+    int read(byte[] b, int off, int len);
+
+    void readFully(byte[] b);
+
+    void readFully(byte[] b, int off, int len);
+
     void writeByte(int paramInt);
 
     void writeShort(int paramInt);
@@ -63,6 +71,9 @@ public interface PacketByteBuf {
 
     void writeUTF(String paramUTF);
 
+    void write(int b);
+
+    void write(byte[] b, int off, int len);
 
 
     static PacketByteBuf out(final DataOutputStream out) {
@@ -166,6 +177,24 @@ public interface PacketByteBuf {
             }
 
             @Override
+            public void write(int b) {
+                try {
+                    out.write(b);
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+            }
+
+            @Override
+            public void write(byte[] b, int off, int len) {
+                try {
+                    out.write(b);
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+            }
+
+            @Override
             public short readShort() {
                 throw new UnsupportedOperationException();
             }
@@ -226,6 +255,26 @@ public interface PacketByteBuf {
             public int readUnsignedShort() {
                 throw new UnsupportedOperationException();
             }
+
+            @Override
+            public int read(byte[] b) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public int read(byte[] b, int off, int len) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public void readFully(byte[] b) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public void readFully(byte[] b, int off, int len) {
+                throw new UnsupportedOperationException();
+            }
         };
     }
 
@@ -233,7 +282,7 @@ public interface PacketByteBuf {
         return new PacketByteBuf() {
             @Override
             public short readShort() {
-                try{
+                try {
                     return in.readShort();
                 } catch (IOException e) {
                     throw new UncheckedIOException(e);
@@ -358,6 +407,42 @@ public interface PacketByteBuf {
             }
 
             @Override
+            public int read(byte[] b) {
+                try {
+                    return in.read(b);
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+            }
+
+            @Override
+            public int read(byte[] b, int off, int len) {
+                try {
+                    return in.read(b, off, len);
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+            }
+
+            @Override
+            public void readFully(byte[] b) {
+                try {
+                    in.readFully(b);
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+            }
+
+            @Override
+            public void readFully(byte[] b, int off, int len) {
+                try {
+                    in.readFully(b, off, len);
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+            }
+
+            @Override
             public void writeShort(int paramInt) {
                 throw new UnsupportedOperationException();
             }
@@ -406,6 +491,16 @@ public interface PacketByteBuf {
 
             @Override
             public void writeUTF(String paramUTF) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public void write(int b) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public void write(byte[] b, int off, int len) {
                 throw new UnsupportedOperationException();
             }
         };

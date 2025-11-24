@@ -6,6 +6,7 @@ import moddedmite.rustedironcore.api.event.events.OreGenerationRegisterEvent;
 import moddedmite.rustedironcore.api.world.BiomeAPI;
 import net.minecraft.BiomeGenBase;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -13,8 +14,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(BiomeGenBase.class)
 public class BiomeGenBaseMixin implements BiomeAPI {
-    @Unique
-    public String biomeUnlocalizedName;
+    @Shadow public String biomeName;
+    @Unique public String biomeUnlocalizedName;
 
     @Inject(method = "<clinit>", at = @At("HEAD"))
     private static void onStaticHead(CallbackInfo ci) {
@@ -60,6 +61,7 @@ public class BiomeGenBaseMixin implements BiomeAPI {
 
     @Override
     public String getBiomeUnlocalizedName() {
+        if (this.biomeUnlocalizedName == null) return biomeName;
         return "biome." + this.biomeUnlocalizedName + ".name";
     }
 }
