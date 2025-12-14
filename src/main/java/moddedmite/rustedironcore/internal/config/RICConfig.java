@@ -12,7 +12,7 @@ public class RICConfig {
     public static final ConfigRegistry INSTANCE;
 
     public static final FieldReference<Boolean> StatementOnLogin = new FieldReference<>(true);
-    public static final FieldReference<Boolean> WorldGenDelegate = new FieldReference<>(false);
+    public static final FieldReference<Boolean> WorldGenDelegate = new FieldReference<>(true);
     public static final FieldReference<Boolean> UseCustomDimension = new FieldReference<>(false);
     public static final FieldReference<Boolean> ApplyPacketPatches = new FieldReference<>(true);
 

@@ -11,6 +11,10 @@ import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 
 public interface PacketByteBuf {
+    DataInputStream getInputStream();
+
+    DataOutputStream getOutputStream();
+
     byte readByte();
 
     short readShort();
@@ -78,6 +82,16 @@ public interface PacketByteBuf {
 
     static PacketByteBuf out(final DataOutputStream out) {
         return new PacketByteBuf() {
+            @Override
+            public DataInputStream getInputStream() {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public DataOutputStream getOutputStream() {
+                return out;
+            }
+
             @Override
             public void writeShort(int paramInt) {
                 try {
@@ -280,6 +294,16 @@ public interface PacketByteBuf {
 
     static PacketByteBuf in(final DataInputStream in) {
         return new PacketByteBuf() {
+            @Override
+            public DataInputStream getInputStream() {
+                return in;
+            }
+
+            @Override
+            public DataOutputStream getOutputStream() {
+                throw new UnsupportedOperationException();
+            }
+
             @Override
             public short readShort() {
                 try {
