@@ -2,6 +2,7 @@ package moddedmite.rustedironcore.mixin.entity;
 
 import moddedmite.rustedironcore.api.event.Handlers;
 import net.minecraft.*;
+import net.xiaoyu233.fml.util.ReflectHelper;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
@@ -9,6 +10,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(EntityLivingBase.class)
 public abstract class EntityLivingBaseMixin extends Entity {
@@ -40,6 +42,7 @@ public abstract class EntityLivingBaseMixin extends Entity {
      */
     @Overwrite
     protected void fall(float fall_distance) {
+        Handlers.EntityEvent.onFall(this.instance, fall_distance);
         float damage;
         super.fall(fall_distance);
         if (this.worldObj.isRemote) {
@@ -106,5 +109,20 @@ public abstract class EntityLivingBaseMixin extends Entity {
     @Inject(method = "onDeath", at = @At(value = "HEAD"))
     private void onDeath(DamageSource par1DamageSource, CallbackInfo ci) {
         Handlers.EntityEvent.onDeath(this.instance, par1DamageSource);
+    }
+
+    @Inject(method = "attackEntityFrom", at = @At("HEAD"))
+    private void onAttackEntityFrom(Damage damage, CallbackInfoReturnable<EntityDamageResult> cir) {
+        Handlers.EntityEvent.onAttackEntityFrom(this.instance, damage);
+    }
+
+    @Inject(method = "onUpdate", at = @At("HEAD"))
+    private void onUpdate(CallbackInfo ci) {
+        Handlers.EntityEvent.onUpdate(this.instance);
+    }
+
+    @Inject(method = "jump", at = @At("TAIL"))
+    private void onJump(CallbackInfo ci) {
+        Handlers.EntityEvent.onJump(this.instance);
     }
 }

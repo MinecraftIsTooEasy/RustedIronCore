@@ -179,7 +179,7 @@ public class Handlers {
      */
     public static final MapGenHandler MapGen = new MapGenHandler();
     /**
-     * Entity spawn, death, loot.
+     * Entity spawn, death, loot, update, attackEntityFrom, fall, jump.
      */
     public static final EntityEventHandler EntityEvent = new EntityEventHandler();
 }
