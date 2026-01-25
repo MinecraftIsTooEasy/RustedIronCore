@@ -110,22 +110,24 @@ public class ChunkProviderUnderworldDelegate implements IChunkProvider {
     }
 
     public void replaceBlocksForBiome(int par1, int par2, byte[] blocks) {
-        for (int var7 = 0; var7 < 16; ++var7) {
-            for (int var8 = 0; var8 < 16; ++var8) {
-                BiomeGenBase biomegenbase = biomesForGeneration[var8 + var7 * 16];
+        if (this.worldObj.underworld_y_offset == 0) {
+            for (int var7 = 0; var7 < 16; ++var7) {
+                for (int var8 = 0; var8 < 16; ++var8) {
+                    BiomeGenBase biomegenbase = biomesForGeneration[var8 + var7 * 16];
 
-                this.hellRNG.nextDouble();
-                this.hellRNG.nextDouble();
-                this.hellRNG.nextDouble();
+                    this.hellRNG.nextDouble();
+                    this.hellRNG.nextDouble();
+                    this.hellRNG.nextDouble();
 
-                for (int var15 = 127; var15 >= 0; --var15) {
-                    int var16 = (var8 * 16 + var7) * 128 + var15;
+                    for (int var15 = 127; var15 >= 0; --var15) {
+                        int var16 = (var8 * 16 + var7) * 128 + var15;
 
 
-                    if (var15 < 127 - this.hellRNG.nextInt(5) && var15 > 0 + this.hellRNG.nextInt(5)) continue;
-                    blocks[var16] = (byte) Block.bedrock.blockID;
+                        if (var15 < 127 - this.hellRNG.nextInt(5) && var15 > 0 + this.hellRNG.nextInt(5)) continue;
+                        blocks[var16] = (byte) Block.bedrock.blockID;
 //                    if (blocks[var16] == 1)
 //                        blocks[var16] = (byte) (biomegenbase == BiomeGenBase.hell ? Block.netherrack.blockID : Block.whiteStone.blockID);
+                    }
                 }
             }
         }
