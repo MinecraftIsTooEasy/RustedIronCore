@@ -34,7 +34,7 @@
     "RustedIronCore.mixins.json",
     "glacier.mixins.json"
   ],
-  "accessWidener": "RustedIronCore.accesswidener",
+  "accessWidener": "RustedIronCore.accessWidener",
   "custom": {
     "loom:injected_interfaces": {
       "net/minecraft/EntityClientPlayerMP": [
