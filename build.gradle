@@ -83,8 +83,9 @@ jar {
 	}
 }
 
-runClient{
-    args("--username", "${username}", "--session", "a.a.a.a", "--width", 854, "--height", 480)
+tasks.named('runClient', JavaExec).configure { exec ->
+    def user = project.hasProperty('username') ? project.username : 'Dev'
+    exec.setArgs(['--username', user, '--session', '0', '--width', '854', '--height', '480'])
 }
 
 // configure the maven publication
