@@ -2,6 +2,7 @@ name: CI Build (push / PR -> build + upload artifact)
 
 on:
   push:
+    branches: [ master ]
   pull_request:
 
 jobs:
