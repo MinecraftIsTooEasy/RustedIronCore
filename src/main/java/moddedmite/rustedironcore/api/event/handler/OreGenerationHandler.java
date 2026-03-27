@@ -18,8 +18,7 @@ public class OreGenerationHandler extends EventHandler<OreGenerationRegisterEven
         World world = context.world;
         Optional<Dimension> optional = ORE_MAP.keySet().stream().filter(x -> x.isOf(world)).findFirst();
         if (optional.isEmpty()) return;
-        BiomeDecorator biomeDecorator = context.biomeDecorator;
-        ORE_MAP.get(optional.get()).forEach(x -> x.generate(biomeDecorator));
+        ORE_MAP.get(optional.get()).forEach(x -> x.generate(context));
     }
 
     @ApiStatus.Internal
@@ -49,8 +48,8 @@ public class OreGenerationHandler extends EventHandler<OreGenerationRegisterEven
     }
 
     private record Setting(WorldGenMinable ore, int frequency, boolean increasesWithDepth) {
-        private void generate(BiomeDecorator biomeDecorator) {
-            biomeDecorator.genMinable(frequency, ore, increasesWithDepth);
+        private void generate(Context context) {
+            context.biomeDecorator.genMinable(frequency, ore, increasesWithDepth);
         }
     }
 }

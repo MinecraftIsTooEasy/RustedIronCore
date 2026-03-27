@@ -2,6 +2,7 @@ package moddedmite.rustedironcore.api.event.events;
 
 import moddedmite.rustedironcore.api.event.Handlers;
 import moddedmite.rustedironcore.api.event.handler.SmeltingHandler;
+import moddedmite.rustedironcore.property.ItemProperties;
 import net.minecraft.*;
 
 public class SmeltingRecipeRegisterEvent {
@@ -31,6 +32,11 @@ public class SmeltingRecipeRegisterEvent {
 
     public void register(int input_item_id, ItemStack output_item_stack) {
         FurnaceRecipes.smelting().addSmelting(input_item_id, output_item_stack);
+    }
+
+    public void register(Item input, ItemStack output, int heatLevelRequired) {
+        ItemProperties.HeatLevelRequired.register(input, heatLevelRequired);
+        this.register(input, output);
     }
 
     public void registerSpecial(SmeltingHandler.SpecialRecipe specialRecipe) {

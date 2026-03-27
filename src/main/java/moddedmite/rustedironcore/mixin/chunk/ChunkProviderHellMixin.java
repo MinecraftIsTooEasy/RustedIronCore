@@ -3,6 +3,7 @@ package moddedmite.rustedironcore.mixin.chunk;
 import com.llamalad7.mixinextras.sugar.Local;
 import moddedmite.rustedironcore.api.event.Handlers;
 import moddedmite.rustedironcore.api.event.handler.BiomeDecorationHandler;
+import moddedmite.rustedironcore.api.event.handler.OreGenerationHandler;
 import moddedmite.rustedironcore.api.world.Dimension;
 import net.minecraft.*;
 import org.spongepowered.asm.mixin.Mixin;
@@ -51,5 +52,11 @@ public abstract class ChunkProviderHellMixin implements IChunkProvider {
                         this.worldObj, BiomeGenBase.hell, BiomeGenBase.hell.theBiomeDecorator,
                         this.hellRNG, blockX, blockZ
                 ));
+        Handlers.OreGeneration.onOresGeneration(
+                OreGenerationHandler.context(
+                        BiomeGenBase.hell.theBiomeDecorator,
+                        this.worldObj
+                )
+        );
     }
 }

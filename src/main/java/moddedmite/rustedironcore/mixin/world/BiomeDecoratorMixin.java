@@ -36,7 +36,10 @@ public class BiomeDecoratorMixin {
     private void onOresGeneration(CallbackInfo ci) {
         Handlers.OreGeneration.onOresGeneration(
                 OreGenerationHandler.context(
-                        (BiomeDecorator) (Object) this, this.currentWorld));
+                        (BiomeDecorator) (Object) this,
+                        this.currentWorld
+                )
+        );
     }
 
     @Inject(method = "decorate()V", at = @At(value = "FIELD", target = "Lnet/minecraft/BiomeDecorator;generateLakes:Z", opcode = Opcodes.GETFIELD))
