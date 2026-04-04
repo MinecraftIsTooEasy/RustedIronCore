@@ -2,12 +2,12 @@ package moddedmite.rustedironcore.api.event.handler;
 
 import moddedmite.rustedironcore.api.event.AbstractHandler;
 import moddedmite.rustedironcore.api.event.listener.IEntityEventListener;
-import net.minecraft.Damage;
-import net.minecraft.DamageSource;
-import net.minecraft.Entity;
-import net.minecraft.EntityLivingBase;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.*;
 
 public class EntityEventHandler extends AbstractHandler<IEntityEventListener> {
+    @Environment(EnvType.SERVER)
     public void onLoot(EntityLivingBase entity, DamageSource damageSource) {
         this.listeners.forEach(x -> x.onLoot(entity, damageSource));
     }
@@ -18,6 +18,11 @@ public class EntityEventHandler extends AbstractHandler<IEntityEventListener> {
 
     public void onDeath(EntityLivingBase entity, DamageSource damageSource) {
         this.listeners.forEach(x -> x.onDeath(entity, damageSource));
+    }
+
+    @Environment(EnvType.SERVER)
+    public void onServerPlayerDeath(ServerPlayer player, DamageSource damageSource) {
+        this.listeners.forEach(x -> x.onServerPlayerDeath(player, damageSource));
     }
 
     public void onUpdate(EntityLivingBase entity) {

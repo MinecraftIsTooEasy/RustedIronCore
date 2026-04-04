@@ -3,8 +3,8 @@ package moddedmite.rustedironcore.mixin.entity.player;
 import moddedmite.rustedironcore.Constants;
 import moddedmite.rustedironcore.api.event.Handlers;
 import moddedmite.rustedironcore.api.player.ServerPlayerAPI;
-import moddedmite.rustedironcore.network.Network;
 import moddedmite.rustedironcore.internal.network.packets.S2CUpdateNutrition;
+import moddedmite.rustedironcore.network.Network;
 import net.minecraft.*;
 import net.minecraft.server.MinecraftServer;
 import org.spongepowered.asm.mixin.Mixin;
@@ -108,6 +108,11 @@ public abstract class ServerPlayerMixin extends EntityPlayer implements ServerPl
     @Inject(method = "travelToDimension", at = @At("HEAD"))
     private void onDimensionTravel(int par1, CallbackInfo ci) {
         Handlers.Achievement.onDimensionTravel(this, this.dimension, par1);
+    }
+
+    @Inject(method = "onDeath", at = @At("HEAD"))
+    private void hookOnDeath(DamageSource par1DamageSource, CallbackInfo ci) {
+        Handlers.EntityEvent.onServerPlayerDeath((ServerPlayer) (Object) this, par1DamageSource);
     }
 }
 
