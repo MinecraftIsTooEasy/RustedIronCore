@@ -4,10 +4,13 @@ import moddedmite.rustedironcore.api.event.handler.OreGenerationHandler;
 import moddedmite.rustedironcore.api.world.Dimension;
 import net.minecraft.WorldGenMinable;
 
+import java.util.Random;
+import java.util.function.ToIntFunction;
+
 public record OreGenerationRegisterEvent(OreGenerationHandler handler) {
 
     public void register(Dimension dimension, WorldGenMinable ore, int frequency) {
-        register(dimension, ore, frequency, false);
+        this.register(dimension, ore, frequency, false);
     }
 
     public void register(Dimension dimension, WorldGenMinable ore, int frequency, boolean increasesWithDepth) {
@@ -21,4 +24,7 @@ public record OreGenerationRegisterEvent(OreGenerationHandler handler) {
         this.handler.unregisterOre(dimension, mineId);
     }
 
+    public void setDimensionOreHeight(Dimension dimension, ToIntFunction<Random> height) {
+        this.handler.setDimensionOreHeight(dimension, height);
+    }
 }

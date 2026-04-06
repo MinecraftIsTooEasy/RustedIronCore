@@ -54,8 +54,7 @@ public abstract class ChunkProviderHellMixin implements IChunkProvider {
                 ));
         Handlers.OreGeneration.onOresGeneration(
                 OreGenerationHandler.context(
-                        BiomeGenBase.hell.theBiomeDecorator,
-                        this.worldObj
+                        this.worldObj, null, this.hellRNG, blockX, blockZ
                 )
         );
     }

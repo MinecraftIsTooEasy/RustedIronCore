@@ -36,8 +36,7 @@ public class BiomeDecoratorMixin {
     private void onOresGeneration(CallbackInfo ci) {
         Handlers.OreGeneration.onOresGeneration(
                 OreGenerationHandler.context(
-                        (BiomeDecorator) (Object) this,
-                        this.currentWorld
+                        this.currentWorld, (BiomeDecorator) (Object) this, this.randomGenerator, this.chunk_X, this.chunk_Z
                 )
         );
     }

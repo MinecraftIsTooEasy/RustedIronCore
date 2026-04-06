@@ -36,6 +36,11 @@ public record Dimension(String name, int id) {
         return ID_TO_DIMENSION.get(id);
     }
 
+    @Nullable
+    public static Dimension fromWorld(World world) {
+        return fromId(world.getDimensionId());
+    }
+
     public boolean isOf(World world) {
         return world.getDimensionId() == this.id;
     }
