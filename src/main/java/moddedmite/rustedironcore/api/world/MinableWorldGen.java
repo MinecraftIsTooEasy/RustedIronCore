@@ -26,6 +26,7 @@ public class MinableWorldGen extends WorldGenMinable {
     };
     @Deprecated
     public static final RandomVeinHeightSupplier Common = STANDARD_RANDOM_HEIGHT;
+    public static final RandomVeinHeightSupplier NETHER_RANDOM_HEIGHT = (world, rand, minable) -> rand.nextInt(108) + 10;
 
     public MinableWorldGen(int minableBlockId, int numberOfBlocks) {
         super(minableBlockId, numberOfBlocks);
