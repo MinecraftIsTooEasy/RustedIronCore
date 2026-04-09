@@ -26,6 +26,13 @@ configurations {
     fml
 }
 
+configurations.matching { it.name in ["apiElements", "runtimeElements"] }.configureEach {
+    attributes {
+        //noinspection GroovyAssignabilityCheck
+        attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, 17)
+    }
+}
+
 dependencies {
     // To change the versions see the gradle.properties file
 
