@@ -134,6 +134,11 @@ public class Handlers {
     @Environment(EnvType.CLIENT)
     public static final KeybindingHandler Keybinding = new KeybindingHandler();
     /**
+     * Register JSON block and item models loaded from assets.
+     */
+    @Environment(EnvType.CLIENT)
+    public static final JsonModelHandler JsonModel = new JsonModelHandler();
+    /**
      * This take over the armor model rendering.
      */
     @Environment(EnvType.CLIENT)

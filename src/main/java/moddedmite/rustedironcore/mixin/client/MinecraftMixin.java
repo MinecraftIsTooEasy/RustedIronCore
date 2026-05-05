@@ -3,8 +3,8 @@ package moddedmite.rustedironcore.mixin.client;
 import moddedmite.rustedironcore.api.event.Handlers;
 import moddedmite.rustedironcore.api.gui.GuiTips;
 import moddedmite.rustedironcore.api.gui.GuiTipsWindow;
+import moddedmite.rustedironcore.api.model.JsonBlockModelManager;
 import net.minecraft.*;
-import net.xiaoyu233.fml.util.ReflectHelper;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -21,6 +21,9 @@ public abstract class MinecraftMixin {
     public abstract NetClientHandler getNetHandler();
 
     @Shadow
+    public abstract ResourceManager getResourceManager();
+
+    @Shadow
     private IntegratedServer theIntegratedServer;
     @Unique
     public GuiTipsWindow guiTipsWindow;
@@ -30,7 +33,8 @@ public abstract class MinecraftMixin {
     @Inject(method = "startGame", at = @At("RETURN"))
     private void addGui(CallbackInfo ci) {
         Handlers.Initialization.onClientStarted(Minecraft.getMinecraft());
-        this.guiTipsWindow = new GuiTipsWindow(ReflectHelper.dyCast(this));
+        ((ReloadableResourceManager) this.getResourceManager()).registerReloadListener(JsonBlockModelManager.INSTANCE);
+        this.guiTipsWindow = new GuiTipsWindow((Minecraft) (Object) this);
         this.guiTips = new GuiTips();
     }
 

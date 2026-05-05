@@ -50,7 +50,7 @@ dependencies {
 def fmlResolvedFile = configurations.fml.files.iterator().next()
 
 loom {
-	accessWidenerPath = file("src/main/resources/RustedIronCore.accessWidener")
+	accessWidenerPath = file("src/main/resources/rustedironcore.accesswidener")
 	mergedMinecraftJar()
 	mods {
 		"${archives_base_name}" {
