@@ -1,4 +1,4 @@
-package moddedmite.rustedironcore.mixin.tileEntity;
+package moddedmite.rustedironcore.mixin.block.entity;
 
 import huix.glacier.api.extension.item.IFusibleItem;
 import huix.glacier.api.registry.MinecraftRegistry;

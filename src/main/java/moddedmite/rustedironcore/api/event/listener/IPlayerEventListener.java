@@ -1,7 +1,9 @@
 package moddedmite.rustedironcore.api.event.listener;
 
+import moddedmite.rustedironcore.api.event.events.PlayerCrossDimensionEvent;
 import moddedmite.rustedironcore.api.event.events.PlayerLoggedInEvent;
 import moddedmite.rustedironcore.api.event.events.PlayerLoggedOutEvent;
+import moddedmite.rustedironcore.api.event.events.PlayerRespawnEvent;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
@@ -13,5 +15,11 @@ public interface IPlayerEventListener {
 
     // at this point, almost all player lists have already removed this player.
     default void onPlayerLoggedOut(PlayerLoggedOutEvent event) {
+    }
+
+    default void onPlayerRespawn(PlayerRespawnEvent event) {
+    }
+
+    default void onPlayerCrossDimension(PlayerCrossDimensionEvent event) {
     }
 }

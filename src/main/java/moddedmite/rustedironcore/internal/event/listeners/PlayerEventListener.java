@@ -1,6 +1,8 @@
 package moddedmite.rustedironcore.internal.event.listeners;
 
+import moddedmite.rustedironcore.api.event.events.PlayerCrossDimensionEvent;
 import moddedmite.rustedironcore.api.event.events.PlayerLoggedInEvent;
+import moddedmite.rustedironcore.api.event.events.PlayerRespawnEvent;
 import moddedmite.rustedironcore.api.event.listener.IPlayerEventListener;
 import moddedmite.rustedironcore.api.player.ServerPlayerAPI;
 import moddedmite.rustedironcore.api.util.FabricUtil;
@@ -16,7 +18,6 @@ public class PlayerEventListener implements IPlayerEventListener {
     @Override
     public void onPlayerLoggedIn(PlayerLoggedInEvent event) {
         ServerPlayer player = event.player();
-        Network.sendToClient(player, new S2CSyncNutritionLimit(((ServerPlayerAPI) player).ric$GetNutritionLimit()));
         if (this.shouldState(event.firstLogin())) {
             player.addChatMessage(RICText.Statement.getKey());
             Network.sendToClient(player, new S2COpenGuiTips());
@@ -29,5 +30,17 @@ public class PlayerEventListener implements IPlayerEventListener {
         if (RICConfig.StatementOnLogin.get()) return true;// if config is true, always send
         if (MinecraftServer.getServer().isServerInOnlineMode()) return false;// if online server, won't send
         return true;// send by default
+    }
+
+    @Override
+    public void onPlayerRespawn(PlayerRespawnEvent event) {
+        ServerPlayer player = event.player();
+        Network.sendToClient(player, new S2CSyncNutritionLimit(((ServerPlayerAPI) player).ric$GetNutritionLimit()));
+    }
+
+    @Override
+    public void onPlayerCrossDimension(PlayerCrossDimensionEvent event) {
+        ServerPlayer player = event.player();
+        Network.sendToClient(player, new S2CSyncNutritionLimit(((ServerPlayerAPI) player).ric$GetNutritionLimit()));
     }
 }
