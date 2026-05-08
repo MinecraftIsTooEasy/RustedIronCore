@@ -27,14 +27,16 @@ public final class JsonBlockModel {
     private final Map<String, String> textures;
     private final List<Element> elements;
     private final DisplayTransforms displayTransforms;
+    private final boolean generatedItem;
 
-    private JsonBlockModel(Identifier modelId, int textureWidth, int textureHeight, Map<String, String> textures, List<Element> elements, DisplayTransforms displayTransforms) {
+    private JsonBlockModel(Identifier modelId, int textureWidth, int textureHeight, Map<String, String> textures, List<Element> elements, DisplayTransforms displayTransforms, boolean generatedItem) {
         this.modelId = modelId;
         this.textureWidth = textureWidth;
         this.textureHeight = textureHeight;
         this.textures = textures;
         this.elements = elements;
         this.displayTransforms = displayTransforms;
+        this.generatedItem = generatedItem;
     }
 
     public static JsonBlockModel fromJson(Identifier modelId, Reader reader, JsonBlockModelManager manager) {
@@ -48,6 +50,7 @@ public final class JsonBlockModel {
         Map<String, String> textures = new HashMap<>();
         List<Element> elements = new ArrayList<>();
         DisplayTransforms displayTransforms = DisplayTransforms.EMPTY;
+        boolean generatedItem = false;
 
         if (root.has("parent")) {
             Identifier parentId = normalizeParentId(root.get("parent").getAsString());
@@ -59,8 +62,11 @@ public final class JsonBlockModel {
                 textures.putAll(parentModel.textures);
                 elements.addAll(parentModel.elements);
                 displayTransforms = parentModel.displayTransforms;
+                generatedItem = parentModel.generatedItem;
             } else {
-                applyBuiltinParent(parentId, elements);
+                BuiltinParent builtinParent = applyBuiltinParent(parentId, elements, displayTransforms);
+                displayTransforms = builtinParent.displayTransforms();
+                generatedItem = generatedItem || builtinParent.generatedItem();
             }
         }
 
@@ -100,11 +106,13 @@ public final class JsonBlockModel {
             displayTransforms = DisplayTransforms.fromJson(root.getAsJsonObject("display"), displayTransforms);
         }
 
-        if (elements.isEmpty()) {
-            applyBuiltinParent(modelId, elements);
+        if (elements.isEmpty() && !generatedItem) {
+            BuiltinParent builtinParent = applyBuiltinParent(modelId, elements, displayTransforms);
+            displayTransforms = builtinParent.displayTransforms();
+            generatedItem = builtinParent.generatedItem();
         }
 
-        return new JsonBlockModel(modelId, textureWidth, textureHeight, textures, elements, displayTransforms);
+        return new JsonBlockModel(modelId, textureWidth, textureHeight, textures, elements, displayTransforms, generatedItem);
     }
 
     private static Identifier normalizeParentId(String rawParent) {
@@ -149,41 +157,91 @@ public final class JsonBlockModel {
         return new int[]{width, height};
     }
 
-    private static void applyBuiltinParent(Identifier parentId, List<Element> elements) {
+    private static BuiltinParent applyBuiltinParent(Identifier parentId, List<Element> elements, DisplayTransforms displayTransforms) {
         String path = parentId.getPath();
+        if ("block/block".equals(path) || "block".equals(path)) {
+            return new BuiltinParent(DisplayTransforms.blockDefaults(displayTransforms), false);
+        }
+
+        if ("builtin".equals(parentId.getNamespace()) && "generated".equals(path)) {
+            return new BuiltinParent(DisplayTransforms.generatedItemDefaults(displayTransforms), true);
+        }
+
+        if ("item/generated".equals(path) || "generated".equals(path)) {
+            return new BuiltinParent(DisplayTransforms.generatedItemDefaults(displayTransforms), true);
+        }
+
+        if ("item/handheld".equals(path) || "handheld".equals(path)) {
+            return new BuiltinParent(DisplayTransforms.handheldItemDefaults(displayTransforms), true);
+        }
+
+        if ("item/handheld_rod".equals(path) || "handheld_rod".equals(path)) {
+            return new BuiltinParent(DisplayTransforms.handheldRodItemDefaults(displayTransforms), true);
+        }
+
         if ("block/cube_all".equals(path) || "cube_all".equals(path)) {
             elements.add(Element.cubeAll());
-            return;
+            return new BuiltinParent(displayTransforms, false);
         }
 
         if ("block/cube".equals(path) || "cube".equals(path)) {
             elements.add(Element.cube());
-            return;
+            return new BuiltinParent(displayTransforms, false);
         }
 
         if ("block/cube_column".equals(path) || "cube_column".equals(path)) {
             elements.add(Element.cubeColumn());
-            return;
+            return new BuiltinParent(displayTransforms, false);
         }
 
         if ("block/cube_bottom_top".equals(path) || "cube_bottom_top".equals(path)) {
             elements.add(Element.cubeBottomTop());
-            return;
+            return new BuiltinParent(displayTransforms, false);
         }
 
         if ("block/orientable".equals(path) || "orientable".equals(path)) {
             elements.add(Element.orientable());
-            return;
+            return new BuiltinParent(displayTransforms, false);
         }
 
         if ("block/cross".equals(path) || "cross".equals(path)) {
             elements.addAll(Element.cross());
-            return;
+            return new BuiltinParent(displayTransforms, false);
+        }
+
+        if ("block/tinted_cross".equals(path) || "tinted_cross".equals(path)) {
+            elements.addAll(Element.tintedCross());
+            return new BuiltinParent(displayTransforms, false);
+        }
+
+        if ("block/crop".equals(path) || "crop".equals(path)) {
+            elements.addAll(Element.crop());
+            return new BuiltinParent(displayTransforms, false);
+        }
+
+        if ("block/leaves".equals(path) || "leaves".equals(path)) {
+            elements.add(Element.cubeAll());
+            return new BuiltinParent(displayTransforms, false);
+        }
+
+        if ("block/slab".equals(path) || "slab".equals(path)) {
+            elements.add(Element.slab(false));
+            return new BuiltinParent(displayTransforms, false);
+        }
+
+        if ("block/slab_top".equals(path) || "slab_top".equals(path)) {
+            elements.add(Element.slab(true));
+            return new BuiltinParent(displayTransforms, false);
         }
 
         if ("entity".equals(path)) {
-            return;
+            return new BuiltinParent(displayTransforms, false);
         }
+
+        return new BuiltinParent(displayTransforms, false);
+    }
+
+    private record BuiltinParent(DisplayTransforms displayTransforms, boolean generatedItem) {
     }
 
     public List<Element> getElements() {
@@ -230,6 +288,16 @@ public final class JsonBlockModel {
                 }
             }
         }
+        if (this.generatedItem) {
+            for (int layer = 0; layer < 5; layer++) {
+                String texture = this.resolveTexture("#layer" + layer);
+                if (texture != null) {
+                    resolvedTextures.add(texture);
+                } else if (layer == 0) {
+                    break;
+                }
+            }
+        }
         return resolvedTextures;
     }
 
@@ -249,6 +317,17 @@ public final class JsonBlockModel {
         return this.displayTransforms.get(context);
     }
 
+    public boolean isGeneratedItem() {
+        return this.generatedItem;
+    }
+
+    public String getGeneratedItemLayerTexture(int layer) {
+        if (layer < 0 || layer > 4) {
+            return null;
+        }
+        return this.resolveTexture("#layer" + layer);
+    }
+
     public static final class Element {
         private final String name;
         private final float fromX;
@@ -259,8 +338,9 @@ public final class JsonBlockModel {
         private final float toZ;
         private final Rotation rotation;
         private final EnumMap<Direction, Face> faces;
+        private final boolean shade;
 
-        private Element(String name, float fromX, float fromY, float fromZ, float toX, float toY, float toZ, Rotation rotation, EnumMap<Direction, Face> faces) {
+        private Element(String name, float fromX, float fromY, float fromZ, float toX, float toY, float toZ, Rotation rotation, EnumMap<Direction, Face> faces, boolean shade) {
             this.name = name;
             this.fromX = fromX;
             this.fromY = fromY;
@@ -270,17 +350,18 @@ public final class JsonBlockModel {
             this.toZ = toZ;
             this.rotation = rotation;
             this.faces = faces;
+            this.shade = shade;
         }
 
         public static Element fromJson(JsonObject object) {
             float[] from = parseVector(object.getAsJsonArray("from"), 0.0F, 0.0F, 0.0F);
             float[] to = parseVector(object.getAsJsonArray("to"), 16.0F, 16.0F, 16.0F);
-            float fromX = Math.min(from[0], to[0]);
-            float fromY = Math.min(from[1], to[1]);
-            float fromZ = Math.min(from[2], to[2]);
-            float toX = Math.max(from[0], to[0]);
-            float toY = Math.max(from[1], to[1]);
-            float toZ = Math.max(from[2], to[2]);
+            float fromX = from[0];
+            float fromY = from[1];
+            float fromZ = from[2];
+            float toX = to[0];
+            float toY = to[1];
+            float toZ = to[2];
             Rotation rotation = object.has("rotation") && object.get("rotation").isJsonObject()
                     ? Rotation.fromJson(object.getAsJsonObject("rotation"))
                     : Rotation.NONE;
@@ -297,48 +378,49 @@ public final class JsonBlockModel {
             }
 
             String name = object.has("name") ? object.get("name").getAsString() : "";
-            return new Element(name, fromX, fromY, fromZ, toX, toY, toZ, rotation, faces);
+            boolean shade = !object.has("shade") || object.get("shade").getAsBoolean();
+            return new Element(name, fromX, fromY, fromZ, toX, toY, toZ, rotation, faces, shade);
         }
 
         private static Element cubeAll() {
             EnumMap<Direction, Face> faces = new EnumMap<>(Direction.class);
             for (Direction direction : Direction.values()) {
-                faces.put(direction, Face.simple("#all"));
+                faces.put(direction, Face.cull("#all", direction));
             }
-            return new Element("cube_all", 0.0F, 0.0F, 0.0F, 16.0F, 16.0F, 16.0F, Rotation.NONE, faces);
+            return new Element("cube_all", 0.0F, 0.0F, 0.0F, 16.0F, 16.0F, 16.0F, Rotation.NONE, faces, true);
         }
 
         private static Element cube() {
             EnumMap<Direction, Face> faces = new EnumMap<>(Direction.class);
-            faces.put(Direction.DOWN, Face.simple("#down"));
-            faces.put(Direction.UP, Face.simple("#up"));
-            faces.put(Direction.NORTH, Face.simple("#north"));
-            faces.put(Direction.SOUTH, Face.simple("#south"));
-            faces.put(Direction.WEST, Face.simple("#west"));
-            faces.put(Direction.EAST, Face.simple("#east"));
-            return new Element("cube", 0.0F, 0.0F, 0.0F, 16.0F, 16.0F, 16.0F, Rotation.NONE, faces);
+            faces.put(Direction.DOWN, Face.cull("#down", Direction.DOWN));
+            faces.put(Direction.UP, Face.cull("#up", Direction.UP));
+            faces.put(Direction.NORTH, Face.cull("#north", Direction.NORTH));
+            faces.put(Direction.SOUTH, Face.cull("#south", Direction.SOUTH));
+            faces.put(Direction.WEST, Face.cull("#west", Direction.WEST));
+            faces.put(Direction.EAST, Face.cull("#east", Direction.EAST));
+            return new Element("cube", 0.0F, 0.0F, 0.0F, 16.0F, 16.0F, 16.0F, Rotation.NONE, faces, true);
         }
 
         private static Element cubeColumn() {
             EnumMap<Direction, Face> faces = new EnumMap<>(Direction.class);
-            faces.put(Direction.DOWN, Face.simple("#end"));
-            faces.put(Direction.UP, Face.simple("#end"));
-            faces.put(Direction.NORTH, Face.simple("#side"));
-            faces.put(Direction.SOUTH, Face.simple("#side"));
-            faces.put(Direction.WEST, Face.simple("#side"));
-            faces.put(Direction.EAST, Face.simple("#side"));
-            return new Element("cube_column", 0.0F, 0.0F, 0.0F, 16.0F, 16.0F, 16.0F, Rotation.NONE, faces);
+            faces.put(Direction.DOWN, Face.cull("#end", Direction.DOWN));
+            faces.put(Direction.UP, Face.cull("#end", Direction.UP));
+            faces.put(Direction.NORTH, Face.cull("#side", Direction.NORTH));
+            faces.put(Direction.SOUTH, Face.cull("#side", Direction.SOUTH));
+            faces.put(Direction.WEST, Face.cull("#side", Direction.WEST));
+            faces.put(Direction.EAST, Face.cull("#side", Direction.EAST));
+            return new Element("cube_column", 0.0F, 0.0F, 0.0F, 16.0F, 16.0F, 16.0F, Rotation.NONE, faces, true);
         }
 
         private static Element cubeBottomTop() {
             EnumMap<Direction, Face> faces = new EnumMap<>(Direction.class);
-            faces.put(Direction.DOWN, Face.simple("#bottom"));
-            faces.put(Direction.UP, Face.simple("#top"));
-            faces.put(Direction.NORTH, Face.simple("#side"));
-            faces.put(Direction.SOUTH, Face.simple("#side"));
-            faces.put(Direction.WEST, Face.simple("#side"));
-            faces.put(Direction.EAST, Face.simple("#side"));
-            return new Element("cube_bottom_top", 0.0F, 0.0F, 0.0F, 16.0F, 16.0F, 16.0F, Rotation.NONE, faces);
+            faces.put(Direction.DOWN, Face.cull("#bottom", Direction.DOWN));
+            faces.put(Direction.UP, Face.cull("#top", Direction.UP));
+            faces.put(Direction.NORTH, Face.cull("#side", Direction.NORTH));
+            faces.put(Direction.SOUTH, Face.cull("#side", Direction.SOUTH));
+            faces.put(Direction.WEST, Face.cull("#side", Direction.WEST));
+            faces.put(Direction.EAST, Face.cull("#side", Direction.EAST));
+            return new Element("cube_bottom_top", 0.0F, 0.0F, 0.0F, 16.0F, 16.0F, 16.0F, Rotation.NONE, faces, true);
         }
 
         private static Element orientable() {
@@ -349,7 +431,7 @@ public final class JsonBlockModel {
             faces.put(Direction.SOUTH, Face.simple("#side"));
             faces.put(Direction.WEST, Face.simple("#side"));
             faces.put(Direction.EAST, Face.simple("#side"));
-            return new Element("orientable", 0.0F, 0.0F, 0.0F, 16.0F, 16.0F, 16.0F, Rotation.NONE, faces);
+            return new Element("orientable", 0.0F, 0.0F, 0.0F, 16.0F, 16.0F, 16.0F, Rotation.NONE, faces, true);
         }
 
         private static List<Element> cross() {
@@ -357,13 +439,63 @@ public final class JsonBlockModel {
             EnumMap<Direction, Face> firstFaces = new EnumMap<>(Direction.class);
             firstFaces.put(Direction.WEST, Face.simple("#cross"));
             firstFaces.put(Direction.EAST, Face.simple("#cross"));
-            elements.add(new Element("cross_0", 7.5F, 0.0F, -3.3137F, 8.5F, 16.0F, 19.3137F, Rotation.of("y", 45.0F, 8.0F, 8.0F, 8.0F), firstFaces));
+            elements.add(new Element("cross_0", 7.5F, 0.0F, -3.3137F, 8.5F, 16.0F, 19.3137F, Rotation.of("y", 45.0F, 8.0F, 8.0F, 8.0F), firstFaces, true));
 
             EnumMap<Direction, Face> secondFaces = new EnumMap<>(Direction.class);
             secondFaces.put(Direction.WEST, Face.simple("#cross"));
             secondFaces.put(Direction.EAST, Face.simple("#cross"));
-            elements.add(new Element("cross_1", 7.5F, 0.0F, -3.3137F, 8.5F, 16.0F, 19.3137F, Rotation.of("y", -45.0F, 8.0F, 8.0F, 8.0F), secondFaces));
+            elements.add(new Element("cross_1", 7.5F, 0.0F, -3.3137F, 8.5F, 16.0F, 19.3137F, Rotation.of("y", -45.0F, 8.0F, 8.0F, 8.0F), secondFaces, true));
             return elements;
+        }
+
+        private static List<Element> tintedCross() {
+            List<Element> elements = cross();
+            List<Element> tinted = new ArrayList<>(elements.size());
+            for (Element element : elements) {
+                EnumMap<Direction, Face> faces = new EnumMap<>(Direction.class);
+                for (Map.Entry<Direction, Face> entry : element.faces.entrySet()) {
+                    faces.put(entry.getKey(), Face.tinted(entry.getValue().getTexture(), 0));
+                }
+                tinted.add(new Element(element.name, element.fromX, element.fromY, element.fromZ, element.toX, element.toY, element.toZ, element.rotation, faces, element.shade));
+            }
+            return tinted;
+        }
+
+        private static List<Element> crop() {
+            List<Element> elements = new ArrayList<>(4);
+            EnumMap<Direction, Face> faces = new EnumMap<>(Direction.class);
+            faces.put(Direction.WEST, Face.uv("#crop", 0.0F, 0.0F, 16.0F, 16.0F));
+            faces.put(Direction.EAST, Face.uv("#crop", 16.0F, 0.0F, 0.0F, 16.0F));
+            elements.add(new Element("crop_west", 4.0F, -1.0F, 0.0F, 4.0F, 15.0F, 16.0F, Rotation.NONE, faces, false));
+
+            faces = new EnumMap<>(Direction.class);
+            faces.put(Direction.WEST, Face.uv("#crop", 16.0F, 0.0F, 0.0F, 16.0F));
+            faces.put(Direction.EAST, Face.uv("#crop", 0.0F, 0.0F, 16.0F, 16.0F));
+            elements.add(new Element("crop_east", 12.0F, -1.0F, 0.0F, 12.0F, 15.0F, 16.0F, Rotation.NONE, faces, false));
+
+            faces = new EnumMap<>(Direction.class);
+            faces.put(Direction.NORTH, Face.uv("#crop", 0.0F, 0.0F, 16.0F, 16.0F));
+            faces.put(Direction.SOUTH, Face.uv("#crop", 16.0F, 0.0F, 0.0F, 16.0F));
+            elements.add(new Element("crop_north", 0.0F, -1.0F, 4.0F, 16.0F, 15.0F, 4.0F, Rotation.NONE, faces, false));
+
+            faces = new EnumMap<>(Direction.class);
+            faces.put(Direction.NORTH, Face.uv("#crop", 16.0F, 0.0F, 0.0F, 16.0F));
+            faces.put(Direction.SOUTH, Face.uv("#crop", 0.0F, 0.0F, 16.0F, 16.0F));
+            elements.add(new Element("crop_south", 0.0F, -1.0F, 12.0F, 16.0F, 15.0F, 12.0F, Rotation.NONE, faces, false));
+            return elements;
+        }
+
+        private static Element slab(boolean top) {
+            float fromY = top ? 8.0F : 0.0F;
+            float toY = top ? 16.0F : 8.0F;
+            EnumMap<Direction, Face> faces = new EnumMap<>(Direction.class);
+            faces.put(Direction.DOWN, Face.cull("#bottom", 0.0F, 0.0F, 16.0F, 16.0F, top ? null : Direction.DOWN));
+            faces.put(Direction.UP, Face.cull("#top", 0.0F, 0.0F, 16.0F, 16.0F, top ? Direction.UP : null));
+            faces.put(Direction.NORTH, Face.cull("#side", 0.0F, top ? 0.0F : 8.0F, 16.0F, top ? 8.0F : 16.0F, Direction.NORTH));
+            faces.put(Direction.SOUTH, Face.cull("#side", 0.0F, top ? 0.0F : 8.0F, 16.0F, top ? 8.0F : 16.0F, Direction.SOUTH));
+            faces.put(Direction.WEST, Face.cull("#side", 0.0F, top ? 0.0F : 8.0F, 16.0F, top ? 8.0F : 16.0F, Direction.WEST));
+            faces.put(Direction.EAST, Face.cull("#side", 0.0F, top ? 0.0F : 8.0F, 16.0F, top ? 8.0F : 16.0F, Direction.EAST));
+            return new Element(top ? "slab_top" : "slab", 0.0F, fromY, 0.0F, 16.0F, toY, 16.0F, Rotation.NONE, faces, true);
         }
 
         public String getName() {
@@ -402,6 +534,10 @@ public final class JsonBlockModel {
             return this.faces.get(direction);
         }
 
+        public boolean isShade() {
+            return this.shade;
+        }
+
         private static float[] parseVector(JsonArray array, float x, float y, float z) {
             if (array == null || array.size() < 3) {
                 return new float[]{x, y, z};
@@ -416,12 +552,14 @@ public final class JsonBlockModel {
         private final String texture;
         private final int rotation;
         private final Direction cullFace;
+        private final int tintIndex;
 
-        private Face(float[] uv, String texture, int rotation, Direction cullFace) {
+        private Face(float[] uv, String texture, int rotation, Direction cullFace, int tintIndex) {
             this.uv = uv;
             this.texture = texture;
             this.rotation = rotation;
             this.cullFace = cullFace;
+            this.tintIndex = tintIndex;
         }
 
         public static Face fromJson(JsonObject object) {
@@ -431,11 +569,28 @@ public final class JsonBlockModel {
             String texture = object.has("texture") ? object.get("texture").getAsString() : null;
             int rotation = object.has("rotation") ? object.get("rotation").getAsInt() : 0;
             Direction cullFace = object.has("cullface") ? Direction.fromName(object.get("cullface").getAsString()) : null;
-            return new Face(uv, texture, rotation, cullFace);
+            int tintIndex = object.has("tintindex") ? object.get("tintindex").getAsInt() : -1;
+            return new Face(uv, texture, rotation, cullFace, tintIndex);
         }
 
         private static Face simple(String texture) {
-            return new Face(null, texture, 0, null);
+            return new Face(null, texture, 0, null, -1);
+        }
+
+        private static Face tinted(String texture, int tintIndex) {
+            return new Face(null, texture, 0, null, tintIndex);
+        }
+
+        private static Face cull(String texture, Direction cullFace) {
+            return new Face(null, texture, 0, cullFace, -1);
+        }
+
+        private static Face uv(String texture, float minU, float minV, float maxU, float maxV) {
+            return new Face(new float[]{minU, minV, maxU, maxV}, texture, 0, null, -1);
+        }
+
+        private static Face cull(String texture, float minU, float minV, float maxU, float maxV, Direction cullFace) {
+            return new Face(new float[]{minU, minV, maxU, maxV}, texture, 0, cullFace, -1);
         }
 
         public float[] getUv(float fromX, float fromY, float fromZ, float toX, float toY, float toZ, Direction direction, int textureWidth, int textureHeight) {
@@ -444,9 +599,12 @@ public final class JsonBlockModel {
             }
 
             return switch (direction) {
-                case DOWN, UP -> new float[]{fromX, fromZ, toX, toZ};
-                case NORTH, SOUTH -> new float[]{fromX, 16.0F - toY, toX, 16.0F - fromY};
-                case WEST, EAST -> new float[]{fromZ, 16.0F - toY, toZ, 16.0F - fromY};
+                case DOWN -> new float[]{fromX, 16.0F - toZ, toX, 16.0F - fromZ};
+                case UP -> new float[]{fromX, fromZ, toX, toZ};
+                case NORTH -> new float[]{16.0F - toX, 16.0F - toY, 16.0F - fromX, 16.0F - fromY};
+                case SOUTH -> new float[]{fromX, 16.0F - toY, toX, 16.0F - fromY};
+                case WEST -> new float[]{fromZ, 16.0F - toY, toZ, 16.0F - fromY};
+                case EAST -> new float[]{16.0F - toZ, 16.0F - toY, 16.0F - fromZ, 16.0F - fromY};
             };
         }
 
@@ -462,6 +620,10 @@ public final class JsonBlockModel {
             return this.cullFace;
         }
 
+        public int getTintIndex() {
+            return this.tintIndex;
+        }
+
         private static float[] parseFaceUv(JsonArray array) {
             if (array.size() < 4) {
                 return null;
@@ -472,16 +634,18 @@ public final class JsonBlockModel {
     }
 
     public static final class Rotation {
-        public static final Rotation NONE = new Rotation("", 0.0F, new float[]{8.0F, 8.0F, 8.0F});
+        public static final Rotation NONE = new Rotation("", 0.0F, new float[]{8.0F, 8.0F, 8.0F}, false);
 
         private final String axis;
         private final float angle;
         private final float[] origin;
+        private final boolean rescale;
 
-        private Rotation(String axis, float angle, float[] origin) {
+        private Rotation(String axis, float angle, float[] origin, boolean rescale) {
             this.axis = axis;
             this.angle = angle;
             this.origin = origin;
+            this.rescale = rescale;
         }
 
         public static Rotation fromJson(JsonObject object) {
@@ -490,11 +654,12 @@ public final class JsonBlockModel {
             float[] origin = object.has("origin") && object.get("origin").isJsonArray()
                     ? Element.parseVector(object.getAsJsonArray("origin"), 8.0F, 8.0F, 8.0F)
                     : new float[]{8.0F, 8.0F, 8.0F};
-            return new Rotation(axis, angle, origin);
+            boolean rescale = object.has("rescale") && object.get("rescale").getAsBoolean();
+            return new Rotation(axis, angle, origin, rescale);
         }
 
         public static Rotation of(String axis, float angle, float originX, float originY, float originZ) {
-            return new Rotation(axis, angle, new float[]{originX, originY, originZ});
+            return new Rotation(axis, angle, new float[]{originX, originY, originZ}, false);
         }
 
         public boolean isPresent() {
@@ -511,6 +676,10 @@ public final class JsonBlockModel {
 
         public float[] getOrigin() {
             return this.origin;
+        }
+
+        public boolean isRescale() {
+            return this.rescale;
         }
     }
 
@@ -534,6 +703,41 @@ public final class JsonBlockModel {
             return new DisplayTransforms(transforms);
         }
 
+        private static DisplayTransforms blockDefaults(DisplayTransforms parent) {
+            Map<RenderContext, DisplayTransform> transforms = new HashMap<>(parent.transforms);
+            transforms.putIfAbsent(RenderContext.GUI, DisplayTransform.of(30.0F, 225.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.625F, 0.625F, 0.625F));
+            transforms.putIfAbsent(RenderContext.GROUND, DisplayTransform.of(0.0F, 0.0F, 0.0F, 0.0F, 3.0F, 0.0F, 0.25F, 0.25F, 0.25F));
+            transforms.putIfAbsent(RenderContext.FIXED, DisplayTransform.of(0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.5F, 0.5F, 0.5F));
+            transforms.putIfAbsent(RenderContext.THIRD_PERSON_RIGHT_HAND, DisplayTransform.of(75.0F, 45.0F, 0.0F, 0.0F, 2.5F, 0.0F, 0.375F, 0.375F, 0.375F));
+            transforms.putIfAbsent(RenderContext.FIRST_PERSON_RIGHT_HAND, DisplayTransform.of(0.0F, 45.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.4F, 0.4F, 0.4F));
+            transforms.putIfAbsent(RenderContext.FIRST_PERSON_LEFT_HAND, DisplayTransform.of(0.0F, 225.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.4F, 0.4F, 0.4F));
+            return new DisplayTransforms(transforms);
+        }
+
+        private static DisplayTransforms generatedItemDefaults(DisplayTransforms parent) {
+            Map<RenderContext, DisplayTransform> transforms = new HashMap<>(parent.transforms);
+            transforms.putIfAbsent(RenderContext.GUI, DisplayTransform.of(0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F));
+            transforms.putIfAbsent(RenderContext.GROUND, DisplayTransform.of(0.0F, 0.0F, 0.0F, 0.0F, 2.0F, 0.0F, 0.5F, 0.5F, 0.5F));
+            transforms.putIfAbsent(RenderContext.HEAD, DisplayTransform.of(0.0F, 180.0F, 0.0F, 0.0F, 13.0F, 7.0F, 1.0F, 1.0F, 1.0F));
+            transforms.putIfAbsent(RenderContext.THIRD_PERSON_RIGHT_HAND, DisplayTransform.of(0.0F, 0.0F, 0.0F, 0.0F, 3.0F, 1.0F, 0.55F, 0.55F, 0.55F));
+            transforms.putIfAbsent(RenderContext.FIRST_PERSON_RIGHT_HAND, DisplayTransform.of(0.0F, -90.0F, 25.0F, 1.13F, 3.2F, 1.13F, 0.68F, 0.68F, 0.68F));
+            transforms.putIfAbsent(RenderContext.FIXED, DisplayTransform.of(0.0F, 180.0F, 0.0F, 0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F));
+            return new DisplayTransforms(transforms);
+        }
+
+        private static DisplayTransforms handheldItemDefaults(DisplayTransforms parent) {
+            Map<RenderContext, DisplayTransform> transforms = new HashMap<>(generatedItemDefaults(parent).transforms);
+            transforms.put(RenderContext.THIRD_PERSON_RIGHT_HAND, DisplayTransform.of(0.0F, -90.0F, 55.0F, 0.0F, 4.0F, 0.5F, 0.85F, 0.85F, 0.85F));
+            transforms.put(RenderContext.THIRD_PERSON_LEFT_HAND, DisplayTransform.of(0.0F, 90.0F, -55.0F, 0.0F, 4.0F, 0.5F, 0.85F, 0.85F, 0.85F));
+            transforms.put(RenderContext.FIRST_PERSON_RIGHT_HAND, DisplayTransform.of(0.0F, -90.0F, 25.0F, 1.13F, 3.2F, 1.13F, 0.68F, 0.68F, 0.68F));
+            transforms.put(RenderContext.FIRST_PERSON_LEFT_HAND, DisplayTransform.of(0.0F, 90.0F, -25.0F, 1.13F, 3.2F, 1.13F, 0.68F, 0.68F, 0.68F));
+            return new DisplayTransforms(transforms);
+        }
+
+        private static DisplayTransforms handheldRodItemDefaults(DisplayTransforms parent) {
+            return handheldItemDefaults(parent);
+        }
+
         public DisplayTransform get(RenderContext context) {
             DisplayTransform transform = this.transforms.get(context);
             if (transform != null) {
@@ -553,11 +757,13 @@ public final class JsonBlockModel {
         private final float[] rotation;
         private final float[] translation;
         private final float[] scale;
+        private final float[] rightRotation;
 
-        private DisplayTransform(float[] rotation, float[] translation, float[] scale) {
+        private DisplayTransform(float[] rotation, float[] translation, float[] scale, float[] rightRotation) {
             this.rotation = rotation;
             this.translation = translation;
             this.scale = scale;
+            this.rightRotation = rightRotation;
         }
 
         public static DisplayTransform fromJson(JsonObject object) {
@@ -570,7 +776,19 @@ public final class JsonBlockModel {
             float[] scale = object.has("scale") && object.get("scale").isJsonArray()
                     ? parseTransformVector(object.getAsJsonArray("scale"), 1.0F, 1.0F, 1.0F)
                     : new float[]{1.0F, 1.0F, 1.0F};
-            return new DisplayTransform(rotation, translation, scale);
+            float[] rightRotation = object.has("right_rotation") && object.get("right_rotation").isJsonArray()
+                    ? parseTransformVector(object.getAsJsonArray("right_rotation"), 0.0F, 0.0F, 0.0F)
+                    : new float[]{0.0F, 0.0F, 0.0F};
+            return new DisplayTransform(rotation, translation, scale, rightRotation);
+        }
+
+        private static DisplayTransform of(float rotationX, float rotationY, float rotationZ, float translationX, float translationY, float translationZ, float scaleX, float scaleY, float scaleZ) {
+            return new DisplayTransform(
+                    new float[]{rotationX, rotationY, rotationZ},
+                    new float[]{translationX, translationY, translationZ},
+                    new float[]{scaleX, scaleY, scaleZ},
+                    new float[]{0.0F, 0.0F, 0.0F}
+            );
         }
 
         public float[] getRotation() {
@@ -585,6 +803,10 @@ public final class JsonBlockModel {
             return this.scale;
         }
 
+        public float[] getRightRotation() {
+            return this.rightRotation;
+        }
+
         private static float[] parseTransformVector(JsonArray array, float x, float y, float z) {
             if (array == null || array.size() < 3) {
                 return new float[]{x, y, z};
@@ -596,9 +818,11 @@ public final class JsonBlockModel {
     public enum RenderContext {
         BLOCK("fixed"),
         BLOCK_ITEM("fixed"),
+        NONE("none"),
         GUI("gui"),
         GROUND("ground"),
         FIXED("fixed"),
+        HEAD("head"),
         FIRST_PERSON_RIGHT_HAND("firstperson_righthand"),
         FIRST_PERSON_LEFT_HAND("firstperson_lefthand"),
         THIRD_PERSON_RIGHT_HAND("thirdperson_righthand"),

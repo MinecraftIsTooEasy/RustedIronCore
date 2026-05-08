@@ -7,6 +7,7 @@
   "mixins": [
     "accessor.BlockAccessor",
     "accessor.ItemAccessor",
+    "accessor.RenderBlocksAccessor",
     "block.BlockFireMixin",
     "block.BlockGravelMixin",
     "block.entity.TileEntityBeaconMixin",

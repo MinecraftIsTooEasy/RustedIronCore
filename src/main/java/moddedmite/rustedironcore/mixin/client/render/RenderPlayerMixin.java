@@ -1,6 +1,8 @@
 package moddedmite.rustedironcore.mixin.client.render;
 
 import moddedmite.rustedironcore.api.event.Handlers;
+import moddedmite.rustedironcore.api.model.JsonBlockModel;
+import moddedmite.rustedironcore.api.model.JsonModelRenderContext;
 import net.minecraft.*;
 import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Mixin;
@@ -39,6 +41,16 @@ public abstract class RenderPlayerMixin extends RendererLivingEntity {
         this.models.add(this.modelArmorChestplate);
         this.models.add(this.modelArmor);// in fact this is leggings
         Handlers.ArmorModel.onArmorModelRegister(this.models::add);
+    }
+
+    @Inject(method = "renderSpecials", at = @At("HEAD"))
+    private void rustedIronCore$pushThirdPersonItemContext(AbstractClientPlayer player, float partialTicks, CallbackInfo ci) {
+        JsonModelRenderContext.push(JsonBlockModel.RenderContext.THIRD_PERSON_RIGHT_HAND);
+    }
+
+    @Inject(method = "renderSpecials", at = @At("RETURN"))
+    private void rustedIronCore$popThirdPersonItemContext(AbstractClientPlayer player, float partialTicks, CallbackInfo ci) {
+        JsonModelRenderContext.pop();
     }
 
     /**

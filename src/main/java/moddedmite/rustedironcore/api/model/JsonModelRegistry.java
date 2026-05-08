@@ -18,13 +18,27 @@ public interface JsonModelRegistry {
 
     void registerBlockState(Block block, Identifier blockStateId);
 
+    void registerBlockState(Block block, int metadata, String blockStateId);
+
+    void registerBlockState(Block block, int metadata, Identifier blockStateId);
+
+    void registerBlockStateProperties(Block block, JsonBlockStatePropertyResolver resolver);
+
     void registerItemModel(Item item, String modelId);
 
     void registerItemModel(Item item, Identifier modelId);
 
+    void registerItemModel(Block block, String modelId);
+
+    void registerItemModel(Block block, Identifier modelId);
+
     void registerItemModel(Item item, int metadata, String modelId);
 
     void registerItemModel(Item item, int metadata, Identifier modelId);
+
+    void registerItemModel(Block block, int metadata, String modelId);
+
+    void registerItemModel(Block block, int metadata, Identifier modelId);
 
     void registerBuiltInRenderer(Item item, BuiltInEntityRenderer renderer);
 

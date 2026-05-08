@@ -5,6 +5,7 @@ import moddedmite.rustedironcore.api.event.AbstractHandler;
 import moddedmite.rustedironcore.api.event.listener.IJsonModelListener;
 import moddedmite.rustedironcore.api.model.BuiltInEntityRenderer;
 import moddedmite.rustedironcore.api.model.JsonBlockModelManager;
+import moddedmite.rustedironcore.api.model.JsonBlockStatePropertyResolver;
 import moddedmite.rustedironcore.api.model.JsonModelRegistry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -51,6 +52,21 @@ public class JsonModelHandler extends AbstractHandler<IJsonModelListener> implem
     }
 
     @Override
+    public void registerBlockState(Block block, int metadata, String blockStateId) {
+        this.registry.registerBlockState(block, metadata, blockStateId);
+    }
+
+    @Override
+    public void registerBlockState(Block block, int metadata, Identifier blockStateId) {
+        this.registry.registerBlockState(block, metadata, blockStateId);
+    }
+
+    @Override
+    public void registerBlockStateProperties(Block block, JsonBlockStatePropertyResolver resolver) {
+        this.registry.registerBlockStateProperties(block, resolver);
+    }
+
+    @Override
     public void registerItemModel(Item item, String modelId) {
         this.registry.registerItemModel(item, modelId);
     }
@@ -61,6 +77,16 @@ public class JsonModelHandler extends AbstractHandler<IJsonModelListener> implem
     }
 
     @Override
+    public void registerItemModel(Block block, String modelId) {
+        this.registry.registerItemModel(block, modelId);
+    }
+
+    @Override
+    public void registerItemModel(Block block, Identifier modelId) {
+        this.registry.registerItemModel(block, modelId);
+    }
+
+    @Override
     public void registerItemModel(Item item, int metadata, String modelId) {
         this.registry.registerItemModel(item, metadata, modelId);
     }
@@ -68,6 +94,16 @@ public class JsonModelHandler extends AbstractHandler<IJsonModelListener> implem
     @Override
     public void registerItemModel(Item item, int metadata, Identifier modelId) {
         this.registry.registerItemModel(item, metadata, modelId);
+    }
+
+    @Override
+    public void registerItemModel(Block block, int metadata, String modelId) {
+        this.registry.registerItemModel(block, metadata, modelId);
+    }
+
+    @Override
+    public void registerItemModel(Block block, int metadata, Identifier modelId) {
+        this.registry.registerItemModel(block, metadata, modelId);
     }
 
     @Override

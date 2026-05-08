@@ -6,6 +6,7 @@ import moddedmite.rustedironcore.mixin.accessor.BlockAccessor;
 import moddedmite.rustedironcore.mixin.accessor.ItemAccessor;
 import net.minecraft.Block;
 import net.minecraft.Icon;
+import net.minecraft.IBlockAccess;
 import net.minecraft.Item;
 import net.minecraft.ItemBlock;
 import net.minecraft.ItemStack;
@@ -21,9 +22,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -41,8 +45,12 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
     private final Map<Block, Identifier> blockModelOverrides = new IdentityHashMap<>();
     private final Map<Block, Identifier> blockStateOverrides = new IdentityHashMap<>();
     private final Map<Integer, Identifier> blockMetadataModelOverrides = new HashMap<>();
+    private final Map<Integer, Identifier> blockMetadataStateOverrides = new HashMap<>();
+    private final Map<Block, JsonBlockStatePropertyResolver> blockStatePropertyResolvers = new IdentityHashMap<>();
     private final Map<Item, Identifier> itemModelOverrides = new IdentityHashMap<>();
     private final Map<Long, Identifier> itemMetadataModelOverrides = new HashMap<>();
+    private final Map<Block, Identifier> blockItemModelOverrides = new IdentityHashMap<>();
+    private final Map<Integer, Identifier> blockItemMetadataModelOverrides = new HashMap<>();
     private final Set<Integer> jsonRenderTypes = new HashSet<>();
     private final Map<Item, BuiltInEntityRenderer> builtInRenderers = new IdentityHashMap<>();
     private final Map<Long, BuiltInEntityRenderer> builtInRenderersByMetadata = new HashMap<>();
@@ -94,6 +102,24 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
         }
     }
 
+    public void registerBlockState(Block block, int metadata, String blockStateId) {
+        this.registerBlockState(block, metadata, new Identifier(blockStateId));
+    }
+
+    public void registerBlockState(Block block, int metadata, Identifier blockStateId) {
+        if (block != null && blockStateId != null) {
+            this.blockMetadataStateOverrides.put(blockMetadataKey(block, metadata), normalizeResourceId(blockStateId, "blockstates"));
+            this.jsonRenderTypes.add(block.getRenderType());
+        }
+    }
+
+    public void registerBlockStateProperties(Block block, JsonBlockStatePropertyResolver resolver) {
+        if (block != null && resolver != null) {
+            this.blockStatePropertyResolvers.put(block, resolver);
+            this.jsonRenderTypes.add(block.getRenderType());
+        }
+    }
+
     public void registerItemModel(Item item, String modelId) {
         this.registerItemModel(item, new Identifier(modelId));
     }
@@ -101,6 +127,23 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
     public void registerItemModel(Item item, Identifier modelId) {
         if (item != null && modelId != null) {
             this.itemModelOverrides.put(item, normalizeModelId(modelId, "item"));
+            if (item instanceof ItemBlock) {
+                this.blockItemModelOverrides.put(((ItemBlock) item).getBlock(), normalizeModelId(modelId, "item"));
+            }
+        }
+    }
+
+    public void registerItemModel(Block block, String modelId) {
+        this.registerItemModel(block, new Identifier(modelId));
+    }
+
+    public void registerItemModel(Block block, Identifier modelId) {
+        if (block != null && modelId != null) {
+            this.blockItemModelOverrides.put(block, normalizeModelId(modelId, "item"));
+            Item item = Item.itemsList[block.blockID];
+            if (item != null) {
+                this.itemModelOverrides.put(item, normalizeModelId(modelId, "item"));
+            }
         }
     }
 
@@ -111,6 +154,23 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
     public void registerItemModel(Item item, int metadata, Identifier modelId) {
         if (item != null && modelId != null) {
             this.itemMetadataModelOverrides.put(itemMetadataKey(item, metadata), normalizeModelId(modelId, "item"));
+            if (item instanceof ItemBlock) {
+                this.blockItemMetadataModelOverrides.put(blockMetadataKey(((ItemBlock) item).getBlock(), metadata), normalizeModelId(modelId, "item"));
+            }
+        }
+    }
+
+    public void registerItemModel(Block block, int metadata, String modelId) {
+        this.registerItemModel(block, metadata, new Identifier(modelId));
+    }
+
+    public void registerItemModel(Block block, int metadata, Identifier modelId) {
+        if (block != null && modelId != null) {
+            this.blockItemMetadataModelOverrides.put(blockMetadataKey(block, metadata), normalizeModelId(modelId, "item"));
+            Item item = Item.itemsList[block.blockID];
+            if (item != null) {
+                this.itemMetadataModelOverrides.put(itemMetadataKey(item, metadata), normalizeModelId(modelId, "item"));
+            }
         }
     }
 
@@ -152,8 +212,8 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
     }
 
     public boolean renderBlock(RenderBlocks renderBlocks, Block block, int x, int y, int z, int metadata) {
-        Optional<BlockModelSelection> selection = this.getBlockModelSelection(block, metadata);
-        if (selection.isEmpty() || selection.get().model.getElements().isEmpty()) {
+        List<BlockModelSelection> selections = this.getBlockModelSelections(block, renderBlocks.blockAccess, x, y, z, metadata);
+        if (selections.isEmpty()) {
             return false;
         }
 
@@ -162,7 +222,16 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
         float red = ((color >> 16) & 255) / 255.0F;
         float green = ((color >> 8) & 255) / 255.0F;
         float blue = (color & 255) / 255.0F;
-        JsonBlockModelRenderer.renderBlock(selection.get().model, selection.get().variant, renderBlocks, block, x, y, z, metadata, brightness, red, green, blue);
+        boolean rendered = false;
+        for (BlockModelSelection selection : selections) {
+            if (!selection.model.getElements().isEmpty()) {
+                JsonBlockModelRenderer.renderBlock(selection.model, selection.variant, renderBlocks, block, x, y, z, metadata, brightness, red, green, blue);
+                rendered = true;
+            }
+        }
+        if (!rendered) {
+            return false;
+        }
         return true;
     }
 
@@ -186,20 +255,27 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
             return true;
         }
 
+        Optional<JsonBlockModel> itemModel = this.getExplicitItemModel(stack);
+        if (itemModel.isPresent()) {
+            return renderBlockItemModel(itemModel.get(), stack, block, metadata, brightness, context);
+        }
+
         if (!this.jsonRenderTypes.contains(block.getRenderType())) {
             return false;
         }
-        Optional<BlockModelSelection> selection = this.getBlockModelSelection(block, metadata);
-        if (selection.isEmpty()) {
+        List<BlockModelSelection> selections = this.getBlockModelSelections(block, null, 0, 0, 0, metadata);
+        if (selections.isEmpty()) {
             return false;
         }
 
-        if (selection.get().model.getElements().isEmpty()) {
-            return false;
+        boolean rendered = false;
+        for (BlockModelSelection selection : selections) {
+            if (!selection.model.getElements().isEmpty()) {
+                JsonBlockModelRenderer.renderBlockAsItem(selection.model, selection.variant, block, metadata, brightness, context);
+                rendered = true;
+            }
         }
-
-        JsonBlockModelRenderer.renderBlockAsItem(selection.get().model, JsonBlockState.EMPTY_VARIANT, block, metadata, brightness, context);
-        return true;
+        return rendered;
     }
 
     public boolean renderItem(ItemStack stack, Icon fallbackIcon, JsonBlockModel.RenderContext context) {
@@ -246,15 +322,25 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
                 JsonBlockModelRenderer.renderBuiltInEntityIntoGui(model, stack, x, y, zLevel, builtInRenderer);
                 return true;
             }
+            Optional<JsonBlockModel> itemModel = this.getExplicitItemModel(stack, block);
+            if (itemModel.isPresent()) {
+                return renderBlockItemModelIntoGui(itemModel.get(), stack, block, x, y, zLevel);
+            }
             if (!this.jsonRenderTypes.contains(block.getRenderType())) {
                 return false;
             }
-            Optional<BlockModelSelection> selection = this.getBlockModelSelection(block, stack.getItemSubtype());
-            if (selection.isEmpty() || selection.get().model.getElements().isEmpty()) {
+            List<BlockModelSelection> selections = this.getBlockModelSelections(block, null, 0, 0, 0, stack.getItemSubtype());
+            if (selections.isEmpty()) {
                 return false;
             }
-            JsonBlockModelRenderer.renderBlockAsItemInGui(selection.get().model, JsonBlockState.EMPTY_VARIANT, block, stack.getItemSubtype(), x, y, zLevel);
-            return true;
+            boolean rendered = false;
+            for (BlockModelSelection selection : selections) {
+                if (!selection.model.getElements().isEmpty()) {
+                    JsonBlockModelRenderer.renderBlockAsItemInGui(selection.model, selection.variant, block, stack.getItemSubtype(), x, y, zLevel);
+                    rendered = true;
+                }
+            }
+            return rendered;
         }
 
         Optional<JsonBlockModel> model = this.getItemModel(stack);
@@ -288,10 +374,23 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
         if (metadataModelId != null) {
             return this.loadModel(metadataModelId);
         }
+        Block stackBlock = stack.isBlock() ? Block.blocksList[stack.itemID] : null;
+        if (stackBlock != null) {
+            metadataModelId = this.blockItemMetadataModelOverrides.get(blockMetadataKey(stackBlock, stack.getItemSubtype()));
+            if (metadataModelId != null) {
+                return this.loadModel(metadataModelId);
+            }
+        }
 
         Identifier modelId = this.itemModelOverrides.get(item);
         if (modelId != null) {
             return this.loadModel(modelId);
+        }
+        if (stackBlock != null) {
+            modelId = this.blockItemModelOverrides.get(stackBlock);
+            if (modelId != null) {
+                return this.loadModel(modelId);
+            }
         }
 
         String iconString = ((ItemAccessor) item).invokeGetIconString();
@@ -301,6 +400,61 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
 
         Identifier itemTextureId = new Identifier(iconString);
         return this.loadModel(new Identifier(itemTextureId.getNamespace(), "item/" + itemTextureId.getPath()));
+    }
+
+    private Optional<JsonBlockModel> getExplicitItemModel(ItemStack stack) {
+        return this.getExplicitItemModel(stack, stack != null && stack.isBlock() ? Block.blocksList[stack.itemID] : null);
+    }
+
+    private Optional<JsonBlockModel> getExplicitItemModel(ItemStack stack, Block block) {
+        if (stack == null || stack.getItem() == null) {
+            return Optional.empty();
+        }
+
+        Item item = stack.getItem();
+        Identifier metadataModelId = this.itemMetadataModelOverrides.get(itemMetadataKey(item, stack.getItemSubtype()));
+        if (metadataModelId != null) {
+            return this.loadModel(metadataModelId);
+        }
+        if (block != null) {
+            metadataModelId = this.blockItemMetadataModelOverrides.get(blockMetadataKey(block, stack.getItemSubtype()));
+            if (metadataModelId != null) {
+                return this.loadModel(metadataModelId);
+            }
+        }
+
+        Identifier modelId = this.itemModelOverrides.get(item);
+        if (modelId != null) {
+            return this.loadModel(modelId);
+        }
+        if (block != null) {
+            modelId = this.blockItemModelOverrides.get(block);
+            if (modelId != null) {
+                return this.loadModel(modelId);
+            }
+        }
+
+        return Optional.empty();
+    }
+
+    private static boolean renderBlockItemModel(JsonBlockModel model, ItemStack stack, Block block, int metadata, float brightness, JsonBlockModel.RenderContext context) {
+        if (model.isGeneratedItem()) {
+            return JsonBlockModelRenderer.renderItem(model, stack, stack.getIconIndex(), context);
+        }
+        if (model.getElements().isEmpty()) {
+            return false;
+        }
+        return JsonBlockModelRenderer.renderBlockAsItem(model, JsonBlockState.EMPTY_VARIANT, block, metadata, brightness, context);
+    }
+
+    private static boolean renderBlockItemModelIntoGui(JsonBlockModel model, ItemStack stack, Block block, int x, int y, float zLevel) {
+        if (model.isGeneratedItem()) {
+            return JsonBlockModelRenderer.renderItemIntoGui(model, stack, x, y, zLevel);
+        }
+        if (model.getElements().isEmpty()) {
+            return false;
+        }
+        return JsonBlockModelRenderer.renderBlockAsItemInGui(model, JsonBlockState.EMPTY_VARIANT, block, stack.getItemSubtype(), x, y, zLevel);
     }
 
     Optional<JsonBlockModel> loadModelById(Identifier modelId) {
@@ -327,10 +481,16 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
                 continue;
             }
 
+            Identifier blockTextureId = getBlockTextureId(block);
             for (int metadata = 0; metadata < 16; metadata++) {
-                Optional<BlockModelSelection> selection = this.getBlockModelSelection(block, metadata);
-                if (selection.isPresent()) {
-                    collectTextureIcons(selection.get().model, BLOCK_TEXTURE_MAP, iconNames);
+                Optional<JsonBlockState> blockState = this.loadBlockState(block, metadata, blockTextureId);
+                if (blockState.isPresent()) {
+                    collectBlockStateTextureIcons(blockState.get(), iconNames);
+                    continue;
+                }
+
+                for (BlockModelSelection selection : this.getBlockModelSelections(block, null, 0, 0, 0, metadata)) {
+                    collectTextureIcons(selection.model, BLOCK_TEXTURE_MAP, iconNames);
                 }
             }
         }
@@ -340,6 +500,12 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
         }
         for (Identifier modelId : this.blockMetadataModelOverrides.values()) {
             this.loadModel(modelId).ifPresent(model -> collectTextureIcons(model, BLOCK_TEXTURE_MAP, iconNames));
+        }
+        for (Identifier blockStateId : this.blockStateOverrides.values()) {
+            this.readBlockState(blockStateId).ifPresent(blockState -> collectBlockStateTextureIcons(blockState, iconNames));
+        }
+        for (Identifier blockStateId : this.blockMetadataStateOverrides.values()) {
+            this.readBlockState(blockStateId).ifPresent(blockState -> collectBlockStateTextureIcons(blockState, iconNames));
         }
     }
 
@@ -370,50 +536,81 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
         }
     }
 
+    private void collectBlockStateTextureIcons(JsonBlockState blockState, Set<String> iconNames) {
+        for (Identifier modelId : blockState.collectModelIds()) {
+            this.loadModel(normalizeModelId(modelId, "block")).ifPresent(model -> collectTextureIcons(model, BLOCK_TEXTURE_MAP, iconNames));
+        }
+    }
+
     private Optional<BlockModelSelection> getBlockModelSelection(Block block, int metadata) {
+        List<BlockModelSelection> selections = this.getBlockModelSelections(block, null, 0, 0, 0, metadata);
+        return selections.isEmpty() ? Optional.empty() : Optional.of(selections.get(0));
+    }
+
+    private List<BlockModelSelection> getBlockModelSelections(Block block, IBlockAccess blockAccess, int x, int y, int z, int metadata) {
+        List<BlockModelSelection> selections = new ArrayList<>();
         if (block == null) {
-            return Optional.empty();
+            return selections;
         }
 
         Identifier metadataModelId = this.blockMetadataModelOverrides.get(blockMetadataKey(block, metadata));
         if (metadataModelId != null) {
-            return this.loadModel(metadataModelId).map(model -> new BlockModelSelection(model, JsonBlockState.EMPTY_VARIANT));
+            this.loadModel(metadataModelId).ifPresent(model -> selections.add(new BlockModelSelection(model, JsonBlockState.EMPTY_VARIANT)));
+            return selections;
         }
 
         Identifier blockModelId = this.blockModelOverrides.get(block);
         if (blockModelId != null) {
-            Optional<JsonBlockModel> model = this.loadModel(blockModelId);
-            if (model.isPresent()) {
-                return Optional.of(new BlockModelSelection(model.get(), JsonBlockState.EMPTY_VARIANT));
-            }
+            this.loadModel(blockModelId).ifPresent(model -> selections.add(new BlockModelSelection(model, JsonBlockState.EMPTY_VARIANT)));
+            return selections;
         }
 
         Identifier blockTextureId = getBlockTextureId(block);
-        if (blockTextureId == null && !this.blockStateOverrides.containsKey(block)) {
-            return Optional.empty();
+        if (blockTextureId == null && !this.hasBlockStateOverride(block, metadata)) {
+            return selections;
         }
 
-        Optional<JsonBlockState> blockState = this.loadBlockState(block, blockTextureId);
+        Optional<JsonBlockState> blockState = this.loadBlockState(block, metadata, blockTextureId);
         if (blockState.isPresent()) {
-            JsonBlockState.Variant variant = blockState.get().getVariant(metadata);
-            if (variant.getModelId() != null) {
+            Map<String, String> properties = this.createBlockStateProperties(block, blockAccess, x, y, z, metadata);
+            for (JsonBlockState.Variant variant : blockState.get().getVariants(metadata, properties)) {
+                if (variant.getModelId() == null) {
+                    continue;
+                }
                 Optional<JsonBlockModel> model = this.loadModel(normalizeModelId(variant.getModelId(), "block"));
                 if (model.isPresent()) {
-                    return Optional.of(new BlockModelSelection(model.get(), variant));
+                    selections.add(new BlockModelSelection(model.get(), variant));
                 }
+            }
+            if (!selections.isEmpty()) {
+                return selections;
             }
         }
 
         if (blockTextureId != null) {
             Identifier fallbackModelId = new Identifier(blockTextureId.getNamespace(), "block/" + blockTextureId.getPath());
-            return this.loadModel(fallbackModelId).map(model -> new BlockModelSelection(model, JsonBlockState.EMPTY_VARIANT));
+            this.loadModel(fallbackModelId).ifPresent(model -> selections.add(new BlockModelSelection(model, JsonBlockState.EMPTY_VARIANT)));
         }
-        return Optional.empty();
+        return selections;
+    }
+
+    private boolean hasBlockStateOverride(Block block, int metadata) {
+        return this.blockMetadataStateOverrides.containsKey(blockMetadataKey(block, metadata)) || this.blockStateOverrides.containsKey(block);
     }
 
     private Optional<JsonBlockState> loadBlockState(Block block, Identifier blockTextureId) {
-        Identifier blockStateId = this.blockStateOverrides.get(block);
+        return this.loadBlockState(block, 0, blockTextureId);
+    }
+
+    private Optional<JsonBlockState> loadBlockState(Block block, int metadata, Identifier blockTextureId) {
+        Identifier blockStateId = this.blockMetadataStateOverrides.get(blockMetadataKey(block, metadata));
         if (blockStateId == null) {
+            blockStateId = this.blockStateOverrides.get(block);
+        }
+        if (blockStateId == null) {
+            if (blockTextureId == null) {
+                return Optional.empty();
+            }
             blockStateId = new Identifier(blockTextureId.getNamespace(), blockTextureId.getPath());
         }
 
@@ -425,6 +622,16 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
         Optional<JsonBlockState> loaded = this.readBlockState(blockStateId);
         this.blockStateCache.put(blockStateId, loaded);
         return loaded;
+    }
+
+    private Map<String, String> createBlockStateProperties(Block block, IBlockAccess blockAccess, int x, int y, int z, int metadata) {
+        Map<String, String> properties = new LinkedHashMap<>();
+        JsonBlockState.addDefaultProperties(properties, metadata);
+        JsonBlockStatePropertyResolver resolver = this.blockStatePropertyResolvers.get(block);
+        if (resolver != null) {
+            resolver.addProperties(block, blockAccess, x, y, z, metadata, properties);
+        }
+        return properties;
     }
 
     private Optional<JsonBlockState> readBlockState(Identifier blockStateId) {
