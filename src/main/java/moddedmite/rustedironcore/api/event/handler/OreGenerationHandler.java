@@ -42,6 +42,11 @@ public class OreGenerationHandler extends EventHandler<OreGenerationRegisterEven
     }
 
     public record Context(World world, @Nullable BiomeDecorator biomeDecorator, Random random, int blockX, int blockZ) {
+
+        @Deprecated
+        public Context(BiomeDecorator biomeDecorator, World world) {
+            this(world, biomeDecorator, null, 0, 0);
+        }
     }
 
     private static Setting setting(WorldGenMinable ore, int frequency, boolean increasesWithDepth) {
