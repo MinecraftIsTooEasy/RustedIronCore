@@ -26,6 +26,7 @@
     "client.gui.GuiCraftingMixin",
     "client.gui.GuiIngameMixin",
     "client.gui.GuiMainMenuMixin",
+    "client.gui.GuiScreenMixin",
     "client.gui.InventoryEffectRendererMixin",
     "client.render.ItemRendererMixin",
     "client.render.RenderBipedMixin",

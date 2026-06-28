@@ -10,6 +10,7 @@ public class IdUtilExtra extends IdUtil {
     private static int nextDimensionID = 2;
     private static int nextWorldType = 3;
     private static int nextSlabGroup = 4;
+    private static int nextCreativeID = 12;
 
     public IdUtilExtra() {
     }
@@ -40,5 +41,9 @@ public class IdUtilExtra extends IdUtil {
 
     public static int getNextSlabGroup() {
         return nextSlabGroup++;
+    }
+
+    public static int getNextCreativeID() {
+        return nextCreativeID++;
     }
 }

@@ -187,4 +187,8 @@ public class Handlers {
      * Entity spawn, death, loot, update, attackEntityFrom, fall, jump.
      */
     public static final EntityEventHandler EntityEvent = new EntityEventHandler();
+    /**
+     * GuiScreen events, like onGuiClosed, onGuiInit, onGuiDraw, etc.
+     */
+    public static final ScreenHandler Screen = new ScreenHandler();
 }

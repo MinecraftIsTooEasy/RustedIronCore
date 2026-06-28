@@ -1,7 +1,5 @@
 package moddedmite.rustedironcore.mixin.dimension.world;
 
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import moddedmite.rustedironcore.api.event.Handlers;
 import net.minecraft.*;
 import org.spongepowered.asm.mixin.*;
@@ -33,10 +31,5 @@ public abstract class WorldMixin {
         Handlers.Dimension.getDimensionContext(dimensionId).ifPresent(x -> {
             this.has_skylight = x.hasSkyLight();
         });
-    }
-
-    // TODO don't know how it arise
-    @WrapOperation(method = "computeLightValue", at = @At(value = "INVOKE", target = "Lnet/minecraft/Minecraft;setErrorMessage(Ljava/lang/String;Z)V"))
-    private void mute(String text, boolean echo_to_err, Operation<Void> original) {
     }
 }

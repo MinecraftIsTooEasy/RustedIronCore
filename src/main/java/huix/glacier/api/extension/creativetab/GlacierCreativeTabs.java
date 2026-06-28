@@ -1,6 +1,6 @@
 package huix.glacier.api.extension.creativetab;
 
-import huix.glacier.util.GlacierHelper;
+import moddedmite.rustedironcore.api.util.IdUtilExtra;
 import net.minecraft.CreativeTabs;
 
 import java.util.ArrayList;
@@ -9,7 +9,7 @@ public class GlacierCreativeTabs extends CreativeTabs {
     public static final ArrayList<CreativeTabs> newCreativeTabArray = new ArrayList<>();
 
     public GlacierCreativeTabs(String par2Str) {
-        super(GlacierHelper.getNextCreativeID(), par2Str);
+        super(IdUtilExtra.getNextCreativeID(), par2Str);
         newCreativeTabArray.add(this);
     }
 

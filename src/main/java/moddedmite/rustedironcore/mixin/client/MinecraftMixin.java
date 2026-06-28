@@ -1,8 +1,6 @@
 package moddedmite.rustedironcore.mixin.client;
 
 import moddedmite.rustedironcore.api.event.Handlers;
-import moddedmite.rustedironcore.api.gui.GuiTips;
-import moddedmite.rustedironcore.api.gui.GuiTipsWindow;
 import moddedmite.rustedironcore.api.model.JsonBlockModelManager;
 import net.minecraft.*;
 import org.spongepowered.asm.mixin.Mixin;
@@ -25,17 +23,11 @@ public abstract class MinecraftMixin {
 
     @Shadow
     private IntegratedServer theIntegratedServer;
-    @Unique
-    public GuiTipsWindow guiTipsWindow;
-    @Unique
-    public GuiTips guiTips;
 
     @Inject(method = "startGame", at = @At("RETURN"))
     private void addGui(CallbackInfo ci) {
         Handlers.Initialization.onClientStarted(Minecraft.getMinecraft());
         ((ReloadableResourceManager) this.getResourceManager()).registerReloadListener(JsonBlockModelManager.INSTANCE);
-        this.guiTipsWindow = new GuiTipsWindow((Minecraft) (Object) this);
-        this.guiTips = new GuiTips();
     }
 
     @Inject(method = "runTick", at = @At("RETURN"))

@@ -4,13 +4,14 @@ import moddedmite.rustedironcore.api.util.StringUtil;
 import net.minecraft.ChatMessageComponent;
 import net.minecraft.EnumChatFormatting;
 import net.minecraft.GuiMainMenu;
-import net.minecraft.I18n;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.util.Locale;
 
 @Mixin(GuiMainMenu.class)
 public class GuiMainMenuMixin {
@@ -20,7 +21,7 @@ public class GuiMainMenuMixin {
     public static String field_96138_a_MITE;
 
     @Unique
-    private static final String HOMEPAGE = "https://minecraftistooeasy.github.io/";
+    private static String HOMEPAGE;
 
     @ModifyConstant(method = "confirmClicked", constant = @Constant(stringValue = "http://minecraft-is-too-easy.com"))
     private String modifyURI(String constant) {
@@ -39,6 +40,11 @@ public class GuiMainMenuMixin {
 
     @Inject(method = "<clinit>", at = @At("TAIL"))
     private static void translate_1(CallbackInfo ci) {
-        field_96138_a_MITE = ChatMessageComponent.createFromTranslationKey("ric.gui.resourcepacks.info.website.1") + " " + (EnumChatFormatting.UNDERLINE) + "https://minecraftistooeasy.github.io/" + (EnumChatFormatting.RESET) + " " + ChatMessageComponent.createFromTranslationKey("ric.gui.resourcepacks.info.website.2");
+        if (StringUtil.getCurrentLanguage().toLowerCase(Locale.ROOT).equals("zh_cn")) {
+            HOMEPAGE = "https://minecraftistooeasy.github.io/";
+        } else {
+            HOMEPAGE = "https://avernite.ca/MITE/";
+        }
+        field_96138_a_MITE = ChatMessageComponent.createFromTranslationKey("ric.gui.resourcepacks.info.website.1") + " " + (EnumChatFormatting.UNDERLINE) + HOMEPAGE + (EnumChatFormatting.RESET) + " " + ChatMessageComponent.createFromTranslationKey("ric.gui.resourcepacks.info.website.2");
     }
 }
