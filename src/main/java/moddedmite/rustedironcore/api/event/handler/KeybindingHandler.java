@@ -7,14 +7,14 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 
 @Environment(EnvType.CLIENT)
 public class KeybindingHandler extends EventHandler<KeybindingRegisterEvent> {
 
-    private final Map<String, KeybindingV1> all = new HashMap<>();
+    private final Map<String, KeybindingV1> all = new LinkedHashMap<>();
 
     public void registerKeybinding(KeybindingV1 keybinding) {
         all.put(keybinding.getName(), keybinding);
