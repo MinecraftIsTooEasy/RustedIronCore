@@ -1,6 +1,7 @@
 package moddedmite.rustedironcore.api.world;
 
 import net.minecraft.World;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
@@ -50,7 +51,7 @@ public record Dimension(String name, int id) {
     }
 
     @Override
-    public String toString() {
+    public @NotNull String toString() {
         return this.name;
     }
 
@@ -60,5 +61,5 @@ public record Dimension(String name, int id) {
 
     public static final Dimension END = register("the_end", 1);
 
-    public static final Dimension UNDERWORLD = register("the_end", -2);
+    public static final Dimension UNDERWORLD = register("underworld", -2);
 }
