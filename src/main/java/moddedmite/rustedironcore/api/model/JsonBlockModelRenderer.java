@@ -202,7 +202,11 @@ public final class JsonBlockModelRenderer {
         if (!state.lightingEnabled()) {
             GL11.glDisable(GL11.GL_LIGHTING);
         }
-        GL11.glEnable(GL11.GL_CULL_FACE);
+        if (state.cullEnabled()) {
+            GL11.glEnable(GL11.GL_CULL_FACE);
+        } else {
+            GL11.glDisable(GL11.GL_CULL_FACE);
+        }
     }
 
     private static void renderElement(Tessellator tessellator, JsonBlockModel model, JsonBlockState.Variant variant, RenderBlocks renderBlocks, Block block, Icon fallbackIcon, JsonBlockModel.Element element, float offsetX, float offsetY, float offsetZ, int metadata, int brightness, float red, float green, float blue, int textureType, boolean manageDrawing) {

@@ -38,10 +38,4 @@ public abstract class RenderBlocksMixin {
         }
     }
 
-    @Inject(method = "renderItemIn3d", at = @At("RETURN"), cancellable = true)
-    private static void ric$renderCustomBlockItemsIn3d(int par0, CallbackInfoReturnable<Boolean> cir) {
-        if (!cir.getReturnValue() && JsonBlockModelManager.INSTANCE.hasJsonBlockInRenderType(par0)) {
-            cir.setReturnValue(Boolean.TRUE);
-        }
-    }
 }

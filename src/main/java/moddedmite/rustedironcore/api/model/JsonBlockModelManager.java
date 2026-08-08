@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
@@ -51,16 +52,12 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
     private final Map<Long, Identifier> itemMetadataModelOverrides = new HashMap<>();
     private final Map<Block, Identifier> blockItemModelOverrides = new IdentityHashMap<>();
     private final Map<Integer, Identifier> blockItemMetadataModelOverrides = new HashMap<>();
-    private final Set<Integer> jsonRenderTypes = new HashSet<>();
+    private final Set<Block> jsonBlocks = Collections.newSetFromMap(new IdentityHashMap<>());
     private final Map<Item, BuiltInEntityRenderer> builtInRenderers = new IdentityHashMap<>();
     private final Map<Long, BuiltInEntityRenderer> builtInRenderersByMetadata = new HashMap<>();
     private final Map<Block, BuiltInEntityRenderer> builtInRenderersByBlock = new IdentityHashMap<>();
 
     private JsonBlockModelManager() {
-    }
-
-    public boolean hasJsonBlockInRenderType(int renderType) {
-        return this.jsonRenderTypes.contains(renderType);
     }
 
     @Override
@@ -76,7 +73,7 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
     public void registerBlockModel(Block block, Identifier modelId) {
         if (block != null && modelId != null) {
             this.blockModelOverrides.put(block, normalizeModelId(modelId, "block"));
-            this.jsonRenderTypes.add(block.getRenderType());
+            this.jsonBlocks.add(block);
         }
     }
 
@@ -87,7 +84,7 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
     public void registerBlockModel(Block block, int metadata, Identifier modelId) {
         if (block != null && modelId != null) {
             this.blockMetadataModelOverrides.put(blockMetadataKey(block, metadata), normalizeModelId(modelId, "block"));
-            this.jsonRenderTypes.add(block.getRenderType());
+            this.jsonBlocks.add(block);
         }
     }
 
@@ -98,7 +95,7 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
     public void registerBlockState(Block block, Identifier blockStateId) {
         if (block != null && blockStateId != null) {
             this.blockStateOverrides.put(block, normalizeResourceId(blockStateId, "blockstates"));
-            this.jsonRenderTypes.add(block.getRenderType());
+            this.jsonBlocks.add(block);
         }
     }
 
@@ -109,14 +106,14 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
     public void registerBlockState(Block block, int metadata, Identifier blockStateId) {
         if (block != null && blockStateId != null) {
             this.blockMetadataStateOverrides.put(blockMetadataKey(block, metadata), normalizeResourceId(blockStateId, "blockstates"));
-            this.jsonRenderTypes.add(block.getRenderType());
+            this.jsonBlocks.add(block);
         }
     }
 
     public void registerBlockStateProperties(Block block, JsonBlockStatePropertyResolver resolver) {
         if (block != null && resolver != null) {
             this.blockStatePropertyResolvers.put(block, resolver);
-            this.jsonRenderTypes.add(block.getRenderType());
+            this.jsonBlocks.add(block);
         }
     }
 
@@ -224,8 +221,8 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
         float blue = (color & 255) / 255.0F;
         boolean rendered = false;
         for (BlockModelSelection selection : selections) {
-            if (!selection.model.getElements().isEmpty()) {
-                JsonBlockModelRenderer.renderBlock(selection.model, selection.variant, renderBlocks, block, x, y, z, metadata, brightness, red, green, blue);
+            if (!selection.model().getElements().isEmpty()) {
+                JsonBlockModelRenderer.renderBlock(selection.model(), selection.variant(), renderBlocks, block, x, y, z, metadata, brightness, red, green, blue);
                 rendered = true;
             }
         }
@@ -249,7 +246,7 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
                 if (selection.isEmpty()) {
                     return false;
                 }
-                model = selection.get().model;
+                model = selection.get().model();
             }
             JsonBlockModelRenderer.renderBuiltInEntityAsBlockItem(model, block, metadata, builtInRenderer, context);
             return true;
@@ -260,7 +257,7 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
             return renderBlockItemModel(itemModel.get(), stack, block, metadata, brightness, context);
         }
 
-        if (!this.jsonRenderTypes.contains(block.getRenderType())) {
+        if (!this.jsonBlocks.contains(block)) {
             return false;
         }
         List<BlockModelSelection> selections = this.getBlockModelSelections(block, null, 0, 0, 0, metadata);
@@ -270,8 +267,8 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
 
         boolean rendered = false;
         for (BlockModelSelection selection : selections) {
-            if (!selection.model.getElements().isEmpty()) {
-                JsonBlockModelRenderer.renderBlockAsItem(selection.model, selection.variant, block, metadata, brightness, context);
+            if (!selection.model().getElements().isEmpty()) {
+                JsonBlockModelRenderer.renderBlockAsItem(selection.model(), selection.variant(), block, metadata, brightness, context);
                 rendered = true;
             }
         }
@@ -317,7 +314,7 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
                     if (selection.isEmpty()) {
                         return false;
                     }
-                    model = selection.get().model;
+                    model = selection.get().model();
                 }
                 JsonBlockModelRenderer.renderBuiltInEntityIntoGui(model, stack, x, y, zLevel, builtInRenderer);
                 return true;
@@ -326,7 +323,7 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
             if (itemModel.isPresent()) {
                 return renderBlockItemModelIntoGui(itemModel.get(), stack, block, x, y, zLevel);
             }
-            if (!this.jsonRenderTypes.contains(block.getRenderType())) {
+            if (!this.jsonBlocks.contains(block)) {
                 return false;
             }
             List<BlockModelSelection> selections = this.getBlockModelSelections(block, null, 0, 0, 0, stack.getItemSubtype());
@@ -335,8 +332,8 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
             }
             boolean rendered = false;
             for (BlockModelSelection selection : selections) {
-                if (!selection.model.getElements().isEmpty()) {
-                    JsonBlockModelRenderer.renderBlockAsItemInGui(selection.model, selection.variant, block, stack.getItemSubtype(), x, y, zLevel);
+                if (!selection.model().getElements().isEmpty()) {
+                    JsonBlockModelRenderer.renderBlockAsItemInGui(selection.model(), selection.variant(), block, stack.getItemSubtype(), x, y, zLevel);
                     rendered = true;
                 }
             }
@@ -361,7 +358,7 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
 
     public Optional<JsonBlockModel> getModel(Block block, int metadata) {
         Optional<BlockModelSelection> selection = this.getBlockModelSelection(block, metadata);
-        return selection.map(blockModelSelection -> blockModelSelection.model);
+        return selection.map(BlockModelSelection::model);
     }
 
     public Optional<JsonBlockModel> getItemModel(ItemStack stack) {
@@ -490,7 +487,7 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
                 }
 
                 for (BlockModelSelection selection : this.getBlockModelSelections(block, null, 0, 0, 0, metadata)) {
-                    collectTextureIcons(selection.model, BLOCK_TEXTURE_MAP, iconNames);
+                    collectTextureIcons(selection.model(), BLOCK_TEXTURE_MAP, iconNames);
                 }
             }
         }
@@ -702,13 +699,4 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
         return ((long) item.itemID << 32) | (metadata & 0xFFFFFFFFL);
     }
 
-    private static final class BlockModelSelection {
-        private final JsonBlockModel model;
-        private final JsonBlockState.Variant variant;
-
-        private BlockModelSelection(JsonBlockModel model, JsonBlockState.Variant variant) {
-            this.model = model;
-            this.variant = variant;
-        }
-    }
 }
