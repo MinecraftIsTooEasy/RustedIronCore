@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
-  "id": "rusted_iron_core",
+  "id": "${id}",
   "version": "${version}",
+  "name": "${name}",
   "depends": {
     "fishmodloader": ">=3.0.0"
   },
   "environment": "*",
-  "name": "Rusted Iron Core",
   "description": "An api mod for 1.6.4-MITE, merged glacier mod",
   "icon": "assets/ric/icon.png",
   "license": "MIT",

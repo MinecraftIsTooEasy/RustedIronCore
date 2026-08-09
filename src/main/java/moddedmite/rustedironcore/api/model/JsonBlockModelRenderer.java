@@ -28,7 +28,7 @@ public final class JsonBlockModelRenderer {
     public static void renderBlock(JsonBlockModel model, JsonBlockState.Variant variant, RenderBlocks renderBlocks, Block block, int x, int y, int z, int metadata, int brightness, float red, float green, float blue) {
         Tessellator tessellator = Tessellator.instance;
         for (JsonBlockModel.Element element : model.getElements()) {
-            renderElement(tessellator, model, variant, renderBlocks, block, null, element, x, y, z, metadata, brightness, red, green, blue, BLOCK_TEXTURE_MAP, false);
+            renderElement(tessellator, model, variant, renderBlocks, block, null, element, x, y, z, metadata, brightness, red, green, blue, BLOCK_TEXTURE_MAP, false, true);
         }
     }
 
@@ -45,7 +45,7 @@ public final class JsonBlockModelRenderer {
         Tessellator tessellator = Tessellator.instance;
         int packedBrightness = Math.max(0, Math.min(FULL_BRIGHTNESS, (int) (brightness * FULL_BRIGHTNESS)));
         for (JsonBlockModel.Element element : model.getElements()) {
-            renderElement(tessellator, model, variant, null, block, null, element, 0.0F, 0.0F, 0.0F, metadata, packedBrightness, 1.0F, 1.0F, 1.0F, BLOCK_TEXTURE_MAP, true);
+            renderElement(tessellator, model, variant, null, block, null, element, 0.0F, 0.0F, 0.0F, metadata, packedBrightness, 1.0F, 1.0F, 1.0F, BLOCK_TEXTURE_MAP, true, false);
         }
 
         GL11.glPopMatrix();
@@ -98,7 +98,7 @@ public final class JsonBlockModelRenderer {
 
         Tessellator tessellator = Tessellator.instance;
         for (JsonBlockModel.Element element : model.getElements()) {
-            renderElement(tessellator, model, JsonBlockState.EMPTY_VARIANT, null, null, fallbackIcon, element, 0.0F, 0.0F, 0.0F, stack.getItemSubtype(), FULL_BRIGHTNESS, 1.0F, 1.0F, 1.0F, ITEM_TEXTURE_MAP, true);
+            renderElement(tessellator, model, JsonBlockState.EMPTY_VARIANT, null, null, fallbackIcon, element, 0.0F, 0.0F, 0.0F, stack.getItemSubtype(), FULL_BRIGHTNESS, 1.0F, 1.0F, 1.0F, ITEM_TEXTURE_MAP, true, false);
         }
 
         GL11.glPopMatrix();
@@ -122,7 +122,7 @@ public final class JsonBlockModelRenderer {
             Tessellator tessellator = Tessellator.instance;
             Icon fallbackIcon = stack.getIconIndex();
             for (JsonBlockModel.Element element : model.getElements()) {
-                renderElement(tessellator, model, JsonBlockState.EMPTY_VARIANT, null, null, fallbackIcon, element, 0.0F, 0.0F, 0.0F, stack.getItemSubtype(), FULL_BRIGHTNESS, 1.0F, 1.0F, 1.0F, ITEM_TEXTURE_MAP, true);
+                renderElement(tessellator, model, JsonBlockState.EMPTY_VARIANT, null, null, fallbackIcon, element, 0.0F, 0.0F, 0.0F, stack.getItemSubtype(), FULL_BRIGHTNESS, 1.0F, 1.0F, 1.0F, ITEM_TEXTURE_MAP, true, false);
             }
             return true;
         } finally {
@@ -179,7 +179,7 @@ public final class JsonBlockModelRenderer {
 
             Tessellator tessellator = Tessellator.instance;
             for (JsonBlockModel.Element element : model.getElements()) {
-                renderElement(tessellator, model, variant, null, block, null, element, 0.0F, 0.0F, 0.0F, metadata, FULL_BRIGHTNESS, 1.0F, 1.0F, 1.0F, BLOCK_TEXTURE_MAP, true);
+                renderElement(tessellator, model, variant, null, block, null, element, 0.0F, 0.0F, 0.0F, metadata, FULL_BRIGHTNESS, 1.0F, 1.0F, 1.0F, BLOCK_TEXTURE_MAP, true, false);
             }
             return true;
         } finally {
@@ -209,16 +209,16 @@ public final class JsonBlockModelRenderer {
         }
     }
 
-    private static void renderElement(Tessellator tessellator, JsonBlockModel model, JsonBlockState.Variant variant, RenderBlocks renderBlocks, Block block, Icon fallbackIcon, JsonBlockModel.Element element, float offsetX, float offsetY, float offsetZ, int metadata, int brightness, float red, float green, float blue, int textureType, boolean manageDrawing) {
-        emitFace(tessellator, model, variant, renderBlocks, block, fallbackIcon, element, JsonBlockModel.Direction.DOWN, offsetX, offsetY, offsetZ, metadata, brightness, red, green, blue, textureType, manageDrawing);
-        emitFace(tessellator, model, variant, renderBlocks, block, fallbackIcon, element, JsonBlockModel.Direction.UP, offsetX, offsetY, offsetZ, metadata, brightness, red, green, blue, textureType, manageDrawing);
-        emitFace(tessellator, model, variant, renderBlocks, block, fallbackIcon, element, JsonBlockModel.Direction.NORTH, offsetX, offsetY, offsetZ, metadata, brightness, red, green, blue, textureType, manageDrawing);
-        emitFace(tessellator, model, variant, renderBlocks, block, fallbackIcon, element, JsonBlockModel.Direction.SOUTH, offsetX, offsetY, offsetZ, metadata, brightness, red, green, blue, textureType, manageDrawing);
-        emitFace(tessellator, model, variant, renderBlocks, block, fallbackIcon, element, JsonBlockModel.Direction.WEST, offsetX, offsetY, offsetZ, metadata, brightness, red, green, blue, textureType, manageDrawing);
-        emitFace(tessellator, model, variant, renderBlocks, block, fallbackIcon, element, JsonBlockModel.Direction.EAST, offsetX, offsetY, offsetZ, metadata, brightness, red, green, blue, textureType, manageDrawing);
+    private static void renderElement(Tessellator tessellator, JsonBlockModel model, JsonBlockState.Variant variant, RenderBlocks renderBlocks, Block block, Icon fallbackIcon, JsonBlockModel.Element element, float offsetX, float offsetY, float offsetZ, int metadata, int brightness, float red, float green, float blue, int textureType, boolean manageDrawing, boolean applyFaceShade) {
+        emitFace(tessellator, model, variant, renderBlocks, block, fallbackIcon, element, JsonBlockModel.Direction.DOWN, offsetX, offsetY, offsetZ, metadata, brightness, red, green, blue, textureType, manageDrawing, applyFaceShade);
+        emitFace(tessellator, model, variant, renderBlocks, block, fallbackIcon, element, JsonBlockModel.Direction.UP, offsetX, offsetY, offsetZ, metadata, brightness, red, green, blue, textureType, manageDrawing, applyFaceShade);
+        emitFace(tessellator, model, variant, renderBlocks, block, fallbackIcon, element, JsonBlockModel.Direction.NORTH, offsetX, offsetY, offsetZ, metadata, brightness, red, green, blue, textureType, manageDrawing, applyFaceShade);
+        emitFace(tessellator, model, variant, renderBlocks, block, fallbackIcon, element, JsonBlockModel.Direction.SOUTH, offsetX, offsetY, offsetZ, metadata, brightness, red, green, blue, textureType, manageDrawing, applyFaceShade);
+        emitFace(tessellator, model, variant, renderBlocks, block, fallbackIcon, element, JsonBlockModel.Direction.WEST, offsetX, offsetY, offsetZ, metadata, brightness, red, green, blue, textureType, manageDrawing, applyFaceShade);
+        emitFace(tessellator, model, variant, renderBlocks, block, fallbackIcon, element, JsonBlockModel.Direction.EAST, offsetX, offsetY, offsetZ, metadata, brightness, red, green, blue, textureType, manageDrawing, applyFaceShade);
     }
 
-    private static void emitFace(Tessellator tessellator, JsonBlockModel model, JsonBlockState.Variant variant, RenderBlocks renderBlocks, Block block, Icon fallbackIcon, JsonBlockModel.Element element, JsonBlockModel.Direction direction, float offsetX, float offsetY, float offsetZ, int metadata, int brightness, float red, float green, float blue, int textureType, boolean manageDrawing) {
+    private static void emitFace(Tessellator tessellator, JsonBlockModel model, JsonBlockState.Variant variant, RenderBlocks renderBlocks, Block block, Icon fallbackIcon, JsonBlockModel.Element element, JsonBlockModel.Direction direction, float offsetX, float offsetY, float offsetZ, int metadata, int brightness, float red, float green, float blue, int textureType, boolean manageDrawing, boolean applyFaceShade) {
         JsonBlockModel.Face face = element.getFace(direction);
         if (face == null) {
             return;
@@ -257,7 +257,7 @@ public final class JsonBlockModelRenderer {
         }
 
         JsonBlockModel.Direction facing = calculateFacing(transformedVertices, direction);
-        float shade = getShade(facing, element.isShade());
+        float shade = applyFaceShade ? getShade(facing, element.isShade()) : 1.0F;
         if (face.getTintIndex() >= 0) {
             tessellator.setColorOpaque_F(red * shade, green * shade, blue * shade);
         } else {

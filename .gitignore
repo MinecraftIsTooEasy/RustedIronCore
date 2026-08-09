@@ -33,3 +33,9 @@ bin/
 build
 run
 /src/test
+
+# Java crash and profiling output
+hs_err_*.log
+replay_*.log
+*.hprof
+*.jfr
