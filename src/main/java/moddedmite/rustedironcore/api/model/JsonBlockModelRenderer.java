@@ -8,6 +8,7 @@ import net.minecraft.ItemRenderer;
 import net.minecraft.ItemStack;
 import net.minecraft.Minecraft;
 import net.minecraft.RenderBlocks;
+import net.minecraft.RenderHelper;
 import net.minecraft.ResourceLocation;
 import net.minecraft.Tessellator;
 import net.minecraft.TextureMap;
@@ -21,7 +22,7 @@ public final class JsonBlockModelRenderer {
 
     private static final int BLOCK_TEXTURE_MAP = 0;
     private static final int ITEM_TEXTURE_MAP = 1;
-    private static final int FULL_BRIGHTNESS = 240;
+    private static final int INHERIT_BRIGHTNESS = -1;
     private static final int MODEL_UV_SIZE = 16;
     private static final double EPSILON = 1.0E-5D;
 
@@ -43,9 +44,8 @@ public final class JsonBlockModelRenderer {
         GL11.glTranslatef(-0.5F, -0.5F, -0.5F);
 
         Tessellator tessellator = Tessellator.instance;
-        int packedBrightness = Math.max(0, Math.min(FULL_BRIGHTNESS, (int) (brightness * FULL_BRIGHTNESS)));
         for (JsonBlockModel.Element element : model.getElements()) {
-            renderElement(tessellator, model, variant, null, block, null, element, 0.0F, 0.0F, 0.0F, metadata, packedBrightness, 1.0F, 1.0F, 1.0F, BLOCK_TEXTURE_MAP, true, false);
+            renderElement(tessellator, model, variant, null, block, null, element, 0.0F, 0.0F, 0.0F, metadata, INHERIT_BRIGHTNESS, brightness, brightness, brightness, BLOCK_TEXTURE_MAP, true, false);
         }
 
         GL11.glPopMatrix();
@@ -61,14 +61,14 @@ public final class JsonBlockModelRenderer {
 
     public static void renderBuiltInEntityIntoGui(JsonBlockModel model, ItemStack stack, int x, int y, float zLevel, BuiltInEntityRenderer renderer) {
         GL11.glPushMatrix();
-        GuiRenderState state = beginGuiRenderState();
+        beginGuiRenderState();
         try {
             GL11.glTranslatef(x + 8.0F, y + 8.0F, zLevel);
             GL11.glScalef(16.0F, -16.0F, 16.0F);
             applyDisplayTransform(model, JsonBlockModel.RenderContext.GUI, 0.0625F);
             renderer.render(stack, JsonBlockModel.RenderContext.GUI);
         } finally {
-            endGuiRenderState(state);
+            endGuiRenderState();
             GL11.glPopMatrix();
         }
     }
@@ -98,7 +98,7 @@ public final class JsonBlockModelRenderer {
 
         Tessellator tessellator = Tessellator.instance;
         for (JsonBlockModel.Element element : model.getElements()) {
-            renderElement(tessellator, model, JsonBlockState.EMPTY_VARIANT, null, null, fallbackIcon, element, 0.0F, 0.0F, 0.0F, stack.getItemSubtype(), FULL_BRIGHTNESS, 1.0F, 1.0F, 1.0F, ITEM_TEXTURE_MAP, true, false);
+            renderElement(tessellator, model, JsonBlockState.EMPTY_VARIANT, null, null, fallbackIcon, element, 0.0F, 0.0F, 0.0F, stack.getItemSubtype(), INHERIT_BRIGHTNESS, 1.0F, 1.0F, 1.0F, ITEM_TEXTURE_MAP, true, false);
         }
 
         GL11.glPopMatrix();
@@ -108,7 +108,7 @@ public final class JsonBlockModelRenderer {
     public static boolean renderItemIntoGui(JsonBlockModel model, ItemStack stack, int x, int y, float zLevel) {
         Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.locationItemsTexture);
         GL11.glPushMatrix();
-        GuiRenderState state = beginGuiRenderState();
+        beginGuiRenderState();
         try {
             GL11.glTranslatef(x + 8.0F, y + 8.0F, zLevel);
             GL11.glScalef(16.0F, -16.0F, 16.0F);
@@ -122,11 +122,11 @@ public final class JsonBlockModelRenderer {
             Tessellator tessellator = Tessellator.instance;
             Icon fallbackIcon = stack.getIconIndex();
             for (JsonBlockModel.Element element : model.getElements()) {
-                renderElement(tessellator, model, JsonBlockState.EMPTY_VARIANT, null, null, fallbackIcon, element, 0.0F, 0.0F, 0.0F, stack.getItemSubtype(), FULL_BRIGHTNESS, 1.0F, 1.0F, 1.0F, ITEM_TEXTURE_MAP, true, false);
+                renderElement(tessellator, model, JsonBlockState.EMPTY_VARIANT, null, null, fallbackIcon, element, 0.0F, 0.0F, 0.0F, stack.getItemSubtype(), INHERIT_BRIGHTNESS, 1.0F, 1.0F, 1.0F, ITEM_TEXTURE_MAP, true, false);
             }
             return true;
         } finally {
-            endGuiRenderState(state);
+            endGuiRenderState();
             GL11.glPopMatrix();
         }
     }
@@ -170,7 +170,7 @@ public final class JsonBlockModelRenderer {
     public static boolean renderBlockAsItemInGui(JsonBlockModel model, JsonBlockState.Variant variant, Block block, int metadata, int x, int y, float zLevel) {
         Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.locationBlocksTexture);
         GL11.glPushMatrix();
-        GuiRenderState state = beginGuiRenderState();
+        beginGuiRenderState();
         try {
             GL11.glTranslatef(x + 8.0F, y + 8.0F, zLevel);
             GL11.glScalef(16.0F, -16.0F, 16.0F);
@@ -179,34 +179,28 @@ public final class JsonBlockModelRenderer {
 
             Tessellator tessellator = Tessellator.instance;
             for (JsonBlockModel.Element element : model.getElements()) {
-                renderElement(tessellator, model, variant, null, block, null, element, 0.0F, 0.0F, 0.0F, metadata, FULL_BRIGHTNESS, 1.0F, 1.0F, 1.0F, BLOCK_TEXTURE_MAP, true, false);
+                renderElement(tessellator, model, variant, null, block, null, element, 0.0F, 0.0F, 0.0F, metadata, INHERIT_BRIGHTNESS, 1.0F, 1.0F, 1.0F, BLOCK_TEXTURE_MAP, true, false);
             }
             return true;
         } finally {
-            endGuiRenderState(state);
+            endGuiRenderState();
             GL11.glPopMatrix();
         }
     }
 
-    private static GuiRenderState beginGuiRenderState() {
-        boolean lightingEnabled = GL11.glIsEnabled(GL11.GL_LIGHTING);
-        boolean cullEnabled = GL11.glIsEnabled(GL11.GL_CULL_FACE);
-        GL11.glEnable(GL11.GL_LIGHTING);
-        if (cullEnabled) {
-            GL11.glDisable(GL11.GL_CULL_FACE);
-        }
-        return new GuiRenderState(lightingEnabled, cullEnabled);
+    private static void beginGuiRenderState() {
+        // GUI JSON models must not depend on whichever world or GUI renderer
+        // happened to configure LIGHT0/LIGHT1 first. Preserve every state that
+        // standard item lighting changes, then establish the vanilla GUI lights.
+        GL11.glPushAttrib(GL11.GL_LIGHTING_BIT | GL11.GL_ENABLE_BIT | GL11.GL_CURRENT_BIT);
+        RenderHelper.enableGUIStandardItemLighting();
+        GL11.glEnable(GL12.GL_RESCALE_NORMAL);
+        GL11.glDisable(GL11.GL_CULL_FACE);
+        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
     }
 
-    private static void endGuiRenderState(GuiRenderState state) {
-        if (!state.lightingEnabled()) {
-            GL11.glDisable(GL11.GL_LIGHTING);
-        }
-        if (state.cullEnabled()) {
-            GL11.glEnable(GL11.GL_CULL_FACE);
-        } else {
-            GL11.glDisable(GL11.GL_CULL_FACE);
-        }
+    private static void endGuiRenderState() {
+        GL11.glPopAttrib();
     }
 
     private static void renderElement(Tessellator tessellator, JsonBlockModel model, JsonBlockState.Variant variant, RenderBlocks renderBlocks, Block block, Icon fallbackIcon, JsonBlockModel.Element element, float offsetX, float offsetY, float offsetZ, int metadata, int brightness, float red, float green, float blue, int textureType, boolean manageDrawing, boolean applyFaceShade) {
@@ -250,7 +244,9 @@ public final class JsonBlockModelRenderer {
             tessellator.startDrawingQuads();
         }
 
-        tessellator.setBrightness(brightness);
+        if (brightness >= 0) {
+            tessellator.setBrightness(brightness);
+        }
         double[][] transformedVertices = new double[4][3];
         for (int i = 0; i < 4; i++) {
             transformedVertices[i] = transformVertex(vertices[i], element.getRotation(), variant, offsetX, offsetY, offsetZ);
@@ -559,9 +555,6 @@ public final class JsonBlockModelRenderer {
     }
 
     private record UvLockResult(float[] uv, int rotation) {
-    }
-
-    private record GuiRenderState(boolean lightingEnabled, boolean cullEnabled) {
     }
 
     private static double[][] createTextureUv(Icon icon, float[] uv, int rotation, JsonBlockModel.Direction direction, int textureWidth, int textureHeight) {

@@ -181,57 +181,63 @@ public final class JsonBlockModel {
 
         if ("block/cube_all".equals(path) || "cube_all".equals(path)) {
             elements.add(Element.cubeAll());
-            return new BuiltinParent(displayTransforms, false);
+            return builtinBlockParent(displayTransforms);
         }
 
         if ("block/cube".equals(path) || "cube".equals(path)) {
             elements.add(Element.cube());
-            return new BuiltinParent(displayTransforms, false);
+            return builtinBlockParent(displayTransforms);
         }
 
         if ("block/cube_column".equals(path) || "cube_column".equals(path)) {
             elements.add(Element.cubeColumn());
-            return new BuiltinParent(displayTransforms, false);
+            return builtinBlockParent(displayTransforms);
+        }
+
+        if ("block/cube_column_horizontal".equals(path) || "cube_column_horizontal".equals(path)) {
+            elements.add(Element.cubeColumnHorizontal());
+            return builtinBlockParent(displayTransforms);
         }
 
         if ("block/cube_bottom_top".equals(path) || "cube_bottom_top".equals(path)) {
             elements.add(Element.cubeBottomTop());
-            return new BuiltinParent(displayTransforms, false);
+            return builtinBlockParent(displayTransforms);
         }
 
-        if ("block/orientable".equals(path) || "orientable".equals(path)) {
+        if ("block/orientable".equals(path) || "orientable".equals(path)
+                || "block/orientable_with_bottom".equals(path) || "orientable_with_bottom".equals(path)) {
             elements.add(Element.orientable());
-            return new BuiltinParent(displayTransforms, false);
+            return builtinBlockParent(displayTransforms);
         }
 
         if ("block/cross".equals(path) || "cross".equals(path)) {
             elements.addAll(Element.cross());
-            return new BuiltinParent(displayTransforms, false);
+            return builtinBlockParent(displayTransforms);
         }
 
         if ("block/tinted_cross".equals(path) || "tinted_cross".equals(path)) {
             elements.addAll(Element.tintedCross());
-            return new BuiltinParent(displayTransforms, false);
+            return builtinBlockParent(displayTransforms);
         }
 
         if ("block/crop".equals(path) || "crop".equals(path)) {
             elements.addAll(Element.crop());
-            return new BuiltinParent(displayTransforms, false);
+            return builtinBlockParent(displayTransforms);
         }
 
         if ("block/leaves".equals(path) || "leaves".equals(path)) {
             elements.add(Element.cubeAll());
-            return new BuiltinParent(displayTransforms, false);
+            return builtinBlockParent(displayTransforms);
         }
 
         if ("block/slab".equals(path) || "slab".equals(path)) {
             elements.add(Element.slab(false));
-            return new BuiltinParent(displayTransforms, false);
+            return builtinBlockParent(displayTransforms);
         }
 
         if ("block/slab_top".equals(path) || "slab_top".equals(path)) {
             elements.add(Element.slab(true));
-            return new BuiltinParent(displayTransforms, false);
+            return builtinBlockParent(displayTransforms);
         }
 
         if ("entity".equals(path)) {
@@ -239,6 +245,12 @@ public final class JsonBlockModel {
         }
 
         return new BuiltinParent(displayTransforms, false);
+    }
+
+    private static BuiltinParent builtinBlockParent(DisplayTransforms displayTransforms) {
+        // Vanilla block templates inherit block/block. Preserve explicit child
+        // transforms while supplying the inherited GUI/hand/ground defaults.
+        return new BuiltinParent(DisplayTransforms.blockDefaults(displayTransforms), false);
     }
 
     private record BuiltinParent(DisplayTransforms displayTransforms, boolean generatedItem) {
@@ -412,6 +424,17 @@ public final class JsonBlockModel {
             return new Element("cube_column", 0.0F, 0.0F, 0.0F, 16.0F, 16.0F, 16.0F, Rotation.NONE, faces, true);
         }
 
+        private static Element cubeColumnHorizontal() {
+            EnumMap<Direction, Face> faces = new EnumMap<>(Direction.class);
+            faces.put(Direction.DOWN, Face.cull("#end", Direction.DOWN));
+            faces.put(Direction.UP, Face.cull("#end", Direction.UP, 180));
+            faces.put(Direction.NORTH, Face.cull("#side", Direction.NORTH));
+            faces.put(Direction.SOUTH, Face.cull("#side", Direction.SOUTH));
+            faces.put(Direction.WEST, Face.cull("#side", Direction.WEST));
+            faces.put(Direction.EAST, Face.cull("#side", Direction.EAST));
+            return new Element("cube_column_horizontal", 0.0F, 0.0F, 0.0F, 16.0F, 16.0F, 16.0F, Rotation.NONE, faces, true);
+        }
+
         private static Element cubeBottomTop() {
             EnumMap<Direction, Face> faces = new EnumMap<>(Direction.class);
             faces.put(Direction.DOWN, Face.cull("#bottom", Direction.DOWN));
@@ -437,14 +460,16 @@ public final class JsonBlockModel {
         private static List<Element> cross() {
             List<Element> elements = new ArrayList<>(2);
             EnumMap<Direction, Face> firstFaces = new EnumMap<>(Direction.class);
-            firstFaces.put(Direction.WEST, Face.simple("#cross"));
-            firstFaces.put(Direction.EAST, Face.simple("#cross"));
-            elements.add(new Element("cross_0", 7.5F, 0.0F, -3.3137F, 8.5F, 16.0F, 19.3137F, Rotation.of("y", 45.0F, 8.0F, 8.0F, 8.0F), firstFaces, true));
+            firstFaces.put(Direction.NORTH, Face.uv("#cross", 0.0F, 0.0F, 16.0F, 16.0F));
+            firstFaces.put(Direction.SOUTH, Face.uv("#cross", 0.0F, 0.0F, 16.0F, 16.0F));
+            elements.add(new Element("cross_0", 0.8F, 0.0F, 8.0F, 15.2F, 16.0F, 8.0F,
+                    Rotation.of("y", 45.0F, 8.0F, 8.0F, 8.0F, true), firstFaces, false));
 
             EnumMap<Direction, Face> secondFaces = new EnumMap<>(Direction.class);
-            secondFaces.put(Direction.WEST, Face.simple("#cross"));
-            secondFaces.put(Direction.EAST, Face.simple("#cross"));
-            elements.add(new Element("cross_1", 7.5F, 0.0F, -3.3137F, 8.5F, 16.0F, 19.3137F, Rotation.of("y", -45.0F, 8.0F, 8.0F, 8.0F), secondFaces, true));
+            secondFaces.put(Direction.WEST, Face.uv("#cross", 0.0F, 0.0F, 16.0F, 16.0F));
+            secondFaces.put(Direction.EAST, Face.uv("#cross", 0.0F, 0.0F, 16.0F, 16.0F));
+            elements.add(new Element("cross_1", 8.0F, 0.0F, 0.8F, 8.0F, 16.0F, 15.2F,
+                    Rotation.of("y", 45.0F, 8.0F, 8.0F, 8.0F, true), secondFaces, false));
             return elements;
         }
 
@@ -585,6 +610,10 @@ public final class JsonBlockModel {
             return new Face(null, texture, 0, cullFace, -1);
         }
 
+        private static Face cull(String texture, Direction cullFace, int rotation) {
+            return new Face(null, texture, rotation, cullFace, -1);
+        }
+
         private static Face uv(String texture, float minU, float minV, float maxU, float maxV) {
             return new Face(new float[]{minU, minV, maxU, maxV}, texture, 0, null, -1);
         }
@@ -660,6 +689,11 @@ public final class JsonBlockModel {
 
         public static Rotation of(String axis, float angle, float originX, float originY, float originZ) {
             return new Rotation(axis, angle, new float[]{originX, originY, originZ}, false);
+        }
+
+        public static Rotation of(String axis, float angle, float originX, float originY, float originZ,
+                                  boolean rescale) {
+            return new Rotation(axis, angle, new float[]{originX, originY, originZ}, rescale);
         }
 
         public boolean isPresent() {
