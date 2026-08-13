@@ -101,6 +101,6 @@ public class GameSettingsMixin {
 
         handler.publish(event);
 
-        this.keyBindings = handler.streamKeybindings().toArray(KeyBinding[]::new);
+        this.keyBindings = handler.streamAllKeybindings().toArray(KeyBinding[]::new);
     }
 }

@@ -28,6 +28,19 @@ jobs:
       - name: Add permission
         run: chmod +x ./gradlew
 
+      - name: Get Changes between Tags
+        id: changes
+        uses: simbo/changes-between-tags-action@v1
+        with:
+          validate-tag: 'false'
+
+      - name: Resolve release version
+        id: version
+        shell: bash
+        run: |
+          TAG='${{ steps.changes.outputs.tag }}'
+          echo "value=${TAG#v}" >> "$GITHUB_OUTPUT"
+
       - name: Ensure jar in fml-loom cache
         run: |
           set -euo pipefail
@@ -52,13 +65,7 @@ jobs:
           echo "Saved $TARGET_JAR"
 
       - name: Execute Gradle build
-        run: ./gradlew build
-
-      - name: Get Changes between Tags
-        id: changes
-        uses: simbo/changes-between-tags-action@v1
-        with:
-          validate-tag: 'false'
+        run: ./gradlew "-Pmod_version=${{ steps.version.outputs.value }}" build
 
       - uses: Kir-Antipov/mc-publish@v3.3.0
         with:
@@ -79,5 +86,5 @@ jobs:
           game-versions: 1.6.4
           java: |
             17
-          version: ${{ steps.changes.outputs.tag }}
+          version: ${{ steps.version.outputs.value }}
           changelog: ${{ steps.changes.outputs.changes }}

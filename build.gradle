@@ -12,7 +12,7 @@ base {
     // Prefix local JAR names with an optional alias, for example: "[Alias]" + archives_base_name.
     // Maven publishing keeps using the compatibility maven_id configured below.
     archivesName = useLocalizedArchiveName
-            ? "[前置锈铁核心]${project.archives_base_name}"
+            ? "[锈铁核心]${project.archives_base_name}"
             : project.archives_base_name
 }
 

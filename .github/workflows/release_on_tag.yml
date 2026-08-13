@@ -31,6 +31,11 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
+      - name: Resolve release version
+        id: version
+        shell: bash
+        run: echo "value=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
       - name: Ensure jar in fml-loom cache
         run: |
           set -euo pipefail
@@ -55,7 +60,7 @@ jobs:
           echo "Saved $TARGET_JAR"
 
       - name: Build
-        run: ./gradlew build
+        run: ./gradlew "-Pmod_version=${{ steps.version.outputs.value }}" build
 
       - name: Create GitHub Release
         uses: ncipollo/release-action@v1.14.0
