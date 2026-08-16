@@ -1,4 +1,4 @@
-package moddedmite.rustedironcore.mixin.entity;
+package moddedmite.rustedironcore.mixin.client.player;
 
 import moddedmite.rustedironcore.api.player.ClientPlayerAPI;
 import net.minecraft.*;

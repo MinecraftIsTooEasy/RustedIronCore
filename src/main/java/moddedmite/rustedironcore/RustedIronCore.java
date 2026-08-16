@@ -1,28 +1,25 @@
 package moddedmite.rustedironcore;
 
 import moddedmite.rustedironcore.api.event.Handlers;
-import moddedmite.rustedironcore.api.event.listener.ITooltipListener;
 import moddedmite.rustedironcore.api.util.FabricUtil;
-import moddedmite.rustedironcore.api.util.StringUtil;
 import moddedmite.rustedironcore.internal.config.RICConfig;
 import moddedmite.rustedironcore.internal.event.listeners.CommandRegistry;
 import moddedmite.rustedironcore.internal.event.listeners.DimensionRegistry;
 import moddedmite.rustedironcore.internal.event.listeners.PlayerEventListener;
 import moddedmite.rustedironcore.internal.event.listeners.TickListener;
 import moddedmite.rustedironcore.internal.network.Packets;
-import moddedmite.rustedironcore.internal.network.packets.S2COpenGuiTips;
 import moddedmite.rustedironcore.network.Network;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.*;
+import net.xiaoyu233.fml.ModResourceManager;
 import net.xiaoyu233.fml.config.ConfigRegistry;
 
-import java.util.List;
 import java.util.Optional;
 
 public class RustedIronCore implements ModInitializer {
+    public static final String MOD_ID = "rusted_iron_core";
     public static final String MOD_NAME = "RustedIronCore";
+    public static final String MOD_ID_ABBR = "ric";
 
     @Override
     public Optional<ConfigRegistry> createConfig() {
@@ -39,6 +36,7 @@ public class RustedIronCore implements ModInitializer {
     }
 
     private void initClient() {
+        ModResourceManager.addResourcePackDomain(MOD_ID_ABBR);
         Network.initClient(packet -> Minecraft.getMinecraft().getNetHandler().addToSendQueue(packet.toVanilla()));
         Packets.registerClientReaders();
     }
@@ -57,12 +55,4 @@ public class RustedIronCore implements ModInitializer {
         }
     }
 
-    @Environment(EnvType.CLIENT)
-    public static boolean shouldRenderStatement() {
-        if (S2COpenGuiTips.firstLoginStatementCounter == 0) return false;// the time is over
-        if (!StringUtil.getCurrentLanguage().equals("zh_CN")) return false;// Non-Chinese skip
-        if (FabricUtil.isDevelopmentEnvironment()) return false;// dev env disable
-        if (RICConfig.StatementOnLogin.get()) return true;// config is true then render
-        return false;
-    }
 }

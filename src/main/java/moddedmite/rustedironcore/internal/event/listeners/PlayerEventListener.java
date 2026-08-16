@@ -19,7 +19,7 @@ public class PlayerEventListener implements IPlayerEventListener {
     public void onPlayerLoggedIn(PlayerLoggedInEvent event) {
         ServerPlayer player = event.player();
         if (this.shouldState(event.firstLogin())) {
-            player.addChatMessage(RICText.Statement.getKey());
+            player.addChatMessage(RICText.STATEMENT.getKey());
             Network.sendToClient(player, new S2COpenGuiTips());
         }
     }

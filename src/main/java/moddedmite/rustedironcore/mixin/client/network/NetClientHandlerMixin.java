@@ -1,4 +1,4 @@
-package moddedmite.rustedironcore.mixin.network;
+package moddedmite.rustedironcore.mixin.client.network;
 
 import moddedmite.rustedironcore.api.event.Handlers;
 import moddedmite.rustedironcore.api.event.handler.EntityTrackerHandler;

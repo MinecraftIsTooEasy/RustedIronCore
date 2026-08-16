@@ -10,6 +10,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 public class TradingHandler extends EventHandler<TradingRegisterEvent> {
     private static final Logger LOGGER = LogUtil.getLogger();
@@ -27,6 +28,14 @@ public class TradingHandler extends EventHandler<TradingRegisterEvent> {
 
     public Optional<VillagerSettings> getForProfession(int profession) {
         return Optional.ofNullable(this.professionMap.getOrDefault(profession, null));
+    }
+
+    public Optional<VillagerSettings> getForName(String name) {
+        return this.stream().filter(x -> x.getName().equals(name)).findFirst();
+    }
+
+    public Stream<VillagerSettings> stream() {
+        return this.professionMap.values().stream();
     }
 
     public void registerProfession(int profession, VillagerSettings villagerSettings) {

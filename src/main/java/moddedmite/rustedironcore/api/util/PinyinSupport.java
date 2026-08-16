@@ -1,6 +1,6 @@
 package moddedmite.rustedironcore.api.util;
 
-import moddedmite.rustedironcore.compat.ModCompat;
+import moddedmite.rustedironcore.integration.ModReference;
 import moddedmite.rustedironcore.internal.unsafe.PinInImpl;
 
 public class PinyinSupport {
@@ -26,7 +26,7 @@ public class PinyinSupport {
     }
 
     static {
-        if (ModCompat.HAS_PININ) {
+        if (ModReference.HAS_PININ) {
             try {
                 pinInImpl = new PinInImpl();
             } catch (RuntimeException e) {

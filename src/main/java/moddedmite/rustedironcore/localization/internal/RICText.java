@@ -1,19 +1,21 @@
 package moddedmite.rustedironcore.localization.internal;
 
-import com.google.common.base.CaseFormat;
-import com.google.common.base.Converter;
 import moddedmite.rustedironcore.localization.LocalizationEnum;
 
 public enum RICText implements LocalizationEnum {
-    Statement,
-    GuiTitle,
-    StatementCountdown,
+    STATEMENT("ric.statement"),
+    GUI_TITLE("ric.gui_title"),
+    STATEMENT_COUNTDOWN("ric.statement_countdown"),
     ;
 
-    private static final Converter<String, String> CONVERTER = CaseFormat.UPPER_CAMEL.converterTo(CaseFormat.LOWER_UNDERSCORE);
+    private final String key;
+
+    RICText(String key) {
+        this.key = key;
+    }
 
     @Override
     public String getKey() {
-        return "ric." + CONVERTER.convert(this.name());
+        return this.key;
     }
 }
