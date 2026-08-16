@@ -36,10 +36,10 @@ public class Statement {
         ScaledResolution scaledResolution = new ScaledResolution(client.gameSettings, client.displayWidth, client.displayHeight);
         int x = scaledResolution.getScaledWidth() / 2;
         int y = scaledResolution.getScaledHeight() / 2;
-        int leftX = x - 85;
+        int leftX = x - 100;
         int topY = y - 35;
-        ((IGuiMixin) guiIngame).invokeDrawGradientRect(leftX, topY, x + 85, y + 35, 1074794512, 1074794512);
-        List<String> list = Arrays.stream(RICText.STATEMENT.translate().split("[,.;]")).map(String::trim).toList();
+        ((IGuiMixin) guiIngame).invokeDrawGradientRect(leftX, topY, x + 100, y + 35, 1074794512, 1074794512);
+        List<String> list = Arrays.stream(RICText.STATEMENT.translate().split("[.;]")).map(String::trim).toList();
         int stringX = leftX + 5;
         int stringY = topY + 5;
         for (String s : list) {
