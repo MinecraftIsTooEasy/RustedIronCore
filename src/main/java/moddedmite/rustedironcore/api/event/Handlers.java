@@ -45,7 +45,7 @@ public class Handlers {
     @Environment(EnvType.SERVER)
     public static final PlayerEventHandler PlayerEvent = new PlayerEventHandler();
     /**
-     * Registering a new arrow is complex. This simplifies the process.
+     * Register custom arrow materials and texture resource domains.
      */
     public static final ArrowRegisterHandler ArrowRegister = new ArrowRegisterHandler();
     /**

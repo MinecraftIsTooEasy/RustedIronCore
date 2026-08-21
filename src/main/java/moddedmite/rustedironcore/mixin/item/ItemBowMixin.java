@@ -13,6 +13,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
@@ -53,6 +54,17 @@ public abstract class ItemBowMixin extends Item implements IDamageableItem {
                 bow_pull_icon_name_array[arrow_index * 3 + icon_index] = material.name + "_arrow_" + icon_index;
             }
         }
+    }
+
+    @ModifyArg(method = "registerIcons", at = @At(value = "INVOKE", target = "Lnet/minecraft/IconRegister;registerIcon(Ljava/lang/String;)Lnet/minecraft/Icon;", ordinal = 1), index = 0)
+    private String applyRegisteredArrowDomain(String texture) {
+        String iconName = texture.substring(texture.lastIndexOf('/') + 1);
+        for (Material material : possible_arrow_materials) {
+            if (iconName.startsWith(material.name + "_arrow_")) {
+                return Handlers.ArrowRegister.resolveTexture(material, texture);
+            }
+        }
+        return texture;
     }
 
     @ModifyConstant(method = "addInformation", constant = @Constant(intValue = 10))

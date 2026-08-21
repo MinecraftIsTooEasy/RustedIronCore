@@ -22,6 +22,7 @@
     "client.render.AnimationMetadataSectionMixin",
     "client.render.AnimationMetadataSectionSerializerMixin",
     "client.render.ItemRendererMixin",
+    "client.render.RenderArrowMixin",
     "client.render.RenderBipedMixin",
     "client.render.RenderBlocksMixin",
     "client.render.RenderItemMixin",
