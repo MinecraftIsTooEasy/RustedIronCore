@@ -5,6 +5,7 @@ import huix.glacier.api.extension.material.IRepairableMaterial;
 import huix.glacier.api.registry.sync.RegistryHelperImpl;
 import huix.glacier.api.registry.sync.remappers.ItemRegistryRemapper;
 import moddedmite.rustedironcore.api.event.Handlers;
+import moddedmite.rustedironcore.internal.Bootstrap;
 import moddedmite.rustedironcore.property.ItemProperties;
 import moddedmite.rustedironcore.property.MaterialProperties;
 import net.minecraft.*;
@@ -54,6 +55,7 @@ public abstract class ItemMixin {
     @Inject(method = "<clinit>", at = @At("RETURN"))
     private static void onClinit(CallbackInfo ci) {
         RegistryHelperImpl.registerRegistryRemapper(ItemRegistryRemapper::new);
+        Bootstrap.logStage("item");
     }
 
     @Inject(method = "addInformation(Lnet/minecraft/ItemStack;Lnet/minecraft/EntityPlayer;Ljava/util/List;ZLnet/minecraft/Slot;)V", at = @At(value = "RETURN", ordinal = 1))

@@ -98,6 +98,7 @@ public class Handlers {
      */
     public static final EntityTrackerHandler EntityTracker = new EntityTrackerHandler();
     public static final TimedTaskHandler TimedTask = new TimedTaskHandler();
+    @Deprecated
     /**
      * Registering the potion is buggy. You must construct your own potion instances here, DO NOT call too early.
      */
@@ -156,6 +157,8 @@ public class Handlers {
     public static final StructureHandler Structure = new StructureHandler();
     /**
      * Take over the {@link Packet132TileEntityData} reading.
+     * <br>
+     * Register here if you need {@link TileEntity#getDescriptionPacket}
      */
     public static final TileEntityDataHandler TileEntityData = new TileEntityDataHandler();
     /**
