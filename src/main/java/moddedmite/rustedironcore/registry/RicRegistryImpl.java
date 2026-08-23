@@ -69,4 +69,9 @@ public class RicRegistryImpl implements RicRegistry {
     public void registerSpawnCondition(Class<? extends Entity> clazz, SpawnConditionHandler.SpawnCondition condition) {
         Handlers.SpawnCondition.addCondition(clazz, condition);
     }
+
+    @Override
+    public void registerAchievement(Achievement achievement, ResourceLocation id) {
+        Registries.ACHIEVEMENT.register(id, achievement);
+    }
 }

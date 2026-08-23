@@ -57,6 +57,10 @@ dependencies {
     // Compile needed
     implementation "com.github.MinecraftIsTooEasy:PinIn-Lib:1.6.0"
 
+    localRuntime "com.github.MinecraftIsTooEasy:FastUtil:8.5.12"
+    localRuntime "com.google.code.gson:gson:2.11.0"
+    localRuntime("com.github.MinecraftIsTooEasy:EMI:1.1.25") { transitive = false }
+    localRuntime "com.github.MinecraftIsTooEasy:ModMenu:10.1.1"
 }
 
 def fmlResolvedFile = configurations.fml.singleFile

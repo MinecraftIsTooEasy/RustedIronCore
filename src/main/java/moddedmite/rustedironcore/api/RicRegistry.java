@@ -29,4 +29,9 @@ public interface RicRegistry {
     void registerPotion(Potion potion, ResourceLocation id);
 
     void registerSpawnCondition(Class<? extends Entity> clazz, SpawnConditionHandler.SpawnCondition condition);
+
+    /**
+     * {@link net.xiaoyu233.fml.reload.utils.IdUtil#getNextAchievementID()}
+     */
+    void registerAchievement(Achievement achievement, ResourceLocation id);
 }

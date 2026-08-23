@@ -7,22 +7,25 @@ import moddedmite.rustedironcore.api.event.events.*;
 import moddedmite.rustedironcore.internal.Bootstrap;
 import moddedmite.rustedironcore.internal.client.ClientBootstrap;
 import moddedmite.rustedironcore.internal.config.RICConfig;
+import net.fabricmc.api.EnvType;
 import net.xiaoyu233.fml.FishModLoader;
 
 public class Hooks {
-    public static void preClientLaunch() {
-        if (!RICConfig.PreLoadGameObjects.get()) return;
+    public static void preEntrypoints(EnvType type) {
+        if (!Bootstrap.preloadGameObjects()) return;
         Bootstrap.bootstrap();
-        ClientBootstrap.bootstrap();
+        if (type == EnvType.CLIENT) {
+            ClientBootstrap.bootstrap();
+        }
     }
 
-    public static void preServerLaunch() {
-        if (!RICConfig.PreLoadGameObjects.get()) return;
-        Bootstrap.bootstrap();
+    public static void postEntrypoints(EnvType type) {
+        if (!Bootstrap.preloadGameObjects()) return;
+        Bootstrap.applyPatch();
     }
 
     public static void postCraftingRecipeRegister() {
-        if (!RICConfig.PreLoadGameObjects.get()) {
+        if (!Bootstrap.preloadGameObjects()) {
             FishModLoader.invokeEntrypoints("registry", IGameRegistry.class, IGameRegistry::onGameRegistry);
         }
         ((StagedHandler) Handlers.PropertiesRegistry).publish();
@@ -34,6 +37,5 @@ public class Hooks {
         if (RICConfig.UseCustomDimension.get()) {
             Handlers.Dimension.publish(new DimensionRegisterEvent(Handlers.Dimension));
         }
-        Bootstrap.logStage("recipe");
     }
 }

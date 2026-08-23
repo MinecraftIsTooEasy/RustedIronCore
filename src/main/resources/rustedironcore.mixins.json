@@ -110,6 +110,7 @@
     "util.ShapedRecipesMixin",
     "util.ShapelessRecipesMixin",
     "util.SlotCraftingMixin",
+    "util.StatListMixin",
     "world.BiomeDecoratorMixin",
     "world.BiomeGenBaseMixin",
     "world.GenLayerAddIslandMixin",

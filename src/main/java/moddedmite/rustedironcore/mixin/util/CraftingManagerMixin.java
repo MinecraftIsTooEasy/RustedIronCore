@@ -5,6 +5,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import moddedmite.rustedironcore.api.event.Handlers;
 import moddedmite.rustedironcore.api.event.events.CraftingRecipeRegisterEvent;
 import moddedmite.rustedironcore.api.util.Platform;
+import moddedmite.rustedironcore.internal.Bootstrap;
 import moddedmite.rustedironcore.internal.event.Hooks;
 import moddedmite.rustedironcore.internal.unsafe.CraftingResultAccess;
 import net.minecraft.*;
@@ -42,12 +43,14 @@ public abstract class CraftingManagerMixin {
             ShapelessRecipes shapelessRecipes = this.addShapelessRecipe(shapeless.result, shapeless.include_in_lowest_crafting_difficulty_determination, shapeless.inputs);
             shapeless.modifyShapelessRecipe(shapelessRecipes);
         }
+
         original.call(list, c);
     }
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void onInit(CallbackInfo ci) {
         Hooks.postCraftingRecipeRegister();
+        Bootstrap.logStage("crafting recipe");
     }
 
     @Inject(method = "findMatchingRecipe", at = @At(value = "INVOKE", target = "Lnet/minecraft/InventoryCrafting;getEventHandler()Lnet/minecraft/Container;"), locals = LocalCapture.CAPTURE_FAILSOFT, cancellable = true)
