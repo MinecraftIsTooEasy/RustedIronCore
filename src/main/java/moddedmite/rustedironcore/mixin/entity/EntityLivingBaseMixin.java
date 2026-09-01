@@ -94,9 +94,9 @@ public abstract class EntityLivingBaseMixin extends Entity {
         }
         if (block_landed_on_info != null && block_landed_on_info.block.stepSound != null) {
             if (instance instanceof EntityPlayer) {
-                this.makeSound("step." + block_landed_on_info.block.stepSound.stepSoundName, Math.min(fall_distance * 0.1f, 1.0f), 1.0f);
+                this.makeSound(block_landed_on_info.block.stepSound.getStepSound(), Math.min(fall_distance * 0.1f, 1.0f), 1.0f);
             } else {
-                this.makeSound("step." + block_landed_on_info.block.stepSound.stepSoundName, Math.min(fall_distance * 0.2f, 2.0f), 1.0f);
+                this.makeSound(block_landed_on_info.block.stepSound.getStepSound(), Math.min(fall_distance * 0.2f, 2.0f), 1.0f);
             }
         }
     }
