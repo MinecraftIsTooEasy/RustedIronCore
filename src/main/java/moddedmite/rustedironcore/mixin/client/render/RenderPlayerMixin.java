@@ -1,5 +1,6 @@
 package moddedmite.rustedironcore.mixin.client.render;
 
+import moddedmite.rustedironcore.api.model.JsonModelDisplayContext;
 import moddedmite.rustedironcore.api.event.Handlers;
 import moddedmite.rustedironcore.api.model.JsonBlockModel;
 import moddedmite.rustedironcore.api.model.JsonModelRenderContext;
@@ -45,7 +46,7 @@ public abstract class RenderPlayerMixin extends RendererLivingEntity {
 
     @Inject(method = "renderSpecials", at = @At("HEAD"))
     private void rustedIronCore$pushThirdPersonItemContext(AbstractClientPlayer player, float partialTicks, CallbackInfo ci) {
-        JsonModelRenderContext.push(JsonBlockModel.RenderContext.THIRD_PERSON_RIGHT_HAND);
+        JsonModelRenderContext.push(JsonModelDisplayContext.THIRD_PERSON_RIGHT_HAND);
     }
 
     @Inject(method = "renderSpecials", at = @At("RETURN"))

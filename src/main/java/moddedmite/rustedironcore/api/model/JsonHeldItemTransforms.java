@@ -1,6 +1,7 @@
-package moddedmite.rustedironcore.internal.client.render;
+package moddedmite.rustedironcore.api.model;
 
-import moddedmite.rustedironcore.api.model.JsonBlockModel;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.AbstractClientPlayer;
 import net.minecraft.Block;
 import net.minecraft.EntityLivingBase;
@@ -12,16 +13,24 @@ import net.minecraft.ItemStack;
 import net.minecraft.RenderBlocks;
 import org.lwjgl.opengl.GL11;
 
-/** Converts MITE's held-item suffix into the modern item-display pipeline. */
+/**
+ * Converts MITE's legacy held-item suffix into the matrix prefix expected by
+ * modern JSON item display transforms.
+ * <p>
+ * RIC applies this automatically to registered JSON models. A custom renderer
+ * should call {@link #apply(EntityLivingBase, ItemStack, JsonModelDisplayContext)}
+ * exactly once only when it intercepts and replaces RIC's normal item render path.
+ */
+@Environment(EnvType.CLIENT)
 public final class JsonHeldItemTransforms {
 
-    public static void apply(EntityLivingBase entity, ItemStack stack, JsonBlockModel.RenderContext context) {
+    public static void apply(EntityLivingBase entity, ItemStack stack, JsonModelDisplayContext context) {
         if (stack == null || stack.getItem() == null) {
             return;
         }
-        if (context == JsonBlockModel.RenderContext.FIRST_PERSON_RIGHT_HAND) {
+        if (context == JsonModelDisplayContext.FIRST_PERSON_RIGHT_HAND) {
             replaceFirstPersonSuffix(stack);
-        } else if (context == JsonBlockModel.RenderContext.THIRD_PERSON_RIGHT_HAND) {
+        } else if (context == JsonModelDisplayContext.THIRD_PERSON_RIGHT_HAND) {
             replaceThirdPersonSuffix(entity, stack);
         }
     }

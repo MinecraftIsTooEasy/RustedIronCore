@@ -1,5 +1,6 @@
 package moddedmite.rustedironcore.mixin.client.render;
 
+import moddedmite.rustedironcore.api.model.JsonModelDisplayContext;
 import moddedmite.rustedironcore.api.model.JsonBlockModel;
 import moddedmite.rustedironcore.api.model.JsonBlockModelManager;
 import net.minecraft.*;
@@ -44,7 +45,7 @@ public abstract class RenderItemMixin {
                 GL11.glPopMatrix();
                 return;
             }
-            boolean rendered = JsonBlockModelManager.INSTANCE.renderBlockAsItem(block, stack.getItemSubtype(), 1.0F, JsonBlockModel.RenderContext.GROUND);
+            boolean rendered = JsonBlockModelManager.INSTANCE.renderBlockAsItem(stack, block, 1.0F, JsonModelDisplayContext.GROUND, null);
             GL11.glPopMatrix();
             if (rendered) {
                 ci.cancel();
@@ -53,7 +54,7 @@ public abstract class RenderItemMixin {
         }
 
         GL11.glScalef(0.5F, 0.5F, 0.5F);
-        boolean rendered = JsonBlockModelManager.INSTANCE.renderItem(stack, stack.getIconIndex(), JsonBlockModel.RenderContext.GROUND);
+        boolean rendered = JsonBlockModelManager.INSTANCE.renderItem(stack, stack.getIconIndex(), JsonModelDisplayContext.GROUND);
         GL11.glPopMatrix();
 
         if (rendered) {

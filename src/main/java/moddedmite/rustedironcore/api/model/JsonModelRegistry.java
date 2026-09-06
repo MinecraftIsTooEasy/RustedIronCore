@@ -40,6 +40,14 @@ public interface JsonModelRegistry {
 
     void registerItemModel(Block block, int metadata, Identifier modelId);
 
+    void registerItemModelPredicate(Item item, String property, JsonItemModelPredicate predicate);
+
+    void registerItemModelPredicate(Item item, Identifier property, JsonItemModelPredicate predicate);
+
+    void registerItemModelPredicate(Block block, String property, JsonItemModelPredicate predicate);
+
+    void registerItemModelPredicate(Block block, Identifier property, JsonItemModelPredicate predicate);
+
     void registerBuiltInRenderer(Item item, BuiltInEntityRenderer renderer);
 
     void registerBuiltInRenderer(Item item, int metadata, BuiltInEntityRenderer renderer);

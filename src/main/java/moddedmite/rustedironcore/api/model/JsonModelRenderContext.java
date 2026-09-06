@@ -5,14 +5,14 @@ import java.util.Deque;
 
 public final class JsonModelRenderContext {
 
-    private static final ThreadLocal<Deque<JsonBlockModel.RenderContext>> CONTEXTS = ThreadLocal.withInitial(ArrayDeque::new);
+    private static final ThreadLocal<Deque<JsonModelDisplayContext>> CONTEXTS = ThreadLocal.withInitial(ArrayDeque::new);
 
-    public static void push(JsonBlockModel.RenderContext context) {
+    public static void push(JsonModelDisplayContext context) {
         CONTEXTS.get().push(context);
     }
 
     public static void pop() {
-        Deque<JsonBlockModel.RenderContext> contexts = CONTEXTS.get();
+        Deque<JsonModelDisplayContext> contexts = CONTEXTS.get();
         if (!contexts.isEmpty()) {
             contexts.pop();
         }
@@ -21,8 +21,8 @@ public final class JsonModelRenderContext {
         }
     }
 
-    public static JsonBlockModel.RenderContext currentOr(JsonBlockModel.RenderContext fallback) {
-        Deque<JsonBlockModel.RenderContext> contexts = CONTEXTS.get();
+    public static JsonModelDisplayContext currentOr(JsonModelDisplayContext fallback) {
+        Deque<JsonModelDisplayContext> contexts = CONTEXTS.get();
         return contexts.isEmpty() ? fallback : contexts.peek();
     }
 }

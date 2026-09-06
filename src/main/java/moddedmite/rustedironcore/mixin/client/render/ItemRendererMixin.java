@@ -1,9 +1,10 @@
 package moddedmite.rustedironcore.mixin.client.render;
 
+import moddedmite.rustedironcore.api.model.JsonModelDisplayContext;
 import moddedmite.rustedironcore.api.model.JsonBlockModel;
 import moddedmite.rustedironcore.api.model.JsonBlockModelManager;
+import moddedmite.rustedironcore.api.model.JsonHeldItemTransforms;
 import moddedmite.rustedironcore.api.model.JsonModelRenderContext;
-import moddedmite.rustedironcore.internal.client.render.JsonHeldItemTransforms;
 import net.minecraft.Block;
 import net.minecraft.EntityLivingBase;
 import net.minecraft.Icon;
@@ -25,7 +26,7 @@ public abstract class ItemRendererMixin {
             return;
         }
 
-        JsonBlockModel.RenderContext context = JsonModelRenderContext.currentOr(JsonBlockModel.RenderContext.FIRST_PERSON_RIGHT_HAND);
+        JsonModelDisplayContext context = JsonModelRenderContext.currentOr(JsonModelDisplayContext.FIRST_PERSON_RIGHT_HAND);
         boolean rendered;
         GL11.glPushMatrix();
         try {
@@ -35,11 +36,10 @@ public abstract class ItemRendererMixin {
                         ? ((ItemBlock) par2ItemStack.getItem()).getBlock()
                         : par2ItemStack.itemID >= 0 && par2ItemStack.itemID < Block.blocksList.length
                         ? Block.blocksList[par2ItemStack.itemID] : null;
-                rendered = block != null && JsonBlockModelManager.INSTANCE.renderBlockAsItem(
-                        block, par2ItemStack.getItemSubtype(), 1.0F, context);
+                rendered = block != null && JsonBlockModelManager.INSTANCE.renderBlockAsItem(par2ItemStack, block, 1.0F, context, par1EntityLivingBase);
             } else {
                 Icon fallbackIcon = par1EntityLivingBase.getItemIcon(par2ItemStack, par3);
-                rendered = JsonBlockModelManager.INSTANCE.renderItem(par2ItemStack, fallbackIcon, context);
+                rendered = JsonBlockModelManager.INSTANCE.renderItem(par2ItemStack, fallbackIcon, context, par1EntityLivingBase);
             }
         } finally {
             GL11.glPopMatrix();
@@ -52,7 +52,7 @@ public abstract class ItemRendererMixin {
 
     @Inject(method = "renderItemInFirstPerson", at = @At("HEAD"))
     private void rustedIronCore$pushFirstPersonItemContext(float partialTicks, CallbackInfo ci) {
-        JsonModelRenderContext.push(JsonBlockModel.RenderContext.FIRST_PERSON_RIGHT_HAND);
+        JsonModelRenderContext.push(JsonModelDisplayContext.FIRST_PERSON_RIGHT_HAND);
     }
 
     @Inject(method = "renderItemInFirstPerson", at = @At("RETURN"))

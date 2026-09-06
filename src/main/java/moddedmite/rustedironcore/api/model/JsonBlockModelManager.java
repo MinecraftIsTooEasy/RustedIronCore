@@ -5,6 +5,7 @@ import moddedmite.rustedironcore.api.util.LogUtil;
 import moddedmite.rustedironcore.mixin.accessor.BlockAccessor;
 import moddedmite.rustedironcore.mixin.accessor.ItemAccessor;
 import net.minecraft.Block;
+import net.minecraft.EntityLivingBase;
 import net.minecraft.Icon;
 import net.minecraft.IBlockAccess;
 import net.minecraft.Item;
@@ -52,6 +53,7 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
     private final Map<Long, Identifier> itemMetadataModelOverrides = new HashMap<>();
     private final Map<Block, Identifier> blockItemModelOverrides = new IdentityHashMap<>();
     private final Map<Integer, Identifier> blockItemMetadataModelOverrides = new HashMap<>();
+    private final Map<Item, Map<Identifier, JsonItemModelPredicate>> itemModelPredicates = new IdentityHashMap<>();
     private final Set<Block> jsonBlocks = Collections.newSetFromMap(new IdentityHashMap<>());
     private final Map<Item, BuiltInEntityRenderer> builtInRenderers = new IdentityHashMap<>();
     private final Map<Long, BuiltInEntityRenderer> builtInRenderersByMetadata = new HashMap<>();
@@ -171,6 +173,30 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
         }
     }
 
+    @Override
+    public void registerItemModelPredicate(Item item, String property, JsonItemModelPredicate predicate) {
+        this.registerItemModelPredicate(item, new Identifier(property), predicate);
+    }
+
+    @Override
+    public void registerItemModelPredicate(Item item, Identifier property, JsonItemModelPredicate predicate) {
+        if (item != null && property != null && predicate != null) {
+            this.itemModelPredicates.computeIfAbsent(item, ignored -> new HashMap<>()).put(property, predicate);
+        }
+    }
+
+    @Override
+    public void registerItemModelPredicate(Block block, String property, JsonItemModelPredicate predicate) {
+        this.registerItemModelPredicate(block, new Identifier(property), predicate);
+    }
+
+    @Override
+    public void registerItemModelPredicate(Block block, Identifier property, JsonItemModelPredicate predicate) {
+        if (block != null) {
+            this.registerItemModelPredicate(Item.itemsList[block.blockID], property, predicate);
+        }
+    }
+
     public void registerBuiltInRenderer(Item item, BuiltInEntityRenderer renderer) {
         if (item != null && renderer != null) {
             this.builtInRenderers.put(item, renderer);
@@ -233,28 +259,33 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
     }
 
     public boolean renderBlockAsItem(Block block, int metadata, float brightness) {
-        return renderBlockAsItem(block, metadata, brightness, JsonBlockModel.RenderContext.BLOCK_ITEM);
+        return renderBlockAsItem(block, metadata, brightness, JsonModelDisplayContext.BLOCK_ITEM);
     }
 
-    public boolean renderBlockAsItem(Block block, int metadata, float brightness, JsonBlockModel.RenderContext context) {
-        ItemStack stack = new ItemStack(block, 1, metadata);
-        BuiltInEntityRenderer builtInRenderer = this.getBuiltInRenderer(stack);
-        if (builtInRenderer != null) {
-            JsonBlockModel model = this.getItemModel(stack).orElse(null);
-            if (model == null) {
-                Optional<BlockModelSelection> selection = this.getBlockModelSelection(block, metadata);
-                if (selection.isEmpty()) {
+    public boolean renderBlockAsItem(Block block, int metadata, float brightness, JsonModelDisplayContext context) {
+        return this.renderBlockAsItem(new ItemStack(block, 1, metadata), block, brightness, context, null);
+    }
+
+    public boolean renderBlockAsItem(ItemStack stack, Block block, float brightness,
+                                     JsonModelDisplayContext context, EntityLivingBase entity) {
+        if (stack == null || block == null) {
+            return false;
+        }
+        int metadata = stack.getItemSubtype();
+
+        Optional<JsonBlockModel> itemModel = this.getExplicitItemModel(stack, block)
+                .map(model -> this.resolveItemModel(model, stack, entity));
+        if (itemModel.isPresent()) {
+            JsonBlockModel model = itemModel.get();
+            if (model.isBuiltInEntity()) {
+                BuiltInEntityRenderer renderer = this.getBuiltInRenderer(stack);
+                if (renderer == null) {
                     return false;
                 }
-                model = selection.get().model();
+                JsonBlockModelRenderer.renderBuiltInEntityAsBlockItem(model, entity, stack, renderer, context);
+                return true;
             }
-            JsonBlockModelRenderer.renderBuiltInEntityAsBlockItem(model, block, metadata, builtInRenderer, context);
-            return true;
-        }
-
-        Optional<JsonBlockModel> itemModel = this.getExplicitItemModel(stack);
-        if (itemModel.isPresent()) {
-            return renderBlockItemModel(itemModel.get(), stack, block, metadata, brightness, context);
+            return renderBlockItemModel(model, stack, block, stack.getItemSubtype(), brightness, context);
         }
 
         if (!this.jsonBlocks.contains(block)) {
@@ -267,7 +298,14 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
 
         boolean rendered = false;
         for (BlockModelSelection selection : selections) {
-            if (!selection.model().getElements().isEmpty()) {
+            JsonBlockModel model = selection.model();
+            if (model.isBuiltInEntity()) {
+                BuiltInEntityRenderer renderer = this.getBuiltInRenderer(stack);
+                if (renderer != null) {
+                    JsonBlockModelRenderer.renderBuiltInEntityAsBlockItem(model, entity, stack, renderer, context);
+                    rendered = true;
+                }
+            } else if (!model.getElements().isEmpty()) {
                 JsonBlockModelRenderer.renderBlockAsItem(selection.model(), selection.variant(), block, metadata, brightness, context);
                 rendered = true;
             }
@@ -275,15 +313,40 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
         return rendered;
     }
 
-    public boolean renderItem(ItemStack stack, Icon fallbackIcon, JsonBlockModel.RenderContext context) {
-        Optional<JsonBlockModel> model = this.getItemModel(stack);
+    /** Draws the registered block-state model in the current item-space matrix without applying JSON display transforms. */
+    public boolean renderBlockAsItemGeometry(Block block, int metadata, float brightness) {
+        if (block == null || !this.jsonBlocks.contains(block)) {
+            return false;
+        }
+        List<BlockModelSelection> selections = this.getBlockModelSelections(block, null, 0, 0, 0, metadata);
+        boolean rendered = false;
+        for (BlockModelSelection selection : selections) {
+            if (!selection.model().getElements().isEmpty()) {
+                JsonBlockModelRenderer.renderBlockAsItemGeometry(
+                        selection.model(), selection.variant(), block, metadata, brightness);
+                rendered = true;
+            }
+        }
+        return rendered;
+    }
+
+    public boolean renderItem(ItemStack stack, Icon fallbackIcon, JsonModelDisplayContext context) {
+        return this.renderItem(stack, fallbackIcon, context, null);
+    }
+
+    public boolean renderItem(ItemStack stack, Icon fallbackIcon, JsonModelDisplayContext context,
+                              EntityLivingBase entity) {
+        Optional<JsonBlockModel> model = this.getItemModel(stack, entity);
         if (model.isEmpty()) {
             return false;
         }
 
-        BuiltInEntityRenderer renderer = this.getBuiltInRenderer(stack);
-        if (renderer != null) {
-            JsonBlockModelRenderer.renderBuiltInEntity(model.get(), stack, fallbackIcon, context, renderer);
+        if (model.get().isBuiltInEntity()) {
+            BuiltInEntityRenderer renderer = this.getBuiltInRenderer(stack);
+            if (renderer == null) {
+                return false;
+            }
+            JsonBlockModelRenderer.renderBuiltInEntity(model.get(), entity, stack, fallbackIcon, context, renderer);
             return true;
         }
 
@@ -300,28 +363,24 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
             return false;
         }
 
-        BuiltInEntityRenderer builtInRenderer = this.getBuiltInRenderer(stack);
-
         if (stack.isBlock()) {
             Block block = Block.blocksList[stack.itemID];
             if (block == null) {
                 return false;
             }
-            if (builtInRenderer != null) {
-                JsonBlockModel model = this.getItemModel(stack).orElse(null);
-                if (model == null) {
-                    Optional<BlockModelSelection> selection = this.getBlockModelSelection(block, stack.getItemSubtype());
-                    if (selection.isEmpty()) {
+            Optional<JsonBlockModel> itemModel = this.getExplicitItemModel(stack, block)
+                    .map(model -> this.resolveItemModel(model, stack, null));
+            if (itemModel.isPresent()) {
+                JsonBlockModel model = itemModel.get();
+                if (model.isBuiltInEntity()) {
+                    BuiltInEntityRenderer renderer = this.getBuiltInRenderer(stack);
+                    if (renderer == null) {
                         return false;
                     }
-                    model = selection.get().model();
+                    JsonBlockModelRenderer.renderBuiltInEntityIntoGui(model, stack, x, y, zLevel, renderer);
+                    return true;
                 }
-                JsonBlockModelRenderer.renderBuiltInEntityIntoGui(model, stack, x, y, zLevel, builtInRenderer);
-                return true;
-            }
-            Optional<JsonBlockModel> itemModel = this.getExplicitItemModel(stack, block);
-            if (itemModel.isPresent()) {
-                return renderBlockItemModelIntoGui(itemModel.get(), stack, block, x, y, zLevel);
+                return renderBlockItemModelIntoGui(model, stack, block, x, y, zLevel);
             }
             if (!this.jsonBlocks.contains(block)) {
                 return false;
@@ -332,7 +391,14 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
             }
             boolean rendered = false;
             for (BlockModelSelection selection : selections) {
-                if (!selection.model().getElements().isEmpty()) {
+                JsonBlockModel model = selection.model();
+                if (model.isBuiltInEntity()) {
+                    BuiltInEntityRenderer renderer = this.getBuiltInRenderer(stack);
+                    if (renderer != null) {
+                        JsonBlockModelRenderer.renderBuiltInEntityIntoGui(model, stack, x, y, zLevel, renderer);
+                        rendered = true;
+                    }
+                } else if (!model.getElements().isEmpty()) {
                     JsonBlockModelRenderer.renderBlockAsItemInGui(selection.model(), selection.variant(), block, stack.getItemSubtype(), x, y, zLevel);
                     rendered = true;
                 }
@@ -344,8 +410,12 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
         if (model.isEmpty()) {
             return false;
         }
-        if (builtInRenderer != null) {
-            JsonBlockModelRenderer.renderBuiltInEntityIntoGui(model.get(), stack, x, y, zLevel, builtInRenderer);
+        if (model.get().isBuiltInEntity()) {
+            BuiltInEntityRenderer renderer = this.getBuiltInRenderer(stack);
+            if (renderer == null) {
+                return false;
+            }
+            JsonBlockModelRenderer.renderBuiltInEntityIntoGui(model.get(), stack, x, y, zLevel, renderer);
             return true;
         }
         if (model.get().getElements().isEmpty()) {
@@ -361,7 +431,23 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
         return selection.map(BlockModelSelection::model);
     }
 
+    /** Loads a model by its full resource path, such as {@code modid:item/model_name}. */
+    public Optional<JsonBlockModel> getModel(Identifier modelId) {
+        if (modelId == null) {
+            return Optional.empty();
+        }
+        return this.loadModel(modelId);
+    }
+
     public Optional<JsonBlockModel> getItemModel(ItemStack stack) {
+        return this.getItemModel(stack, null);
+    }
+
+    public Optional<JsonBlockModel> getItemModel(ItemStack stack, EntityLivingBase entity) {
+        return this.getBaseItemModel(stack).map(model -> this.resolveItemModel(model, stack, entity));
+    }
+
+    private Optional<JsonBlockModel> getBaseItemModel(ItemStack stack) {
         if (stack == null || stack.getItem() == null) {
             return Optional.empty();
         }
@@ -399,6 +485,37 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
         return this.loadModel(new Identifier(itemTextureId.getNamespace(), "item/" + itemTextureId.getPath()));
     }
 
+    private JsonBlockModel resolveItemModel(JsonBlockModel model, ItemStack stack, EntityLivingBase entity) {
+        List<JsonItemModelOverride> overrides = model.getOverrides();
+        for (int index = overrides.size() - 1; index >= 0; index--) {
+            JsonItemModelOverride override = overrides.get(index);
+            if (!this.matchesItemOverride(stack, entity, override)) {
+                continue;
+            }
+            Identifier modelId = normalizeModelId(override.getModelId(), "item");
+            if (modelId.equals(model.getModelId())) {
+                return model;
+            }
+            return this.loadModel(modelId).orElse(model);
+        }
+        return model;
+    }
+
+    private boolean matchesItemOverride(ItemStack stack, EntityLivingBase entity,
+                                        JsonItemModelOverride override) {
+        Map<Identifier, JsonItemModelPredicate> predicates = this.itemModelPredicates.get(stack.getItem());
+        if (predicates == null) {
+            return false;
+        }
+        for (Map.Entry<Identifier, Float> entry : override.getPredicates().entrySet()) {
+            JsonItemModelPredicate predicate = predicates.get(entry.getKey());
+            if (predicate == null || predicate.getValue(stack, entity) < entry.getValue()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     private Optional<JsonBlockModel> getExplicitItemModel(ItemStack stack) {
         return this.getExplicitItemModel(stack, stack != null && stack.isBlock() ? Block.blocksList[stack.itemID] : null);
     }
@@ -434,7 +551,7 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
         return Optional.empty();
     }
 
-    private static boolean renderBlockItemModel(JsonBlockModel model, ItemStack stack, Block block, int metadata, float brightness, JsonBlockModel.RenderContext context) {
+    private static boolean renderBlockItemModel(JsonBlockModel model, ItemStack stack, Block block, int metadata, float brightness, JsonModelDisplayContext context) {
         if (model.isGeneratedItem()) {
             return JsonBlockModelRenderer.renderItem(model, stack, stack.getIconIndex(), context);
         }
@@ -463,8 +580,9 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
         Set<String> iconNames = new HashSet<>();
         if (textureType == BLOCK_TEXTURE_MAP) {
             this.collectBlockTextureIcons(iconNames);
+            this.collectItemTextureIcons(iconNames, BLOCK_TEXTURE_MAP);
         } else if (textureType == ITEM_TEXTURE_MAP) {
-            this.collectItemTextureIcons(iconNames);
+            this.collectItemTextureIcons(iconNames, ITEM_TEXTURE_MAP);
         }
 
         for (String iconName : iconNames) {
@@ -506,30 +624,56 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
         }
     }
 
-    private void collectItemTextureIcons(Set<String> iconNames) {
+    private void collectItemTextureIcons(Set<String> iconNames, int textureType) {
         for (Item item : Item.itemsList) {
             if (item == null) {
                 continue;
             }
 
             Optional<JsonBlockModel> model = this.getItemModel(new ItemStack(item));
-            model.ifPresent(jsonBlockModel -> collectTextureIcons(jsonBlockModel, ITEM_TEXTURE_MAP, iconNames));
+            model.ifPresent(jsonBlockModel ->
+                    collectTextureIcons(jsonBlockModel, textureType, ITEM_TEXTURE_MAP, iconNames));
         }
 
         for (Identifier modelId : this.itemModelOverrides.values()) {
-            this.loadModel(modelId).ifPresent(model -> collectTextureIcons(model, ITEM_TEXTURE_MAP, iconNames));
+            this.loadModel(modelId).ifPresent(model ->
+                    collectTextureIcons(model, textureType, ITEM_TEXTURE_MAP, iconNames));
         }
         for (Identifier modelId : this.itemMetadataModelOverrides.values()) {
-            this.loadModel(modelId).ifPresent(model -> collectTextureIcons(model, ITEM_TEXTURE_MAP, iconNames));
+            this.loadModel(modelId).ifPresent(model ->
+                    collectTextureIcons(model, textureType, ITEM_TEXTURE_MAP, iconNames));
         }
     }
 
-    private static void collectTextureIcons(JsonBlockModel model, int textureType, Set<String> iconNames) {
+    private void collectTextureIcons(JsonBlockModel model, int textureType, Set<String> iconNames) {
+        this.collectTextureIcons(model, textureType, textureType, iconNames, new HashSet<>());
+    }
+
+    private void collectTextureIcons(JsonBlockModel model, int textureType, int defaultTextureType,
+                                     Set<String> iconNames) {
+        this.collectTextureIcons(model, textureType, defaultTextureType, iconNames, new HashSet<>());
+    }
+
+    private void collectTextureIcons(JsonBlockModel model, int textureType, int defaultTextureType,
+                                     Set<String> iconNames,
+                                     Set<Identifier> visitedModels) {
+        if (!visitedModels.add(model.getModelId())) {
+            return;
+        }
         for (String texture : model.collectResolvedTextures()) {
+            if (JsonBlockModelRenderer.getAtlasTextureType(texture, defaultTextureType) != textureType) {
+                continue;
+            }
             String iconName = JsonBlockModelRenderer.toAtlasIconName(texture, textureType);
             if (iconName != null) {
                 iconNames.add(iconName);
             }
+        }
+        for (JsonItemModelOverride override : model.getOverrides()) {
+            Identifier modelId = normalizeModelId(override.getModelId(), "item");
+            this.loadModel(modelId).ifPresent(overrideModel ->
+                    this.collectTextureIcons(
+                            overrideModel, textureType, defaultTextureType, iconNames, visitedModels));
         }
     }
 

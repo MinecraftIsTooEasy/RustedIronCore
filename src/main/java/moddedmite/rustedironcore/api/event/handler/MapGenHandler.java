@@ -8,7 +8,11 @@ import net.minecraft.MapGenBase;
 import net.minecraft.MapGenStructure;
 import net.minecraft.World;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 public class MapGenHandler extends EventHandler<MapGenRegisterEvent> {
     private final Map<Dimension, List<MapGenBase>> MAP_GEN_MAP = new HashMap<>();
@@ -20,8 +24,10 @@ public class MapGenHandler extends EventHandler<MapGenRegisterEvent> {
     }
 
     public void registerStructure(Dimension dimension, MapGenStructure structure) {
-        STRUCTURE_MAP.computeIfAbsent(dimension, k -> new ArrayList<>())
-                .add(structure);
+        List<MapGenStructure> structures = STRUCTURE_MAP.computeIfAbsent(dimension, key -> new ArrayList<>());
+        if (!structures.contains(structure)) {
+            structures.add(structure);
+        }
     }
 
     public void onChunkProvideMapGen(Dimension dimension,
@@ -54,10 +60,9 @@ public class MapGenHandler extends EventHandler<MapGenRegisterEvent> {
                                      int chunkX,
                                      int chunkZ
     ) {
-        List<MapGenBase> list = this.MAP_GEN_MAP.get(dimension);
+        List<MapGenStructure> list = this.STRUCTURE_MAP.get(dimension);
         if (list == null) return;
-        list.stream().filter(x -> x instanceof MapGenStructure)
-                .forEach(x -> x.generate(chunkProvider, world, chunkX, chunkZ, null));
+        list.forEach(x -> x.generate(chunkProvider, world, chunkX, chunkZ, null));
     }
 
     public void onChunkPopulateStructures(Dimension dimension,

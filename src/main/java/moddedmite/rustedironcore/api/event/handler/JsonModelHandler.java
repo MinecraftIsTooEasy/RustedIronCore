@@ -6,6 +6,7 @@ import moddedmite.rustedironcore.api.event.listener.IJsonModelListener;
 import moddedmite.rustedironcore.api.model.BuiltInEntityRenderer;
 import moddedmite.rustedironcore.api.model.JsonBlockModelManager;
 import moddedmite.rustedironcore.api.model.JsonBlockStatePropertyResolver;
+import moddedmite.rustedironcore.api.model.JsonItemModelPredicate;
 import moddedmite.rustedironcore.api.model.JsonModelRegistry;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -104,6 +105,26 @@ public class JsonModelHandler extends AbstractHandler<IJsonModelListener> implem
     @Override
     public void registerItemModel(Block block, int metadata, Identifier modelId) {
         this.registry.registerItemModel(block, metadata, modelId);
+    }
+
+    @Override
+    public void registerItemModelPredicate(Item item, String property, JsonItemModelPredicate predicate) {
+        this.registry.registerItemModelPredicate(item, property, predicate);
+    }
+
+    @Override
+    public void registerItemModelPredicate(Item item, Identifier property, JsonItemModelPredicate predicate) {
+        this.registry.registerItemModelPredicate(item, property, predicate);
+    }
+
+    @Override
+    public void registerItemModelPredicate(Block block, String property, JsonItemModelPredicate predicate) {
+        this.registry.registerItemModelPredicate(block, property, predicate);
+    }
+
+    @Override
+    public void registerItemModelPredicate(Block block, Identifier property, JsonItemModelPredicate predicate) {
+        this.registry.registerItemModelPredicate(block, property, predicate);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package moddedmite.rustedironcore.mixin.client.render;
 
+import moddedmite.rustedironcore.api.model.JsonModelDisplayContext;
 import moddedmite.rustedironcore.api.model.JsonBlockModel;
 import moddedmite.rustedironcore.api.model.JsonBlockModelManager;
 import moddedmite.rustedironcore.api.model.JsonModelRenderContext;
@@ -30,9 +31,8 @@ public abstract class RenderBlocksMixin {
 
     @Inject(method = "renderBlockAsItem", at = @At("HEAD"), cancellable = true)
     private void renderJsonBlockAsItem(Block par1Block, int par2, float par3, CallbackInfo ci) {
-        if (JsonBlockModelManager.INSTANCE.renderBlockAsItem(par1Block, par2, par3, JsonModelRenderContext.currentOr(JsonBlockModel.RenderContext.BLOCK_ITEM))) {
+        if (JsonBlockModelManager.INSTANCE.renderBlockAsItem(par1Block, par2, par3, JsonModelRenderContext.currentOr(JsonModelDisplayContext.BLOCK_ITEM))) {
             ci.cancel();
         }
     }
-
 }
