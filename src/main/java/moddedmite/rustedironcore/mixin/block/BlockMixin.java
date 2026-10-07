@@ -16,20 +16,20 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class BlockMixin {
 
     @Inject(method = "<clinit>", at = @At("RETURN"))
-    private static void rusted_iron_core$onClinit(CallbackInfo ci) {
+    private static void onClinit(CallbackInfo ci) {
         RegistryHelperImpl.registerRegistryRemapper(BlockRegistryRemapper::new);
         Bootstrap.logStage("block");
     }
 
     @Redirect(method = "getBlockBrightness", at = @At(value = "INVOKE", target = "Lnet/minecraft/IBlockAccess;getBrightness(IIII)F"))
-    private float rusted_iron_core$useDynamicBrightness(IBlockAccess access, int x, int y, int z, int fallbackEmission) {
-        int emission = DynamicLightBlock.resolve(access, x, y, z, fallbackEmission);
+    private float useDynamicBrightness(IBlockAccess access, int x, int y, int z, int staticEmission) {
+        int emission = DynamicLightBlock.resolve(access, x, y, z, staticEmission);
         return access.getBrightness(x, y, z, emission);
     }
 
     @Redirect(method = "getMixedBrightnessForBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/IBlockAccess;getLightBrightnessForSkyBlocks(IIII)I"))
-    private int rusted_iron_core$useDynamicMixedBrightness(IBlockAccess access, int x, int y, int z, int fallbackEmission) {
-        int emission = DynamicLightBlock.resolve(access, x, y, z, fallbackEmission);
+    private int useDynamicMixedBrightness(IBlockAccess access, int x, int y, int z, int staticEmission) {
+        int emission = DynamicLightBlock.resolve(access, x, y, z, staticEmission);
         return access.getLightBrightnessForSkyBlocks(x, y, z, emission);
     }
 }

@@ -240,7 +240,6 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
             return false;
         }
 
-        int brightness = block.getMixedBrightnessForBlock(renderBlocks.blockAccess, x, y, z);
         int color = block.colorMultiplier(renderBlocks.blockAccess, x, y, z);
         float red = ((color >> 16) & 255) / 255.0F;
         float green = ((color >> 8) & 255) / 255.0F;
@@ -248,7 +247,7 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
         boolean rendered = false;
         for (BlockModelSelection selection : selections) {
             if (!selection.model().getElements().isEmpty()) {
-                JsonBlockModelRenderer.renderBlock(selection.model(), selection.variant(), renderBlocks, block, x, y, z, metadata, brightness, red, green, blue);
+                JsonBlockModelRenderer.renderBlock(selection.model(), selection.variant(), renderBlocks, block, x, y, z, metadata, red, green, blue);
                 rendered = true;
             }
         }

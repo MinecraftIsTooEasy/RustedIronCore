@@ -2,13 +2,15 @@ package moddedmite.rustedironcore.mixin.item;
 
 import huix.glacier.api.extension.material.IBowMaterial;
 import moddedmite.rustedironcore.api.event.Handlers;
+import net.minecraft.EntityPlayer;
 import net.minecraft.IDamageableItem;
+import net.minecraft.Icon;
+import net.minecraft.IconRegister;
 import net.minecraft.Item;
 import net.minecraft.ItemBow;
 import net.minecraft.Material;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
@@ -16,18 +18,16 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ItemBow.class)
 public abstract class ItemBowMixin extends Item implements IDamageableItem {
-    @Mutable
     @Shadow
     @Final
     private static Material[] possible_arrow_materials;
 
-    @Mutable
     @Shadow
-    @Final
-    public static String[] bow_pull_icon_name_array;
+    private Icon[] iconArray;
 
     @Shadow private Material reinforcement_material;
 
@@ -38,21 +38,21 @@ public abstract class ItemBowMixin extends Item implements IDamageableItem {
         }
     }
 
-    @Inject(method = "<clinit>", at = @At("RETURN"))
-    private static void addArrowMaterials(CallbackInfo ci) {
+    @Inject(method = "registerIcons", at = @At("HEAD"))
+    private void registerArrowMaterialsBeforeIconRegistration(IconRegister register, CallbackInfo ci) {
         Handlers.ArrowRegister.onRegister();
-        Material[] original = possible_arrow_materials;
-        Material[] arrowMaterials = Handlers.ArrowRegister.keySet().toArray(Material[]::new);
-        Material[] expanded = new Material[original.length + arrowMaterials.length];
-        System.arraycopy(original, 0, expanded, 0, original.length);
-        System.arraycopy(arrowMaterials, 0, expanded, original.length, arrowMaterials.length);
-        possible_arrow_materials = expanded;
-        bow_pull_icon_name_array = new String[possible_arrow_materials.length * 3];
-        for (int arrow_index = 0; arrow_index < possible_arrow_materials.length; ++arrow_index) {
-            Material material = possible_arrow_materials[arrow_index];
-            for (int icon_index = 0; icon_index < 3; ++icon_index) {
-                bow_pull_icon_name_array[arrow_index * 3 + icon_index] = material.name + "_arrow_" + icon_index;
-            }
+    }
+
+    @Inject(method = "getItemIconForUseDuration", at = @At("HEAD"), cancellable = true)
+    private void guardArrowIconIndex(int pullStage, EntityPlayer player, CallbackInfoReturnable<Icon> cir) {
+        if (player.nocked_arrow == null || this.iconArray == null || this.iconArray.length == 0) {
+            return;
+        }
+
+        int iconIndex = pullStage + player.nocked_arrow.getArrowIndex() * 3;
+        if (iconIndex < 0 || iconIndex >= this.iconArray.length) {
+            int fallbackIndex = Math.max(0, Math.min(pullStage, this.iconArray.length - 1));
+            cir.setReturnValue(this.iconArray[fallbackIndex]);
         }
     }
 

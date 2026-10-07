@@ -18,7 +18,7 @@ public abstract class EntityTrackerMixin {
     public abstract void addEntityToTracker(Entity par1Entity, int par2, int par3, boolean par4);
 
     @Inject(method = "addEntityToTracker(Lnet/minecraft/Entity;)V", at = @At("HEAD"), cancellable = true)
-    private void rusted_iron_core$trackRegisteredEntity(Entity par1Entity, CallbackInfo ci) {
+    private void trackRegisteredEntity(Entity par1Entity, CallbackInfo ci) {
         Optional<EntityTrackerHandler.EntityTrackerEntry> entry = Handlers.EntityTracker.matchEntityTracker(par1Entity);
         if (entry.isEmpty()) {
             return;

@@ -2,7 +2,6 @@ package moddedmite.rustedironcore.mixin.client.render;
 
 import moddedmite.rustedironcore.api.model.JsonModelDisplayContext;
 import moddedmite.rustedironcore.api.event.Handlers;
-import moddedmite.rustedironcore.api.model.JsonBlockModel;
 import moddedmite.rustedironcore.api.model.JsonModelRenderContext;
 import net.minecraft.*;
 import org.lwjgl.opengl.GL11;
@@ -45,12 +44,12 @@ public abstract class RenderBipedMixin extends RenderLiving {
     }
 
     @Inject(method = "func_130005_c", at = @At("HEAD"))
-    private void rustedIronCore$pushThirdPersonItemContext(EntityLiving par1EntityLiving, float par2, CallbackInfo ci) {
+    private void pushThirdPersonItemContext(EntityLiving par1EntityLiving, float par2, CallbackInfo ci) {
         JsonModelRenderContext.push(JsonModelDisplayContext.THIRD_PERSON_RIGHT_HAND);
     }
 
     @Inject(method = "func_130005_c", at = @At("RETURN"))
-    private void rustedIronCore$popThirdPersonItemContext(EntityLiving par1EntityLiving, float par2, CallbackInfo ci) {
+    private void popThirdPersonItemContext(EntityLiving par1EntityLiving, float par2, CallbackInfo ci) {
         JsonModelRenderContext.pop();
     }
 

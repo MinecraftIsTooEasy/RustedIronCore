@@ -40,6 +40,8 @@
     "ServerMainMixin",
     "accessor.BlockAccessor",
     "accessor.ItemAccessor",
+    "accessor.ItemArrowAccessor",
+    "accessor.ItemBowAccessor",
     "accessor.RenderBlocksAccessor",
     "block.BlockFireMixin",
     "block.BlockGravelMixin",

@@ -23,14 +23,14 @@ public final class JsonBlockModelRenderer {
 
     private static final int BLOCK_TEXTURE_MAP = 0;
     private static final int ITEM_TEXTURE_MAP = 1;
-    private static final int INHERIT_BRIGHTNESS = -1;
     private static final int MODEL_UV_SIZE = 16;
     private static final double EPSILON = 1.0E-5D;
 
-    public static void renderBlock(JsonBlockModel model, JsonBlockState.Variant variant, RenderBlocks renderBlocks, Block block, int x, int y, int z, int metadata, int brightness, float red, float green, float blue) {
+    public static void renderBlock(JsonBlockModel model, JsonBlockState.Variant variant, RenderBlocks renderBlocks, Block block, int x, int y, int z, int metadata, float red, float green, float blue) {
         Tessellator tessellator = Tessellator.instance;
+        WorldLightSampler lightSampler = new WorldLightSampler(renderBlocks.blockAccess, block, x, y, z);
         for (JsonModelElement element : model.getElements()) {
-            renderElement(tessellator, model, variant, renderBlocks, block, null, element, x, y, z, metadata, brightness, red, green, blue, BLOCK_TEXTURE_MAP, false, true);
+            renderElement(tessellator, model, variant, renderBlocks, block, null, element, x, y, z, metadata, lightSampler, red, green, blue, BLOCK_TEXTURE_MAP, false, true);
         }
     }
 
@@ -54,7 +54,7 @@ public final class JsonBlockModelRenderer {
         Tessellator tessellator = Tessellator.instance;
         for (JsonModelElement element : model.getElements()) {
             renderElement(tessellator, model, variant, null, block, null, element,
-                    0.0F, 0.0F, 0.0F, metadata, INHERIT_BRIGHTNESS,
+                    0.0F, 0.0F, 0.0F, metadata, null,
                     brightness, brightness, brightness, BLOCK_TEXTURE_MAP, true, false);
         }
     }
@@ -126,7 +126,7 @@ public final class JsonBlockModelRenderer {
 
         Tessellator tessellator = Tessellator.instance;
         for (JsonModelElement element : model.getElements()) {
-            renderElement(tessellator, model, JsonBlockState.EMPTY_VARIANT, null, null, fallbackIcon, element, 0.0F, 0.0F, 0.0F, stack.getItemSubtype(), INHERIT_BRIGHTNESS, 1.0F, 1.0F, 1.0F, ITEM_TEXTURE_MAP, true, false);
+            renderElement(tessellator, model, JsonBlockState.EMPTY_VARIANT, null, null, fallbackIcon, element, 0.0F, 0.0F, 0.0F, stack.getItemSubtype(), null, 1.0F, 1.0F, 1.0F, ITEM_TEXTURE_MAP, true, false);
         }
 
         GL11.glPopMatrix();
@@ -150,7 +150,7 @@ public final class JsonBlockModelRenderer {
             Tessellator tessellator = Tessellator.instance;
             Icon fallbackIcon = stack.getIconIndex();
             for (JsonModelElement element : model.getElements()) {
-                renderElement(tessellator, model, JsonBlockState.EMPTY_VARIANT, null, null, fallbackIcon, element, 0.0F, 0.0F, 0.0F, stack.getItemSubtype(), INHERIT_BRIGHTNESS, 1.0F, 1.0F, 1.0F, ITEM_TEXTURE_MAP, true, false);
+                renderElement(tessellator, model, JsonBlockState.EMPTY_VARIANT, null, null, fallbackIcon, element, 0.0F, 0.0F, 0.0F, stack.getItemSubtype(), null, 1.0F, 1.0F, 1.0F, ITEM_TEXTURE_MAP, true, false);
             }
             return true;
         } finally {
@@ -219,7 +219,9 @@ public final class JsonBlockModelRenderer {
 
             Tessellator tessellator = Tessellator.instance;
             for (JsonModelElement element : model.getElements()) {
-                renderElement(tessellator, model, variant, null, block, null, element, 0.0F, 0.0F, 0.0F, metadata, INHERIT_BRIGHTNESS, 1.0F, 1.0F, 1.0F, BLOCK_TEXTURE_MAP, true, false);
+                renderElement(tessellator, model, variant, null, block, null, element,
+                        0.0F, 0.0F, 0.0F, metadata, null,
+                        1.0F, 1.0F, 1.0F, BLOCK_TEXTURE_MAP, true, false);
             }
             return true;
         } finally {
@@ -243,16 +245,39 @@ public final class JsonBlockModelRenderer {
         GL11.glPopAttrib();
     }
 
-    private static void renderElement(Tessellator tessellator, JsonBlockModel model, JsonBlockState.Variant variant, RenderBlocks renderBlocks, Block block, Icon fallbackIcon, JsonModelElement element, float offsetX, float offsetY, float offsetZ, int metadata, int brightness, float red, float green, float blue, int textureType, boolean manageDrawing, boolean applyFaceShade) {
-        emitFace(tessellator, model, variant, renderBlocks, block, fallbackIcon, element, JsonModelDirection.DOWN, offsetX, offsetY, offsetZ, metadata, brightness, red, green, blue, textureType, manageDrawing, applyFaceShade);
-        emitFace(tessellator, model, variant, renderBlocks, block, fallbackIcon, element, JsonModelDirection.UP, offsetX, offsetY, offsetZ, metadata, brightness, red, green, blue, textureType, manageDrawing, applyFaceShade);
-        emitFace(tessellator, model, variant, renderBlocks, block, fallbackIcon, element, JsonModelDirection.NORTH, offsetX, offsetY, offsetZ, metadata, brightness, red, green, blue, textureType, manageDrawing, applyFaceShade);
-        emitFace(tessellator, model, variant, renderBlocks, block, fallbackIcon, element, JsonModelDirection.SOUTH, offsetX, offsetY, offsetZ, metadata, brightness, red, green, blue, textureType, manageDrawing, applyFaceShade);
-        emitFace(tessellator, model, variant, renderBlocks, block, fallbackIcon, element, JsonModelDirection.WEST, offsetX, offsetY, offsetZ, metadata, brightness, red, green, blue, textureType, manageDrawing, applyFaceShade);
-        emitFace(tessellator, model, variant, renderBlocks, block, fallbackIcon, element, JsonModelDirection.EAST, offsetX, offsetY, offsetZ, metadata, brightness, red, green, blue, textureType, manageDrawing, applyFaceShade);
+    private static void renderElement(Tessellator tessellator, JsonBlockModel model,
+                                      JsonBlockState.Variant variant, RenderBlocks renderBlocks,
+                                      Block block, Icon fallbackIcon, JsonModelElement element,
+                                      float offsetX, float offsetY, float offsetZ, int metadata,
+                                      WorldLightSampler lightSampler, float red, float green, float blue,
+                                      int textureType, boolean manageDrawing, boolean applyFaceShade) {
+        emitFace(tessellator, model, variant, renderBlocks, block, fallbackIcon, element,
+                JsonModelDirection.DOWN, offsetX, offsetY, offsetZ, metadata, lightSampler,
+                red, green, blue, textureType, manageDrawing, applyFaceShade);
+        emitFace(tessellator, model, variant, renderBlocks, block, fallbackIcon, element,
+                JsonModelDirection.UP, offsetX, offsetY, offsetZ, metadata, lightSampler,
+                red, green, blue, textureType, manageDrawing, applyFaceShade);
+        emitFace(tessellator, model, variant, renderBlocks, block, fallbackIcon, element,
+                JsonModelDirection.NORTH, offsetX, offsetY, offsetZ, metadata, lightSampler,
+                red, green, blue, textureType, manageDrawing, applyFaceShade);
+        emitFace(tessellator, model, variant, renderBlocks, block, fallbackIcon, element,
+                JsonModelDirection.SOUTH, offsetX, offsetY, offsetZ, metadata, lightSampler,
+                red, green, blue, textureType, manageDrawing, applyFaceShade);
+        emitFace(tessellator, model, variant, renderBlocks, block, fallbackIcon, element,
+                JsonModelDirection.WEST, offsetX, offsetY, offsetZ, metadata, lightSampler,
+                red, green, blue, textureType, manageDrawing, applyFaceShade);
+        emitFace(tessellator, model, variant, renderBlocks, block, fallbackIcon, element,
+                JsonModelDirection.EAST, offsetX, offsetY, offsetZ, metadata, lightSampler,
+                red, green, blue, textureType, manageDrawing, applyFaceShade);
     }
 
-    private static void emitFace(Tessellator tessellator, JsonBlockModel model, JsonBlockState.Variant variant, RenderBlocks renderBlocks, Block block, Icon fallbackIcon, JsonModelElement element, JsonModelDirection direction, float offsetX, float offsetY, float offsetZ, int metadata, int brightness, float red, float green, float blue, int textureType, boolean manageDrawing, boolean applyFaceShade) {
+    private static void emitFace(Tessellator tessellator, JsonBlockModel model,
+                                 JsonBlockState.Variant variant, RenderBlocks renderBlocks,
+                                 Block block, Icon fallbackIcon, JsonModelElement element,
+                                 JsonModelDirection direction, float offsetX, float offsetY, float offsetZ,
+                                 int metadata, WorldLightSampler lightSampler,
+                                 float red, float green, float blue, int textureType,
+                                 boolean manageDrawing, boolean applyFaceShade) {
         JsonModelFace face = element.getFace(direction);
         if (face == null) {
             return;
@@ -290,9 +315,8 @@ public final class JsonBlockModelRenderer {
         }
 
         JsonModelDirection facing = calculateFacing(transformedVertices, direction);
-        if (brightness >= 0) {
-            tessellator.setBrightness(getFaceBrightness(renderBlocks, block, transformedVertices, facing,
-                    offsetX, offsetY, offsetZ, brightness));
+        if (lightSampler != null) {
+            tessellator.setBrightness(lightSampler.sampleFace(transformedVertices, facing));
         }
         float shade = applyFaceShade ? getShade(facing, element.isShade()) : 1.0F;
         if (face.getTintIndex() >= 0) {
@@ -311,58 +335,12 @@ public final class JsonBlockModelRenderer {
         }
     }
 
-    private static int getFaceBrightness(RenderBlocks renderBlocks, Block block, double[][] vertices,
-                                         JsonModelDirection facing, float offsetX, float offsetY,
-                                         float offsetZ, int fallbackBrightness) {
-        if (renderBlocks == null || block == null || renderBlocks.blockAccess == null) {
-            return fallbackBrightness;
-        }
-
-        int x = (int) Math.floor(offsetX);
-        int y = (int) Math.floor(offsetY);
-        int z = (int) Math.floor(offsetZ);
-        boolean sampleNeighbor = switch (facing) {
-            case DOWN -> getMinimumCoordinate(vertices, 1) <= offsetY + EPSILON;
-            case UP -> getMaximumCoordinate(vertices, 1) >= offsetY + 1.0D - EPSILON;
-            case NORTH -> getMinimumCoordinate(vertices, 2) <= offsetZ + EPSILON;
-            case SOUTH -> getMaximumCoordinate(vertices, 2) >= offsetZ + 1.0D - EPSILON;
-            case WEST -> getMinimumCoordinate(vertices, 0) <= offsetX + EPSILON;
-            case EAST -> getMaximumCoordinate(vertices, 0) >= offsetX + 1.0D - EPSILON;
-        };
-        if (!sampleNeighbor) {
-            return fallbackBrightness;
-        }
-
-        return switch (facing) {
-            case DOWN -> block.getMixedBrightnessForBlock(renderBlocks.blockAccess, x, y - 1, z);
-            case UP -> block.getMixedBrightnessForBlock(renderBlocks.blockAccess, x, y + 1, z);
-            case NORTH -> block.getMixedBrightnessForBlock(renderBlocks.blockAccess, x, y, z - 1);
-            case SOUTH -> block.getMixedBrightnessForBlock(renderBlocks.blockAccess, x, y, z + 1);
-            case WEST -> block.getMixedBrightnessForBlock(renderBlocks.blockAccess, x - 1, y, z);
-            case EAST -> block.getMixedBrightnessForBlock(renderBlocks.blockAccess, x + 1, y, z);
-        };
-    }
-
-    private static double getMinimumCoordinate(double[][] vertices, int axis) {
-        double minimum = Double.POSITIVE_INFINITY;
-        for (double[] vertex : vertices) {
-            minimum = Math.min(minimum, vertex[axis]);
-        }
-        return minimum;
-    }
-
-    private static double getMaximumCoordinate(double[][] vertices, int axis) {
-        double maximum = Double.NEGATIVE_INFINITY;
-        for (double[] vertex : vertices) {
-            maximum = Math.max(maximum, vertex[axis]);
-        }
-        return maximum;
-    }
-
     private static boolean isDegenerateFace(JsonModelElement element, JsonModelDirection direction) {
         double width = Math.abs(element.getToX() - element.getFromX());
         double height = Math.abs(element.getToY() - element.getFromY());
         double depth = Math.abs(element.getToZ() - element.getFromZ());
+        // A modern cross model intentionally has zero thickness on its plane.
+        // Only reject faces whose two in-plane dimensions have zero area.
         return switch (direction) {
             case DOWN, UP -> width <= EPSILON || depth <= EPSILON;
             case NORTH, SOUTH -> width <= EPSILON || height <= EPSILON;

@@ -1,7 +1,6 @@
 package moddedmite.rustedironcore.mixin.client.render;
 
 import moddedmite.rustedironcore.api.model.JsonModelDisplayContext;
-import moddedmite.rustedironcore.api.model.JsonBlockModel;
 import moddedmite.rustedironcore.api.model.JsonBlockModelManager;
 import moddedmite.rustedironcore.api.model.JsonHeldItemTransforms;
 import moddedmite.rustedironcore.api.model.JsonModelRenderContext;
@@ -51,12 +50,12 @@ public abstract class ItemRendererMixin {
     }
 
     @Inject(method = "renderItemInFirstPerson", at = @At("HEAD"))
-    private void rustedIronCore$pushFirstPersonItemContext(float partialTicks, CallbackInfo ci) {
+    private void pushFirstPersonItemContext(float partialTicks, CallbackInfo ci) {
         JsonModelRenderContext.push(JsonModelDisplayContext.FIRST_PERSON_RIGHT_HAND);
     }
 
     @Inject(method = "renderItemInFirstPerson", at = @At("RETURN"))
-    private void rustedIronCore$popFirstPersonItemContext(float partialTicks, CallbackInfo ci) {
+    private void popFirstPersonItemContext(float partialTicks, CallbackInfo ci) {
         JsonModelRenderContext.pop();
     }
 }

@@ -8,6 +8,7 @@ import java.util.function.Consumer;
 
 /**
  * Register custom arrows through {@link ArrowRegistry}.
+ * Register listeners during mod initialization, before item icons are loaded.
  */
 public interface IArrowRegisterListener {
 

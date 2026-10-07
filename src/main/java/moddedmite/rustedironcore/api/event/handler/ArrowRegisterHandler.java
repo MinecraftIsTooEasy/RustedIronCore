@@ -4,10 +4,13 @@ import huix.glacier.api.extension.material.IArrowMaterial;
 import moddedmite.rustedironcore.api.event.AbstractHandler;
 import moddedmite.rustedironcore.api.event.listener.IArrowRegisterListener;
 import moddedmite.rustedironcore.api.item.ArrowRegistry;
+import moddedmite.rustedironcore.internal.item.ArrowMaterialSynchronizer;
 import moddedmite.rustedironcore.property.FloatProperty;
 import net.minecraft.Material;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -22,14 +25,34 @@ public class ArrowRegisterHandler extends AbstractHandler<IArrowRegisterListener
     private final Map<Material, String> textureDomains = new HashMap<>();
 
     private boolean registered;
+    private boolean registering;
+
+    @Override
+    public void register(IArrowRegisterListener listener) {
+        boolean added = !this.listeners.contains(listener);
+        super.register(listener);
+        if (added && (this.registered || this.registering)) {
+            this.registerListener(listener);
+        }
+    }
 
     public void onRegister() {
-        if (this.registered) return;
-        this.listeners.forEach(x -> {
-            x.onRegister(this.ArrowRecoveryChance);
-            x.onRegister(this);
-        });
-        this.registered = true;
+        if (this.registered || this.registering) return;
+        this.registering = true;
+        try {
+            List<IArrowRegisterListener> listeners = new ArrayList<>(this.listeners);
+            for (IArrowRegisterListener listener : listeners) {
+                this.registerListener(listener);
+            }
+            this.registered = true;
+        } finally {
+            this.registering = false;
+        }
+    }
+
+    private void registerListener(IArrowRegisterListener listener) {
+        listener.onRegister(this.ArrowRecoveryChance);
+        listener.onRegister(this);
     }
 
     @Override
@@ -50,6 +73,7 @@ public class ArrowRegisterHandler extends AbstractHandler<IArrowRegisterListener
 
         this.ArrowRecoveryChance.register(material, arrowMaterial.getChanceOfRecovery());
         this.textureDomains.put(material, domain);
+        ArrowMaterialSynchronizer.register(material);
     }
 
     public Set<Material> keySet() {

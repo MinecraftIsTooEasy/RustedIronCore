@@ -142,44 +142,44 @@ public abstract class EntityLivingBaseMixin extends Entity implements DeathExper
     }
 
     @Inject(method = "onDeath", at = @At(value = "INVOKE", target = "Lnet/minecraft/EntityLivingBase;dropContainedItems()V"))
-    private void rusted_iron_core$onLoot(DamageSource par1DamageSource, CallbackInfo ci) {
+    private void onLoot(DamageSource par1DamageSource, CallbackInfo ci) {
         Handlers.EntityEvent.onLoot(this.rusted_iron_core$instance, par1DamageSource);
     }
 
     @Inject(method = "onDeath", at = @At(value = "HEAD"))
-    private void rusted_iron_core$onDeath(DamageSource par1DamageSource, CallbackInfo ci) {
+    private void onDeath(DamageSource par1DamageSource, CallbackInfo ci) {
         Handlers.EntityEvent.onDeath(this.rusted_iron_core$instance, par1DamageSource);
     }
 
     @ModifyExpressionValue(method = "onDeathUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/EntityLivingBase;getExperienceValue()I"))
-    private int rusted_iron_core$readDeathExperience(int original) {
+    private int readDeathExperience(int original) {
         return this.rusted_iron_core$deathExperienceConsumed ? 0 : original;
     }
 
     @Inject(method = "writeEntityToNBT", at = @At("TAIL"))
-    private void rusted_iron_core$writeDeathExperienceState(NBTTagCompound par1NBTTagCompound, CallbackInfo ci) {
+    private void writeDeathExperienceState(NBTTagCompound par1NBTTagCompound, CallbackInfo ci) {
         if (this.rusted_iron_core$deathExperienceConsumed) {
             par1NBTTagCompound.setBoolean("RICDeathExperienceConsumed", true);
         }
     }
 
     @Inject(method = "readEntityFromNBT", at = @At("TAIL"))
-    private void rusted_iron_core$readDeathExperienceState(NBTTagCompound par1NBTTagCompound, CallbackInfo ci) {
+    private void readDeathExperienceState(NBTTagCompound par1NBTTagCompound, CallbackInfo ci) {
         this.rusted_iron_core$deathExperienceConsumed = par1NBTTagCompound.getBoolean("RICDeathExperienceConsumed");
     }
 
     @Inject(method = "attackEntityFrom", at = @At("HEAD"))
-    private void rusted_iron_core$onAttackEntityFrom(Damage damage, CallbackInfoReturnable<EntityDamageResult> cir) {
+    private void onAttackEntityFrom(Damage damage, CallbackInfoReturnable<EntityDamageResult> cir) {
         Handlers.EntityEvent.onAttackEntityFrom(this.rusted_iron_core$instance, damage);
     }
 
     @Inject(method = "onUpdate", at = @At("HEAD"))
-    private void rusted_iron_core$onUpdate(CallbackInfo ci) {
+    private void onUpdate(CallbackInfo ci) {
         Handlers.EntityEvent.onUpdate(this.rusted_iron_core$instance);
     }
 
     @Inject(method = "jump", at = @At("TAIL"))
-    private void rusted_iron_core$onJump(CallbackInfo ci) {
+    private void onJump(CallbackInfo ci) {
         Handlers.EntityEvent.onJump(this.rusted_iron_core$instance);
     }
 }

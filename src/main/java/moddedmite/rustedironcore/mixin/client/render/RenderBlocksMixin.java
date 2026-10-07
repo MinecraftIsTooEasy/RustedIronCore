@@ -1,7 +1,6 @@
 package moddedmite.rustedironcore.mixin.client.render;
 
 import moddedmite.rustedironcore.api.model.JsonModelDisplayContext;
-import moddedmite.rustedironcore.api.model.JsonBlockModel;
 import moddedmite.rustedironcore.api.model.JsonBlockModelManager;
 import moddedmite.rustedironcore.api.model.JsonModelRenderContext;
 import net.minecraft.Block;

@@ -22,7 +22,7 @@ public abstract class RenderGlobalMixin {
     protected abstract void rusted_iron_core$drawOutlinedBoundingBox(AxisAlignedBB bounds);
 
     @Redirect(method = "drawSelectionBox", at = @At(value = "INVOKE", target = "Lnet/minecraft/RenderGlobal;drawOutlinedBoundingBox(Lnet/minecraft/AxisAlignedBB;)V"))
-    private void rusted_iron_core$drawSelectionBounds(RenderGlobal instance, AxisAlignedBB par1AxisAlignedBB, EntityPlayer par1EntityPlayer, RaycastCollision rc, int par3, float par4) {
+    private void drawSelectionBounds(RenderGlobal instance, AxisAlignedBB par1AxisAlignedBB, EntityPlayer par1EntityPlayer, RaycastCollision rc, int par3, float par4) {
         Block block = rc.getBlockHit();
         Object collisionBounds = block.getCollisionBounds(this.theWorld, rc.block_hit_x, rc.block_hit_y, rc.block_hit_z, null);
         if (!(collisionBounds instanceof AxisAlignedBB[] bounds)) {
