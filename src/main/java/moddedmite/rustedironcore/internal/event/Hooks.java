@@ -37,5 +37,9 @@ public class Hooks {
         if (RICConfig.UseCustomDimension.get()) {
             Handlers.Dimension.publish(new DimensionRegisterEvent(Handlers.Dimension));
         }
+        BiomeDecorationRegisterEvent biomeDecorationRegisterEvent = new BiomeDecorationRegisterEvent();
+        Handlers.BiomeDecoration.publish(biomeDecorationRegisterEvent);
+        Handlers.BiomeDecoration.buildMap(biomeDecorationRegisterEvent.getMap());
+        Handlers.OreGeneration.publish(new OreGenerationRegisterEvent(Handlers.OreGeneration));
     }
 }

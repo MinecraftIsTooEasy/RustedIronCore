@@ -1,8 +1,5 @@
 package moddedmite.rustedironcore.mixin.world;
 
-import moddedmite.rustedironcore.api.event.Handlers;
-import moddedmite.rustedironcore.api.event.events.BiomeDecorationRegisterEvent;
-import moddedmite.rustedironcore.api.event.events.OreGenerationRegisterEvent;
 import moddedmite.rustedironcore.api.world.BiomeAPI;
 import moddedmite.rustedironcore.internal.Bootstrap;
 import net.minecraft.BiomeGenBase;
@@ -15,15 +12,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(BiomeGenBase.class)
 public class BiomeGenBaseMixin implements BiomeAPI {
-    @Shadow public String biomeName;
-    @Unique public String biomeUnlocalizedName;
+    @Shadow
+    public String biomeName;
+    @Unique
+    public String biomeUnlocalizedName;
 
     @Inject(method = "<clinit>", at = @At("RETURN"))
     private static void onStaticHead(CallbackInfo ci) {
-        BiomeDecorationRegisterEvent biomeDecorationRegisterEvent = new BiomeDecorationRegisterEvent();
-        Handlers.BiomeDecoration.publish(biomeDecorationRegisterEvent);
-        Handlers.BiomeDecoration.buildMap(biomeDecorationRegisterEvent.getMap());
-        Handlers.OreGeneration.publish(new OreGenerationRegisterEvent(Handlers.OreGeneration));
         Bootstrap.logStage("biome");
     }
 
