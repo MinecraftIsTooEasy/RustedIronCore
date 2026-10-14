@@ -22,6 +22,7 @@ public class PlayerEventListener implements IPlayerEventListener {
             player.addChatMessage(RICText.STATEMENT.getKey());
             Network.sendToClient(player, new S2COpenGuiTips());
         }
+        Network.sendToClient(player, new S2CSyncNutritionLimit(((ServerPlayerAPI) player).ric$GetNutritionLimit()));
     }
 
     private boolean shouldState(boolean firstLogin) {
