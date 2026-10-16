@@ -1,6 +1,8 @@
 package moddedmite.rustedironcore.mixin.entity;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import moddedmite.rustedironcore.api.event.Handlers;
 import moddedmite.rustedironcore.api.sound.BlockSoundType;
 import moddedmite.rustedironcore.internal.entity.DeathExperienceBridge;
@@ -181,5 +183,11 @@ public abstract class EntityLivingBaseMixin extends Entity implements DeathExper
     @Inject(method = "jump", at = @At("TAIL"))
     private void onJump(CallbackInfo ci) {
         Handlers.EntityEvent.onJump(this.rusted_iron_core$instance);
+    }
+
+    @WrapOperation(method = "<init>(Lnet/minecraft/World;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/EntityLivingBase;applyEntityAttributes()V"))
+    private void applyEntityAttributes(EntityLivingBase instance, Operation<Void> original) {
+        original.call(instance);
+        Handlers.EntityAttribute.applyEntityAttributes(this.rusted_iron_core$instance);
     }
 }
