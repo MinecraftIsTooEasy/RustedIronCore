@@ -1,12 +1,14 @@
 package moddedmite.rustedironcore.internal.event;
 
 import huix.glacier.api.entrypoint.IGameRegistry;
+import moddedmite.rustedironcore.api.RicRegistry;
 import moddedmite.rustedironcore.api.event.Handlers;
 import moddedmite.rustedironcore.api.event.StagedHandler;
 import moddedmite.rustedironcore.api.event.events.*;
 import moddedmite.rustedironcore.internal.Bootstrap;
 import moddedmite.rustedironcore.internal.client.ClientBootstrap;
 import moddedmite.rustedironcore.internal.config.RICConfig;
+import moddedmite.rustedironcore.util.RegistryUtil;
 import net.fabricmc.api.EnvType;
 import net.xiaoyu233.fml.FishModLoader;
 
@@ -28,7 +30,9 @@ public class Hooks {
         if (!Bootstrap.preloadGameObjects()) {
             FishModLoader.invokeEntrypoints("registry", IGameRegistry.class, IGameRegistry::onGameRegistry);
         }
+        RegistryUtil.buildCopy();
         ((StagedHandler) Handlers.PropertiesRegistry).publish();
+        Handlers.Tag.loadTags();
         Handlers.Smelting.publish(new SmeltingRecipeRegisterEvent());
         Handlers.SpawnCondition.publish(new SpawnConditionRegisterEvent());
         Handlers.EntityTracker.publish(new EntityTrackerRegisterEvent());

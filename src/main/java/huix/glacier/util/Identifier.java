@@ -22,6 +22,10 @@ import org.apache.commons.lang3.Validate;
 
 import java.util.Locale;
 
+/**
+ * Use {@link moddedmite.rustedironcore.resources.Identifier}
+ */
+@Deprecated(since = "1.5.10")
 public class Identifier implements Comparable<Identifier> {
 	protected final String namespace;
 	protected final String path;

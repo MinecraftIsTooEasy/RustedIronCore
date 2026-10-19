@@ -1,6 +1,7 @@
-package moddedmite.rustedironcore.internal.config;
+package moddedmite.rustedironcore.mixins;
 
 import moddedmite.rustedironcore.api.util.Platform;
+import moddedmite.rustedironcore.internal.config.RICConfig;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
@@ -8,7 +9,7 @@ import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 import java.util.List;
 import java.util.Set;
 
-public class MixinConfig implements IMixinConfigPlugin {
+public class MixinConfigPlugin implements IMixinConfigPlugin {
     @Override
     public void onLoad(String s) {
 

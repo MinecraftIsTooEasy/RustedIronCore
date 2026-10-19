@@ -46,6 +46,7 @@
     "block.BlockFireMixin",
     "block.BlockGravelMixin",
     "block.BlockMixin",
+    "block.IBlockMixin",
     "block.entity.ITileEntityMixin",
     "block.entity.TileEntityBeaconMixin",
     "block.entity.TileEntityFurnaceMixin",
@@ -82,6 +83,7 @@
     "entity.player.ServerPlayerMixin",
     "entity.sync.EntityTrackerEntryMixin",
     "entity.sync.EntityTrackerMixin",
+    "item.IItemMixin",
     "item.ItemArmorMixin",
     "item.ItemArrowMixin",
     "item.ItemBlockMixin",
@@ -145,5 +147,5 @@
   "overwrites": {
     "requireAnnotations": true
   },
-  "plugin": "moddedmite.rustedironcore.internal.config.MixinConfig"
+  "plugin": "moddedmite.rustedironcore.mixins.MixinConfigPlugin"
 }

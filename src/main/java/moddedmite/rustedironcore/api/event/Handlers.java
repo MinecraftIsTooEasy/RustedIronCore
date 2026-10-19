@@ -198,4 +198,9 @@ public class Handlers {
      * GuiScreen events, like onGuiClosed, onGuiInit, onGuiDraw, etc.
      */
     public static final ScreenHandler Screen = new ScreenHandler();
+
+    /**
+     * Tags for block, item
+     */
+    public static final TagHandler Tag = new TagHandler();
 }

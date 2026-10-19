@@ -1,0 +1,27 @@
+package moddedmite.rustedironcore.core.registries;
+
+import moddedmite.rustedironcore.annotations.NotVanilla;
+import moddedmite.rustedironcore.core.Registry;
+import moddedmite.rustedironcore.data.tags.TagsProvider;
+import moddedmite.rustedironcore.resources.Identifier;
+import moddedmite.rustedironcore.resources.ResourceKey;
+import net.minecraft.*;
+
+@NotVanilla
+public class Registries {
+    public static final Identifier ROOT_REGISTRY_NAME = Identifier.withDefaultNamespace("root");
+
+    public static final ResourceKey<Registry<Block>> BLOCK = createRegistryKey("block");
+
+    public static final ResourceKey<Registry<Item>> ITEM = createRegistryKey("item");
+
+    public static final ResourceKey<Registry<Class<? extends Entity>>> ENTITY = createRegistryKey("entity");
+    public static final ResourceKey<Registry<BiomeGenBase>> BIOME = createRegistryKey("biome");
+    public static final ResourceKey<Registry<Potion>> POTION = createRegistryKey("potion");
+    public static final ResourceKey<Registry<Achievement>> ACHIEVEMENT = createRegistryKey("achievement");
+    public static final ResourceKey<Registry<TagsProvider<?>>> TAGS_PROVIDER = createRegistryKey("tags_provider");
+
+    private static <T> ResourceKey<Registry<T>> createRegistryKey(final String name) {
+        return ResourceKey.createRegistryKey(Identifier.withDefaultNamespace(name));
+    }
+}

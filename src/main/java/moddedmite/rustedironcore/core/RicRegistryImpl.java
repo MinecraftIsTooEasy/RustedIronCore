@@ -1,11 +1,16 @@
-package moddedmite.rustedironcore.registry;
+package moddedmite.rustedironcore.core;
 
 import moddedmite.rustedironcore.api.RicRegistry;
 import moddedmite.rustedironcore.api.event.Handlers;
 import moddedmite.rustedironcore.api.event.handler.SpawnConditionHandler;
 import moddedmite.rustedironcore.api.util.IdUtilExtra;
+import moddedmite.rustedironcore.core.registries.BuiltInRegistries;
+import moddedmite.rustedironcore.core.registries.Registries;
+import moddedmite.rustedironcore.data.tags.TagsProvider;
 import moddedmite.rustedironcore.mixin.block.entity.ITileEntityMixin;
 import moddedmite.rustedironcore.mixin.entity.IEntityListMixin;
+import moddedmite.rustedironcore.resources.Identifier;
+import moddedmite.rustedironcore.resources.ResourceKey;
 import net.minecraft.*;
 import net.xiaoyu233.fml.api.block.IBlock;
 import net.xiaoyu233.fml.api.item.IItem;
@@ -33,7 +38,7 @@ public class RicRegistryImpl implements RicRegistry {
     @Override
     public void registerEntity(Class<? extends Entity> clazz, ResourceLocation id, int numberId) {
         IEntityListMixin.invokeAddMapping(clazz, id.toString(), numberId);
-        Registries.MOD_ENTITY.register(id, clazz);
+        BuiltInRegistries.MOD_ENTITY.register(ResourceKey.create(Registries.ENTITY, Identifier.fromRL(id)), clazz);
     }
 
     @SuppressWarnings("unchecked")
@@ -57,12 +62,12 @@ public class RicRegistryImpl implements RicRegistry {
 
     @Override
     public void registerBiome(BiomeGenBase biome, ResourceLocation id) {
-        Registries.MOD_BIOME.register(id, biome);
+        BuiltInRegistries.MOD_BIOME.register(ResourceKey.create(Registries.BIOME, Identifier.fromRL(id)), biome);
     }
 
     @Override
     public void registerPotion(Potion potion, ResourceLocation id) {
-        Registries.MOD_POTION.register(id, potion);
+        BuiltInRegistries.MOD_POTION.register(ResourceKey.create(Registries.POTION, Identifier.fromRL(id)), potion);
     }
 
     @Override
@@ -72,6 +77,11 @@ public class RicRegistryImpl implements RicRegistry {
 
     @Override
     public void registerAchievement(Achievement achievement, ResourceLocation id) {
-        Registries.ACHIEVEMENT.register(id, achievement);
+        BuiltInRegistries.ACHIEVEMENT.register(ResourceKey.create(Registries.ACHIEVEMENT, Identifier.fromRL(id)), achievement);
+    }
+
+    @Override
+    public void registerTagsProvider(TagsProvider<?> tagsProvider, ResourceLocation id) {
+        BuiltInRegistries.TAGS_PROVIDER.register(ResourceKey.create(Registries.TAGS_PROVIDER, Identifier.fromRL(id)), tagsProvider);
     }
 }

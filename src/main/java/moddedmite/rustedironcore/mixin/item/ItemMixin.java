@@ -5,12 +5,16 @@ import huix.glacier.api.extension.material.IRepairableMaterial;
 import huix.glacier.api.registry.sync.RegistryHelperImpl;
 import huix.glacier.api.registry.sync.remappers.ItemRegistryRemapper;
 import moddedmite.rustedironcore.api.event.Handlers;
+import moddedmite.rustedironcore.core.Holder;
+import moddedmite.rustedironcore.core.registries.BuiltInRegistries;
 import moddedmite.rustedironcore.internal.Bootstrap;
+import moddedmite.rustedironcore.mixins.interfaces.RicItemImpl;
 import moddedmite.rustedironcore.property.ItemProperties;
 import moddedmite.rustedironcore.property.MaterialProperties;
 import net.minecraft.*;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -19,7 +23,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.List;
 
 @Mixin(Item.class)
-public abstract class ItemMixin {
+public abstract class ItemMixin implements RicItemImpl {
+    @Unique
+    private final Holder.Reference<Item> builtInRegistryHolder = BuiltInRegistries.ITEM.createIntrusiveHolder((Item) (Object) this);
+
     @Shadow
     public abstract Material getMaterialForRepairs();
 
@@ -61,5 +68,10 @@ public abstract class ItemMixin {
     @Inject(method = "addInformation(Lnet/minecraft/ItemStack;Lnet/minecraft/EntityPlayer;Ljava/util/List;ZLnet/minecraft/Slot;)V", at = @At(value = "RETURN", ordinal = 1))
     private void onTooltipFood(ItemStack stack, EntityPlayer player, List<String> info, boolean detailed, Slot slot, CallbackInfo ci) {
         Handlers.Tooltip.onTooltipBody(stack, info, player, detailed, slot);
+    }
+
+    @Override
+    public Holder.Reference<Item> ric$builtInRegistryHolder() {
+        return this.builtInRegistryHolder;
     }
 }
