@@ -3,7 +3,7 @@ package moddedmite.rustedironcore.mixin.item;
 import moddedmite.rustedironcore.api.event.Handlers;
 import moddedmite.rustedironcore.core.Holder;
 import moddedmite.rustedironcore.mixins.interfaces.ItemInstanceImpl;
-import moddedmite.rustedironcore.mixins.interfaces.RicItem;
+import moddedmite.rustedironcore.mixins.interfaces.RicItemImpl;
 import net.minecraft.EntityPlayer;
 import net.minecraft.Item;
 import net.minecraft.ItemStack;
@@ -54,7 +54,7 @@ public abstract class ItemStackMixin implements ItemInstanceImpl {
 
     @Override
     public Holder<Item> ric$typeHolder() {
-        return RicItem.cast(this.getItem()).builtInRegistryHolder();
+        return RicItemImpl.cast(this.getItem()).builtInRegistryHolder();
     }
 
     @Override

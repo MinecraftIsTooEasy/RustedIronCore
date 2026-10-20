@@ -1,4 +1,4 @@
-package moddedmite.rustedironcore.mixin.container;
+package moddedmite.rustedironcore.mixin.inventory;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import moddedmite.rustedironcore.api.block.WorkbenchBlock;

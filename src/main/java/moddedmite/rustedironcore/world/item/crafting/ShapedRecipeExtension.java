@@ -1,46 +1,38 @@
 package moddedmite.rustedironcore.world.item.crafting;
 
-import net.minecraft.CraftingResult;
-import net.minecraft.InventoryCrafting;
+import moddedmite.rustedironcore.world.item.ItemStackTemplate;
 import net.minecraft.ItemStack;
 import net.minecraft.World;
 
 public class ShapedRecipeExtension extends NormalCraftingRecipe {
+    private final ShapedRecipePattern pattern;
+    private final ItemStackTemplate result;
 
-    @Override
-    public boolean matches(InventoryCrafting inv, World world) {
-//        for (int x = 0; x <= inv.getWidth() - width; x++) {
-//            for (int y = 0; y <= inv.getHeight() - height; ++y) {
-//                if (checkMatch(inv, x, y, false)) {
-//                    return true;
-//                }
-//
-//                if (mirrored && checkMatch(inv, x, y, true)) {
-//                    return true;
-//                }
-//            }
-//        }
-
-        return false;
+    public ShapedRecipeExtension(
+            final Recipe.CommonInfo commonInfo, final CraftingRecipe.CraftingBookInfo bookInfo, final ShapedRecipePattern pattern, final ItemStackTemplate result
+    ) {
+        super(commonInfo, bookInfo);
+        this.pattern = pattern;
+        this.result = result;
     }
 
     @Override
-    public CraftingResult getCraftingResult(InventoryCrafting inv) {
-        return null;
+    protected PlacementInfo createPlacementInfo() {
+        return PlacementInfo.createFromOptionals(this.pattern.ingredients());
+    }
+
+    @Override
+    public boolean matches(CraftingInput input, World level) {
+        return this.pattern.matches(input);
+    }
+
+    @Override
+    public ItemStack assemble(CraftingInput input) {
+        return this.result.create();
     }
 
     @Override
     public int getRecipeSize() {
-        return 0;
-    }
-
-    @Override
-    public ItemStack getRecipeOutput() {
-        return null;
-    }
-
-    @Override
-    public ItemStack[] getComponents() {
-        return new ItemStack[0];
+        return this.pattern.width() * this.pattern.height();
     }
 }

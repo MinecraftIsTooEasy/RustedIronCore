@@ -16,13 +16,14 @@ public class RICConfig {
     public static final FieldReference<Boolean> UseCustomDimension = new FieldReference<>(false);
     public static final FieldReference<Boolean> ApplyPacketPatches = new FieldReference<>(true);
     public static final FieldReference<Boolean> PreLoadGameObjects = new FieldReference<>(true);
+    public static final FieldReference<Boolean> RegisterTestObjects = new FieldReference<>(false);
 
     public static final ConfigRoot ROOT = ConfigRoot.create(1)
             .addEntry(ConfigEntry.of("StatementOnLogin", StatementOnLogin).withComment("第一次进入世界时显示锈铁核心声明"))
             .addEntry(ConfigEntry.of("WorldGenDelegate", WorldGenDelegate).withComment("世界生成代理"))
             .addEntry(ConfigEntry.of("UseCustomDimension", UseCustomDimension).withComment("使用自定义维度"))
             .addEntry(ConfigEntry.of("ApplyPacketPatches", ApplyPacketPatches).withComment("应用网络包补丁"))
-            .addEntry(ConfigEntry.of("PreLoadGameObjects", PreLoadGameObjects).withComment("提前加载游戏对象"));
+            .addEntry(ConfigEntry.of("RegisterTestObjects", RegisterTestObjects).withComment("注册测试对象"));
 
     public static final File CONFIG_FILE = new File(RustedIronCore.MOD_NAME + ".json");
 

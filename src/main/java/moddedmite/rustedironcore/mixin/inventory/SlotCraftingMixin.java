@@ -1,4 +1,4 @@
-package moddedmite.rustedironcore.mixin.container;
+package moddedmite.rustedironcore.mixin.inventory;
 
 import moddedmite.rustedironcore.api.event.Handlers;
 import net.minecraft.EntityPlayer;

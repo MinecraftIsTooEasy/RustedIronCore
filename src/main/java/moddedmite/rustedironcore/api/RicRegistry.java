@@ -3,6 +3,7 @@ package moddedmite.rustedironcore.api;
 import moddedmite.rustedironcore.api.event.handler.SpawnConditionHandler;
 import moddedmite.rustedironcore.core.RicRegistryImpl;
 import moddedmite.rustedironcore.data.tags.TagsProvider;
+import moddedmite.rustedironcore.internal.event.InternalRecipeProvider;
 import net.minecraft.*;
 
 public interface RicRegistry {
@@ -37,4 +38,6 @@ public interface RicRegistry {
     void registerAchievement(Achievement achievement, ResourceLocation id);
 
     void registerTagsProvider(TagsProvider<?> tagsProvider, ResourceLocation id);
+
+    void registerRecipeProvider(InternalRecipeProvider recipeProvider, ResourceLocation id);
 }

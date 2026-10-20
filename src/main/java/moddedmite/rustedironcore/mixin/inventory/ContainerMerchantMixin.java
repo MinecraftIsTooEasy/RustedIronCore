@@ -1,4 +1,4 @@
-package moddedmite.rustedironcore.mixin.container;
+package moddedmite.rustedironcore.mixin.inventory;
 
 import moddedmite.rustedironcore.network.Network;
 import moddedmite.rustedironcore.internal.network.packets.S2CSyncTradeRecipe;

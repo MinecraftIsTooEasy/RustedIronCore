@@ -47,10 +47,10 @@ public abstract class CraftingManagerMixin {
         original.call(list, c);
     }
 
-    @Inject(method = "<init>", at = @At("RETURN"))
-    private void onInit(CallbackInfo ci) {
-        Hooks.postCraftingRecipeRegister();
+    @Inject(method = "<clinit>", at = @At("RETURN"))
+    private static void onClinit(CallbackInfo ci) {
         Bootstrap.logStage("crafting recipe");
+        Hooks.postCraftingRecipeRegister();
     }
 
     @Inject(method = "findMatchingRecipe", at = @At(value = "INVOKE", target = "Lnet/minecraft/InventoryCrafting;getEventHandler()Lnet/minecraft/Container;"), locals = LocalCapture.CAPTURE_FAILSOFT, cancellable = true)

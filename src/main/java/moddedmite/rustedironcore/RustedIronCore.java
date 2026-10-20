@@ -7,6 +7,7 @@ import moddedmite.rustedironcore.data.tags.VanillaBlockTagsProvider;
 import moddedmite.rustedironcore.data.tags.VanillaItemTagsProvider;
 import moddedmite.rustedironcore.internal.client.event.listeners.TooltipListener;
 import moddedmite.rustedironcore.internal.config.RICConfig;
+import moddedmite.rustedironcore.internal.event.InternalRecipeProvider;
 import moddedmite.rustedironcore.internal.event.listeners.CommandRegistry;
 import moddedmite.rustedironcore.internal.event.listeners.DimensionRegistry;
 import moddedmite.rustedironcore.internal.event.listeners.PlayerEventListener;
@@ -61,6 +62,9 @@ public class RustedIronCore implements ModInitializer {
         RicRegistry ricRegistry = RicRegistry.getInstance();
         ricRegistry.registerTagsProvider(new VanillaBlockTagsProvider(), new ResourceLocation(MOD_ID_ABBR, "block"));
         ricRegistry.registerTagsProvider(new VanillaItemTagsProvider(), new ResourceLocation(MOD_ID_ABBR, "item"));
+        if (RICConfig.RegisterTestObjects.get()) {
+            ricRegistry.registerRecipeProvider(new InternalRecipeProvider(), new ResourceLocation(MOD_ID_ABBR, "recipe"));
+        }
     }
 
 }

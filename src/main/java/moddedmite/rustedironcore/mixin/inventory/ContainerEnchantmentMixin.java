@@ -1,4 +1,4 @@
-package moddedmite.rustedironcore.mixin.container;
+package moddedmite.rustedironcore.mixin.inventory;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import moddedmite.rustedironcore.api.event.Handlers;

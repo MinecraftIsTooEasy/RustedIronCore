@@ -2,6 +2,8 @@ package moddedmite.rustedironcore.api.event.handler;
 
 import moddedmite.rustedironcore.api.event.EventHandler;
 import moddedmite.rustedironcore.api.event.events.CraftingRecipeRegisterEvent;
+import moddedmite.rustedironcore.core.registries.BuiltInRegistries;
+import moddedmite.rustedironcore.data.recipes.RecipeProvider;
 import moddedmite.rustedironcore.internal.unsafe.CraftingResultAccess;
 import net.minecraft.*;
 
@@ -9,6 +11,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class CraftingHandler extends EventHandler<CraftingRecipeRegisterEvent> {
+    public void loadRecipes() {
+        BuiltInRegistries.RECIPE_PROVIDER.forEach(RecipeProvider::buildRecipes);
+    }
+
     private final Map<Item, Material> RepairArmorMap = new HashMap<>();
 
     public void registerArmorRepairRecipe(Item repairItem, Material materialForArmor) {

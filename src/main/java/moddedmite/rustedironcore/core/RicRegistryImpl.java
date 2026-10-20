@@ -1,5 +1,6 @@
 package moddedmite.rustedironcore.core;
 
+import moddedmite.rustedironcore.RustedIronCore;
 import moddedmite.rustedironcore.api.RicRegistry;
 import moddedmite.rustedironcore.api.event.Handlers;
 import moddedmite.rustedironcore.api.event.handler.SpawnConditionHandler;
@@ -7,6 +8,7 @@ import moddedmite.rustedironcore.api.util.IdUtilExtra;
 import moddedmite.rustedironcore.core.registries.BuiltInRegistries;
 import moddedmite.rustedironcore.core.registries.Registries;
 import moddedmite.rustedironcore.data.tags.TagsProvider;
+import moddedmite.rustedironcore.internal.event.InternalRecipeProvider;
 import moddedmite.rustedironcore.mixin.block.entity.ITileEntityMixin;
 import moddedmite.rustedironcore.mixin.entity.IEntityListMixin;
 import moddedmite.rustedironcore.resources.Identifier;
@@ -85,5 +87,10 @@ public class RicRegistryImpl implements RicRegistry {
     @Override
     public void registerTagsProvider(TagsProvider<?> tagsProvider, ResourceLocation id) {
         Registry.register(BuiltInRegistries.TAGS_PROVIDER, ResourceKey.create(Registries.TAGS_PROVIDER, Identifier.fromRL(id)), tagsProvider);
+    }
+
+    @Override
+    public void registerRecipeProvider(InternalRecipeProvider recipeProvider, ResourceLocation id) {
+        Registry.register(BuiltInRegistries.RECIPE_PROVIDER, ResourceKey.create(Registries.RECIPE_PROVIDER, Identifier.fromRL(id)), recipeProvider  );
     }
 }

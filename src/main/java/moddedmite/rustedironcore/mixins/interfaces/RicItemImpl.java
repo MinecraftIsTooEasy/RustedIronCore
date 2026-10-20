@@ -3,11 +3,12 @@ package moddedmite.rustedironcore.mixins.interfaces;
 import moddedmite.rustedironcore.core.Holder;
 import net.minecraft.Item;
 
-public interface RicItemImpl extends RicItem {
+public interface RicItemImpl {
     Holder.Reference<Item> ric$builtInRegistryHolder();
 
-    @Override
-    default Holder.Reference<Item> builtInRegistryHolder() {
-        return this.ric$builtInRegistryHolder();
+    @SuppressWarnings({"Convert2MethodRef", "RedundantCast"})
+    static RicItem cast(Item item) {
+        RicItemImpl instance = (RicItemImpl) (Object) item;
+        return () -> instance.ric$builtInRegistryHolder();
     }
 }

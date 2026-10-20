@@ -4,10 +4,15 @@ import com.google.common.collect.Maps;
 import moddedmite.rustedironcore.annotations.NotVanilla;
 import moddedmite.rustedironcore.api.util.LogUtil;
 import moddedmite.rustedironcore.core.*;
+import moddedmite.rustedironcore.data.recipes.RecipeProvider;
 import moddedmite.rustedironcore.data.tags.TagsProvider;
+import moddedmite.rustedironcore.internal.event.InternalRecipeProvider;
 import moddedmite.rustedironcore.resources.Identifier;
 import moddedmite.rustedironcore.resources.ResourceKey;
 import moddedmite.rustedironcore.serialization.Lifecycle;
+import moddedmite.rustedironcore.world.item.crafting.RecipeBookCategories;
+import moddedmite.rustedironcore.world.item.crafting.RecipeBookCategory;
+import moddedmite.rustedironcore.world.item.crafting.RecipeType;
 import net.minecraft.*;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.ApiStatus;
@@ -33,6 +38,9 @@ public class BuiltInRegistries {
     public static final Registry<Potion> MOD_POTION = registerSimple(Registries.POTION, var0 -> Potion.moveSpeed);
     public static final Registry<Achievement> ACHIEVEMENT = registerSimple(Registries.ACHIEVEMENT, var0 -> AchievementList.openInventory);
     public static final Registry<TagsProvider<?>> TAGS_PROVIDER = registerSimple(Registries.TAGS_PROVIDER, var0 -> new Object());
+    public static final Registry<RecipeProvider> RECIPE_PROVIDER = registerSimple(Registries.RECIPE_PROVIDER, var0 -> new Object());
+    public static final Registry<RecipeBookCategory> RECIPE_BOOK_CATEGORY = registerSimple(Registries.RECIPE_BOOK_CATEGORY, RecipeBookCategories::bootstrap);
+    public static final Registry<RecipeType<?>> RECIPE_TYPE = registerSimple(Registries.RECIPE_TYPE, var0 -> RecipeType.CRAFTING);
 
 
     public static final Registry<? extends Registry<?>> REGISTRY = WRITABLE_REGISTRY;

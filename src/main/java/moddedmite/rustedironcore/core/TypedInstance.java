@@ -21,9 +21,9 @@ public interface TypedInstance<T> {
         return this.typeHolder().is(tag);
     }
 
-//    default boolean is(final HolderSet<T> set) {
-//        return set.contains(this.typeHolder());
-//    }
+    default boolean is(final HolderSet<T> set) {
+        return set.contains(this.typeHolder());
+    }
 
     default boolean is(final T rawType) {
         return this.typeHolder().value() == rawType;
@@ -38,10 +38,10 @@ public interface TypedInstance<T> {
     }
 
     static ItemInstance castItem(ItemStack stack) {
-        return (ItemInstanceImpl) (Object) stack;
+        return ItemInstanceImpl.cast(stack);
     }
 
     static TypedInstance<Block> castBlock(Block block) {
-        return (BlockInstanceImpl) (Object) block;
+        return BlockInstanceImpl.cast(block);
     }
 }

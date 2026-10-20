@@ -34,6 +34,7 @@ public class Hooks {
         RegistryUtil.buildCopy();
         BuiltInRegistries.bootStrap();
         Handlers.Tag.loadTags();
+        Handlers.Crafting.loadRecipes();
         ((StagedHandler) Handlers.PropertiesRegistry).publish();
         Handlers.Smelting.publish(new SmeltingRecipeRegisterEvent());
         Handlers.SpawnCondition.publish(new SpawnConditionRegisterEvent());
