@@ -21,7 +21,31 @@ public class Registries {
     public static final ResourceKey<Registry<Achievement>> ACHIEVEMENT = createRegistryKey("achievement");
     public static final ResourceKey<Registry<TagsProvider<?>>> TAGS_PROVIDER = createRegistryKey("tags_provider");
 
+//    public static ResourceKey<Level> levelStemToLevel(final ResourceKey<LevelStem> levelStem) {
+//        return ResourceKey.create(DIMENSION, levelStem.identifier());
+//    }
+//
+//    public static ResourceKey<LevelStem> levelToLevelStem(final ResourceKey<Level> level) {
+//        return ResourceKey.create(LEVEL_STEM, level.identifier());
+//    }
+
     private static <T> ResourceKey<Registry<T>> createRegistryKey(final String name) {
         return ResourceKey.createRegistryKey(Identifier.withDefaultNamespace(name));
+    }
+
+    private static String registryDirPath(final ResourceKey<? extends Registry<?>> registryKey) {
+        return registryKey.identifier().getPath();
+    }
+
+    public static String elementsDirPath(final ResourceKey<? extends Registry<?>> registryKey) {
+        return registryDirPath(registryKey);
+    }
+
+    public static String tagsDirPath(final ResourceKey<? extends Registry<?>> registryKey) {
+        return "tags/" + registryDirPath(registryKey);
+    }
+
+    public static String componentsDirPath(final ResourceKey<? extends Registry<?>> registryKey) {
+        return "components/" + registryDirPath(registryKey);
     }
 }

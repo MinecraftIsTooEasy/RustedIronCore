@@ -1,6 +1,5 @@
 package moddedmite.rustedironcore.tags;
 
-import moddedmite.rustedironcore.annotations.NotVanilla;
 import moddedmite.rustedironcore.resources.Identifier;
 import org.jspecify.annotations.Nullable;
 
@@ -33,15 +32,6 @@ public class TagEntry {
 
     public static TagEntry optionalTag(final Identifier id) {
         return new TagEntry(id, true, false);
-    }
-
-    @NotVanilla
-    public void build(Consumer<Identifier> consumer) {
-        if (this.tag) {
-            // TODO
-        } else {
-            consumer.accept(this.id);
-        }
     }
 
     public <T> boolean build(final TagEntry.Lookup<T> lookup, final Consumer<T> output) {

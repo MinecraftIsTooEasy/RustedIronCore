@@ -2,7 +2,6 @@ package moddedmite.rustedironcore.data.tags;
 
 import com.google.common.collect.Maps;
 import moddedmite.rustedironcore.annotations.NotVanilla;
-import moddedmite.rustedironcore.api.event.Handlers;
 import moddedmite.rustedironcore.core.HolderLookup;
 import moddedmite.rustedironcore.core.Registry;
 import moddedmite.rustedironcore.data.CachedOutput;
@@ -10,12 +9,15 @@ import moddedmite.rustedironcore.data.DataProvider;
 import moddedmite.rustedironcore.resources.Identifier;
 import moddedmite.rustedironcore.resources.ResourceKey;
 import moddedmite.rustedironcore.tags.TagBuilder;
+import moddedmite.rustedironcore.tags.TagEntry;
 import moddedmite.rustedironcore.tags.TagKey;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 @NotVanilla
 public abstract class TagsProvider<T> implements DataProvider {
@@ -39,12 +41,40 @@ public abstract class TagsProvider<T> implements DataProvider {
 
     protected abstract void addTags(HolderLookup.Provider registries);
 
-    @Override
-    public CompletableFuture<?> run(CachedOutput cache) {
+    @NotVanilla
+    public ResourceKey<? extends Registry<T>> getRegistryKey() {
+        return this.registryKey;
+    }
+
+    public record Result(Identifier tagKey, List<TagEntry> entries) {
+    }
+
+    @NotVanilla
+    public Stream<Result> provide() {
         this.builders.clear();
         this.addTags(new HolderLookup.Provider() {
+            @Override
+            public Stream<ResourceKey<? extends Registry<?>>> listRegistryKeys() {
+                return Stream.empty();
+            }
+
+            @Override
+            public <T> Optional<? extends HolderLookup.RegistryLookup<T>> lookup(ResourceKey<? extends Registry<? extends T>> key) {
+                return Optional.empty();
+            }
         });
-        this.builders.forEach((key, builder) -> Handlers.Tag.saveTags(this.registryKey, key, builder.build()));
+        return this.builders.entrySet().stream()
+                .map(
+                        x -> new Result(
+                                x.getKey(),
+                                x.getValue().build()
+                        )
+                );
+    }
+
+    @NotVanilla
+    @Override
+    public CompletableFuture<?> run(CachedOutput cache) {
         return CompletableFuture.completedFuture(null);
     }
 

@@ -5,6 +5,7 @@ import moddedmite.rustedironcore.api.RicRegistry;
 import moddedmite.rustedironcore.api.event.Handlers;
 import moddedmite.rustedironcore.api.event.StagedHandler;
 import moddedmite.rustedironcore.api.event.events.*;
+import moddedmite.rustedironcore.core.registries.BuiltInRegistries;
 import moddedmite.rustedironcore.internal.Bootstrap;
 import moddedmite.rustedironcore.internal.client.ClientBootstrap;
 import moddedmite.rustedironcore.internal.config.RICConfig;
@@ -31,8 +32,9 @@ public class Hooks {
             FishModLoader.invokeEntrypoints("registry", IGameRegistry.class, IGameRegistry::onGameRegistry);
         }
         RegistryUtil.buildCopy();
-        ((StagedHandler) Handlers.PropertiesRegistry).publish();
+        BuiltInRegistries.bootStrap();
         Handlers.Tag.loadTags();
+        ((StagedHandler) Handlers.PropertiesRegistry).publish();
         Handlers.Smelting.publish(new SmeltingRecipeRegisterEvent());
         Handlers.SpawnCondition.publish(new SpawnConditionRegisterEvent());
         Handlers.EntityTracker.publish(new EntityTrackerRegisterEvent());

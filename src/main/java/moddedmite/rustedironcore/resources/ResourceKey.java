@@ -1,8 +1,8 @@
 package moddedmite.rustedironcore.resources;
 
 import com.google.common.collect.MapMaker;
-import moddedmite.rustedironcore.core.registries.Registries;
 import moddedmite.rustedironcore.core.Registry;
+import moddedmite.rustedironcore.core.registries.Registries;
 
 import java.util.Optional;
 import java.util.concurrent.ConcurrentMap;
@@ -22,7 +22,7 @@ public class ResourceKey<T> {
     }
 
     private static <T> ResourceKey<T> create(final Identifier registryName, final Identifier identifier) {
-        return (ResourceKey<T>)VALUES.computeIfAbsent(new ResourceKey.InternKey(registryName, identifier), k -> new ResourceKey(k.registry, k.identifier));
+        return (ResourceKey<T>) VALUES.computeIfAbsent(new ResourceKey.InternKey(registryName, identifier), k -> new ResourceKey(k.registry, k.identifier));
     }
 
     private ResourceKey(final Identifier registryName, final Identifier identifier) {
@@ -40,7 +40,7 @@ public class ResourceKey<T> {
     }
 
     public <E> Optional<ResourceKey<E>> cast(final ResourceKey<? extends Registry<E>> registry) {
-        return this.isFor(registry) ? Optional.of((ResourceKey<E>)this) : Optional.empty();
+        return this.isFor(registry) ? Optional.of((ResourceKey<E>) this) : Optional.empty();
     }
 
     public <E> ResourceKey<E> dependent(final ResourceKey<? extends Registry<E>> registryKey, final String suffix) {

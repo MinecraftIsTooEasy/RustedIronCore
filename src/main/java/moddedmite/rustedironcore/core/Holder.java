@@ -1,13 +1,15 @@
 package moddedmite.rustedironcore.core;
 
-import moddedmite.rustedironcore.annotations.NotVanilla;
 import moddedmite.rustedironcore.core.component.DataComponentMap;
 import moddedmite.rustedironcore.resources.Identifier;
 import moddedmite.rustedironcore.resources.ResourceKey;
 import moddedmite.rustedironcore.tags.TagKey;
 import org.jspecify.annotations.Nullable;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -148,7 +150,7 @@ public sealed interface Holder<T> permits Holder.Direct, Holder.Reference {
             return new Holder.Reference<>(Holder.Reference.Type.STAND_ALONE, owner, key, null);
         }
 
-        //		@Deprecated
+        @Deprecated
         public static <T> Holder.Reference<T> createIntrusive(final HolderOwner<T> owner, final @Nullable T value) {
             return new Holder.Reference<>(Holder.Reference.Type.INTRUSIVE, owner, null, value);
         }
@@ -247,14 +249,6 @@ public sealed interface Holder<T> permits Holder.Direct, Holder.Reference {
             }
 
             this.value = value;
-        }
-
-        @NotVanilla
-        public void addTag(TagKey<T> tag) {
-            if (this.tags == null) {
-                this.tags = new HashSet<>();
-            }
-            this.tags.add(tag);
         }
 
         void bindTags(final Collection<TagKey<T>> tags) {

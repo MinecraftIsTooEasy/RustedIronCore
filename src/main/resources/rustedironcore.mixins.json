@@ -99,6 +99,7 @@
     "item.ItemRockMixin",
     "item.ItemStackMixin",
     "item.ItemToolMixin",
+    "mod.fml.ItemRegistryEventMixin",
     "network.NetServerHandlerMixin",
     "network.Packet23VehicleSpawnMixin",
     "network.Packet250CustomPayLoadMixin",

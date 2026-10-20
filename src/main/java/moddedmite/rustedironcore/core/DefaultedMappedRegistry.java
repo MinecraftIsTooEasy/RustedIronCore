@@ -3,6 +3,8 @@ package moddedmite.rustedironcore.core;
 import moddedmite.rustedironcore.annotations.NotVanilla;
 import moddedmite.rustedironcore.resources.Identifier;
 import moddedmite.rustedironcore.resources.ResourceKey;
+import moddedmite.rustedironcore.serialization.Lifecycle;
+import moddedmite.rustedironcore.util.RandomSource;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
@@ -13,17 +15,21 @@ public class DefaultedMappedRegistry<T> extends MappedRegistry<T> implements Def
     private final Identifier defaultKey;
     private Holder.Reference<T> defaultValue;
 
-    public DefaultedMappedRegistry(Identifier defaultKey, final boolean intrusiveHolders) {
-        super(intrusiveHolders);
-        this.defaultKey = defaultKey;
+    public DefaultedMappedRegistry(
+            final String defaultKey, final ResourceKey<? extends Registry<T>> key, final Lifecycle lifecycle, final boolean intrusiveHolders
+    ) {
+        super(key, lifecycle, intrusiveHolders);
+        this.defaultKey = Identifier.parse(defaultKey);
     }
 
     @Override
-    public void register(final ResourceKey<T> key, final T value) {
-        super.register(key, value);
-        if (this.defaultKey.equals(key)) {
-            this.defaultValue = null;// TODO
+    public Holder.Reference<T> register(final ResourceKey<T> key, final T value, final RegistrationInfo registrationInfo) {
+        Holder.Reference<T> result = super.register(key, value, registrationInfo);
+        if (this.defaultKey.equals(key.identifier())) {
+            this.defaultValue = result;
         }
+
+        return result;
     }
 
     @Override
@@ -58,6 +64,11 @@ public class DefaultedMappedRegistry<T> extends MappedRegistry<T> implements Def
     public @NonNull T byId(final int id) {
         T t = super.byId(id);
         return t == null ? this.defaultValue.value() : t;
+    }
+
+    @Override
+    public Optional<Holder.Reference<T>> getRandom(final RandomSource random) {
+        return super.getRandom(random).or(() -> Optional.of(this.defaultValue));
     }
 
     @Override
