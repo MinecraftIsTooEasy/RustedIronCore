@@ -23,9 +23,6 @@ import java.util.stream.Stream;
 public final class Ingredient implements Predicate<ItemStack>, StackedContents.IngredientInfo<Holder<Item>> {
     private final HolderSet<Item> values;
 
-    @NotVanilla
-    public static final Ingredient EMPTY = new Ingredient(HolderSet.empty());
-
     private Ingredient(final HolderSet<Item> values) {
 //        values.unwrap().ifRight(directValues -> {
 //            if (directValues.isEmpty()) {

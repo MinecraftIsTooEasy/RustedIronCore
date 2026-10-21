@@ -1,6 +1,7 @@
 package moddedmite.rustedironcore.world.item.crafting;
 
-import net.minecraft.*;
+import net.minecraft.IRecipe;
+import net.minecraft.Material;
 import org.jspecify.annotations.Nullable;
 
 public abstract class NormalCraftingRecipe implements CraftingRecipe {
@@ -44,11 +45,6 @@ public abstract class NormalCraftingRecipe implements CraftingRecipe {
         }
 
         return this.placementInfo;
-    }
-
-    @Override
-    public ItemStack[] getComponents() {
-        return null;// TODO maybe safe
     }
 
     @Override

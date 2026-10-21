@@ -5,14 +5,12 @@ import moddedmite.rustedironcore.annotations.NotVanilla;
 import moddedmite.rustedironcore.core.HolderGetter;
 import moddedmite.rustedironcore.core.registries.BuiltInRegistries;
 import moddedmite.rustedironcore.tags.TagKey;
+import moddedmite.rustedironcore.util.RecipeHelper;
 import moddedmite.rustedironcore.world.item.ItemStackTemplate;
 import moddedmite.rustedironcore.world.item.crafting.Ingredient;
 import moddedmite.rustedironcore.world.level.ItemLike;
 import net.minecraft.CraftingManager;
-import net.minecraft.IRecipe;
 import net.minecraft.Item;
-
-import java.util.List;
 
 @NotFinished
 public abstract class RecipeProvider {
@@ -57,13 +55,13 @@ public abstract class RecipeProvider {
 //		.put(BlockFamily.Variant.COBBLED, (context, result, base) -> context.stonecutterResultFromBase(RecipeCategory.BUILDING_BLOCKS, result, base, 1))
 //		.build();
 //
+    @SuppressWarnings("unchecked")
     @NotVanilla
     protected RecipeProvider() {
         this.items = BuiltInRegistries.ITEM;
         this.output = recipe -> {
-            @SuppressWarnings("unchecked")
-            List<IRecipe> recipeList = CraftingManager.getInstance().getRecipeList();
-            recipeList.add(recipe);
+            RecipeHelper.buildRecipe(recipe);
+            CraftingManager.getInstance().getRecipeList().add(recipe);
         };
     }
 
@@ -929,39 +927,39 @@ public abstract class RecipeProvider {
 //	}
 //
 
-	public static String getHasName(final ItemLike baseBlock) {
-		return "has_" + getItemName(baseBlock);
-	}
+    public static String getHasName(final ItemLike baseBlock) {
+        return "has_" + getItemName(baseBlock);
+    }
 
 
-	public static String getItemName(final ItemLike itemLike) {
-		return BuiltInRegistries.ITEM.getKey(itemLike.asItem()).getPath();
-	}
+    public static String getItemName(final ItemLike itemLike) {
+        return BuiltInRegistries.ITEM.getKey(itemLike.asItem()).getPath();
+    }
 
 
-	public static String getSimpleRecipeName(final ItemLike itemLike) {
-		return getItemName(itemLike);
-	}
+    public static String getSimpleRecipeName(final ItemLike itemLike) {
+        return getItemName(itemLike);
+    }
 
 
-	public static String getConversionRecipeName(final ItemLike product, final ItemLike material) {
-		return getItemName(product) + "_from_" + getItemName(material);
-	}
+    public static String getConversionRecipeName(final ItemLike product, final ItemLike material) {
+        return getItemName(product) + "_from_" + getItemName(material);
+    }
 
 
-	public static String getSmeltingRecipeName(final ItemLike product) {
-		return getItemName(product) + "_from_smelting";
-	}
+    public static String getSmeltingRecipeName(final ItemLike product) {
+        return getItemName(product) + "_from_smelting";
+    }
 
 
-	public static String getBlastingRecipeName(final ItemLike product) {
-		return getItemName(product) + "_from_blasting";
-	}
+    public static String getBlastingRecipeName(final ItemLike product) {
+        return getItemName(product) + "_from_blasting";
+    }
 
 
-	public Ingredient tag(final TagKey<Item> id) {
-		return Ingredient.of(this.items.getOrThrow(id));
-	}
+    public Ingredient tag(final TagKey<Item> id) {
+        return Ingredient.of(this.items.getOrThrow(id));
+    }
 
     @NotVanilla
     public ShapedRecipeBuilder shaped(final RecipeCategory category, final Object item) {

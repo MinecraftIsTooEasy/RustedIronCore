@@ -40,6 +40,11 @@ public class ShapelessRecipeExtension extends NormalCraftingRecipe {
     }
 
     @Override
+    public List<Ingredient> getIngredients() {
+        return this.ingredients;
+    }
+
+    @Override
     public int getRecipeSize() {
         return this.ingredients.size();
     }

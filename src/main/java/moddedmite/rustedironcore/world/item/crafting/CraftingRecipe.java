@@ -6,32 +6,9 @@ import net.minecraft.InventoryCrafting;
 import net.minecraft.ItemStack;
 import net.minecraft.World;
 
+import java.util.List;
+
 public interface CraftingRecipe extends Recipe<CraftingInput> {
-    @Override
-    default boolean matches(InventoryCrafting inventory, World world) {
-        return this.matches(CraftingContainer.wrap(inventory).asCraftInput(), world);
-    }
-
-    @Override
-    default ItemStack getRecipeOutput() {
-        return this.assemble(null);
-    }
-
-    @Override
-    default CraftingResult getCraftingResult(InventoryCrafting inventory) {
-        CraftingInput input = CraftingContainer.wrap(inventory).asCraftInput();
-        ItemStack stack = this.assemble(input);
-//        if (this.field_92101_f) {
-//            for (int var3 = 0; var3 < par1InventoryCrafting.getSizeInventory(); var3++) {
-//                ItemStack var4 = par1InventoryCrafting.getStackInSlot(var3);
-//                if (var4 != null && var4.hasTagCompound()) {
-//                    stack.setTagCompound((NBTTagCompound)var4.stackTagCompound.copy());
-//                }
-//            }
-//        }
-        return new CraftingResult(stack, this.getUnmodifiedDifficulty(), this.getSkillsets(), this);
-    }
-
     @Override
     default RecipeType<CraftingRecipe> getType() {
         return RecipeType.CRAFTING;
@@ -76,5 +53,38 @@ public interface CraftingRecipe extends Recipe<CraftingInput> {
 //        public static final StreamCodec<RegistryFriendlyByteBuf, CraftingRecipe.CraftingBookInfo> STREAM_CODEC = Recipe.BookInfo.streamCodec(
 //                CraftingBookCategory.STREAM_CODEC, CraftingRecipe.CraftingBookInfo::new
 //        );
+    }
+
+    @Override
+    default boolean matches(InventoryCrafting inventory, World world) {
+        return this.matches(CraftingContainer.wrap(inventory).asCraftInput(), world);
+    }
+
+    @Override
+    default ItemStack getRecipeOutput() {
+        return this.assemble(null);
+    }
+
+    @Override
+    default CraftingResult getCraftingResult(InventoryCrafting inventory) {
+        CraftingInput input = CraftingContainer.wrap(inventory).asCraftInput();
+        ItemStack stack = this.assemble(input);
+//        if (this.field_92101_f) {
+//            for (int var3 = 0; var3 < par1InventoryCrafting.getSizeInventory(); var3++) {
+//                ItemStack var4 = par1InventoryCrafting.getStackInSlot(var3);
+//                if (var4 != null && var4.hasTagCompound()) {
+//                    stack.setTagCompound((NBTTagCompound)var4.stackTagCompound.copy());
+//                }
+//            }
+//        }
+        return new CraftingResult(stack, this.getUnmodifiedDifficulty(), this.getSkillsets(), this);
+    }
+
+    List<Ingredient> getIngredients();
+
+    @Deprecated
+    @Override
+    default ItemStack[] getComponents() {
+        return null;
     }
 }

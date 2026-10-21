@@ -130,6 +130,7 @@
     "world.WorldProviderUnderworldMixin",
     "world.WorldServerMixin",
     "world.decoration.WorldGenDungeonsMixin",
+    "world.material.IMaterialMixin",
     "world.structure.ComponentDesertPyramidMixin",
     "world.structure.ComponentNetherBridgePieceMixin",
     "world.structure.ComponentSmithMixin",
