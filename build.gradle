@@ -107,6 +107,17 @@ tasks.withType(JavaCompile).configureEach {
     options.release = 17
 }
 
+tasks.register("auditLegacyResourceCompatibility", JavaExec) {
+    dependsOn(testClasses)
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = "moddedmite.rustedironcore.api.resource.LegacyResourcePathsAudit"
+    if (project.hasProperty("resourcePackAuditPaths")) {
+        args project.property("resourcePackAuditPaths").split(';').toList()
+    }
+}
+
+check.dependsOn(tasks.named("auditLegacyResourceCompatibility"))
+
 java {
     // Loom automatically attaches sourcesJar to remapSourcesJar and the build lifecycle when it is present.
     // Remove this line only when source artifacts should not be generated.

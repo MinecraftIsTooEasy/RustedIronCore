@@ -8,10 +8,12 @@ import moddedmite.rustedironcore.api.model.JsonBlockModelManager;
 import moddedmite.rustedironcore.api.model.JsonBlockStatePropertyResolver;
 import moddedmite.rustedironcore.api.model.JsonItemModelPredicate;
 import moddedmite.rustedironcore.api.model.JsonModelRegistry;
+import moddedmite.rustedironcore.api.model.JsonItemDefinitionBinding;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.Block;
 import net.minecraft.Item;
+import java.util.Collection;
 
 @Environment(EnvType.CLIENT)
 public class JsonModelHandler extends AbstractHandler<IJsonModelListener> implements JsonModelRegistry {
@@ -20,6 +22,16 @@ public class JsonModelHandler extends AbstractHandler<IJsonModelListener> implem
 
     public void onJsonModelRegister() {
         this.listeners.forEach(listener -> listener.onJsonModelRegister(this));
+    }
+
+    @Override
+    public void registerAuxiliaryModels(String owner, Collection<Identifier> modelIds) {
+        this.registry.registerAuxiliaryModels(owner, modelIds);
+    }
+
+    @Override
+    public void registerItemDefinitions(String owner, Collection<JsonItemDefinitionBinding> bindings) {
+        this.registry.registerItemDefinitions(owner, bindings);
     }
 
     @Override

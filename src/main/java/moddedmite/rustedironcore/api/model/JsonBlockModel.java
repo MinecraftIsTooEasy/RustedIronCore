@@ -5,6 +5,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import huix.glacier.util.Identifier;
+import net.minecraft.ItemPotion;
+import net.minecraft.ItemStack;
 
 import java.io.Reader;
 import java.util.ArrayList;
@@ -28,6 +30,7 @@ public final class JsonBlockModel {
     private final JsonDisplayTransforms displayTransforms;
     private final boolean generatedItem;
     private final boolean builtInEntity;
+    private List<JsonObject> itemTints = List.of();
 
     private JsonBlockModel(Identifier modelId, int textureWidth, int textureHeight, Map<String, String> textures, List<JsonModelElement> elements, List<JsonItemModelOverride> overrides, JsonDisplayTransforms displayTransforms, boolean generatedItem, boolean builtInEntity) {
         this.modelId = modelId;
@@ -332,6 +335,25 @@ public final class JsonBlockModel {
 
     public Identifier getModelId() {
         return this.modelId;
+    }
+
+    public JsonBlockModel withItemTints(List<JsonObject> tints) {
+        JsonBlockModel result = new JsonBlockModel(modelId, textureWidth, textureHeight, textures, elements, overrides, displayTransforms, generatedItem, builtInEntity);
+        result.itemTints = List.copyOf(tints);
+        return result;
+    }
+
+    public int itemTintColor(ItemStack stack, int index) {
+        if (index < 0) return 0xFFFFFF;
+        if (itemTints.isEmpty()) return stack.getItem().getColorFromItemStack(stack, index);
+        if (index >= itemTints.size()) return 0xFFFFFF;
+        JsonObject tint = itemTints.get(index);
+        String type = tint.get("type").getAsString();
+        if (type.equals("minecraft:potion") || type.equals("potion"))
+            return stack.getItem() instanceof ItemPotion ? stack.getItem().getColorFromItemStack(stack, 0)
+                    : tint.has("default") ? tint.get("default").getAsInt() : 0xFFFFFF;
+        if (type.equals("minecraft:constant") || type.equals("constant")) return tint.get("value").getAsInt();
+        return 0xFFFFFF;
     }
 
     public int getTextureWidth() {

@@ -4,6 +4,7 @@ import moddedmite.rustedironcore.api.model.JsonModelDisplayContext;
 import moddedmite.rustedironcore.api.model.JsonBlockModelManager;
 import moddedmite.rustedironcore.api.model.JsonHeldItemTransforms;
 import moddedmite.rustedironcore.api.model.JsonModelRenderContext;
+import moddedmite.rustedironcore.api.model.JsonModernHeldItemRenderer;
 import net.minecraft.Block;
 import net.minecraft.EntityLivingBase;
 import net.minecraft.Icon;
@@ -29,7 +30,9 @@ public abstract class ItemRendererMixin {
         boolean rendered;
         GL11.glPushMatrix();
         try {
-            JsonHeldItemTransforms.apply(par1EntityLivingBase, par2ItemStack, context);
+            if (!JsonModelRenderContext.hasModernPrefix()) {
+                JsonHeldItemTransforms.apply(par1EntityLivingBase, par2ItemStack, context);
+            }
             if (par2ItemStack.isBlock()) {
                 Block block = par2ItemStack.getItem() instanceof ItemBlock
                         ? ((ItemBlock) par2ItemStack.getItem()).getBlock()
@@ -44,18 +47,12 @@ public abstract class ItemRendererMixin {
             GL11.glPopMatrix();
         }
 
+        if (!rendered && JsonModelRenderContext.hasModernPrefix()) {
+            JsonModernHeldItemRenderer.renderFallback(par1EntityLivingBase, par2ItemStack, par3, context);
+            rendered = true;
+        }
         if (rendered) {
             ci.cancel();
         }
-    }
-
-    @Inject(method = "renderItemInFirstPerson", at = @At("HEAD"))
-    private void pushFirstPersonItemContext(float partialTicks, CallbackInfo ci) {
-        JsonModelRenderContext.push(JsonModelDisplayContext.FIRST_PERSON_RIGHT_HAND);
-    }
-
-    @Inject(method = "renderItemInFirstPerson", at = @At("RETURN"))
-    private void popFirstPersonItemContext(float partialTicks, CallbackInfo ci) {
-        JsonModelRenderContext.pop();
     }
 }

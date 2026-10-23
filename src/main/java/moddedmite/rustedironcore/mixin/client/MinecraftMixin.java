@@ -2,6 +2,7 @@ package moddedmite.rustedironcore.mixin.client;
 
 import moddedmite.rustedironcore.api.event.Handlers;
 import moddedmite.rustedironcore.api.model.JsonBlockModelManager;
+import moddedmite.rustedironcore.api.sound.ResourceSoundPlayer;
 import net.minecraft.*;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -28,6 +29,7 @@ public abstract class MinecraftMixin {
     private void addGui(CallbackInfo ci) {
         Handlers.Initialization.onClientStarted(Minecraft.getMinecraft());
         ((ReloadableResourceManager) this.getResourceManager()).registerReloadListener(JsonBlockModelManager.INSTANCE);
+        ((ReloadableResourceManager) this.getResourceManager()).registerReloadListener(manager -> ResourceSoundPlayer.clearCache());
     }
 
     @Inject(method = "runTick", at = @At("RETURN"))

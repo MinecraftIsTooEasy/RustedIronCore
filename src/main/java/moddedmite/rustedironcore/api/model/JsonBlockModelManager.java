@@ -1,6 +1,7 @@
 package moddedmite.rustedironcore.api.model;
 
 import huix.glacier.util.Identifier;
+import com.google.gson.JsonParser;
 import moddedmite.rustedironcore.api.util.LogUtil;
 import moddedmite.rustedironcore.mixin.accessor.BlockAccessor;
 import moddedmite.rustedironcore.mixin.accessor.ItemAccessor;
@@ -25,6 +26,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
@@ -58,14 +60,33 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
     private final Map<Item, BuiltInEntityRenderer> builtInRenderers = new IdentityHashMap<>();
     private final Map<Long, BuiltInEntityRenderer> builtInRenderersByMetadata = new HashMap<>();
     private final Map<Block, BuiltInEntityRenderer> builtInRenderersByBlock = new IdentityHashMap<>();
+    private final Map<String, List<Identifier>> auxiliaryModels = new LinkedHashMap<>();
+    private final Map<String, List<JsonItemDefinitionBinding>> itemDefinitions = new LinkedHashMap<>();
+    private final Map<Identifier, Optional<JsonItemDefinition>> itemDefinitionCache = new HashMap<>();
 
     private JsonBlockModelManager() {
     }
 
     @Override
     public void onResourceManagerReload(ResourceManager resourceManager) {
+        this.invalidateResourceCaches();
+    }
+
+    /** Also called before stitching: reload-listener registration order must not expose old models. */
+    public void invalidateResourceCaches() {
         this.blockStateCache.clear();
         this.modelCache.clear();
+        this.itemDefinitionCache.clear();
+    }
+
+    @Override
+    public void registerAuxiliaryModels(String owner, Collection<Identifier> modelIds) {
+        this.auxiliaryModels.put(owner, List.copyOf(modelIds));
+    }
+
+    @Override
+    public void registerItemDefinitions(String owner, Collection<JsonItemDefinitionBinding> bindings) {
+        this.itemDefinitions.put(owner, List.copyOf(bindings));
     }
 
     public void registerBlockModel(Block block, String modelId) {
@@ -272,7 +293,8 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
         }
         int metadata = stack.getItemSubtype();
 
-        Optional<JsonBlockModel> itemModel = this.getExplicitItemModel(stack, block)
+        Optional<JsonBlockModel> itemModel = this.getDefinedItemModel(stack, entity, context);
+        if (itemModel.isEmpty()) itemModel = this.getExplicitItemModel(stack, block)
                 .map(model -> this.resolveItemModel(model, stack, entity));
         if (itemModel.isPresent()) {
             JsonBlockModel model = itemModel.get();
@@ -335,7 +357,7 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
 
     public boolean renderItem(ItemStack stack, Icon fallbackIcon, JsonModelDisplayContext context,
                               EntityLivingBase entity) {
-        Optional<JsonBlockModel> model = this.getItemModel(stack, entity);
+        Optional<JsonBlockModel> model = this.getItemModel(stack, entity, context);
         if (model.isEmpty()) {
             return false;
         }
@@ -349,7 +371,7 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
             return true;
         }
 
-        if (model.get().getElements().isEmpty()) {
+        if (model.get().getElements().isEmpty() && !model.get().isGeneratedItem()) {
             return false;
         }
 
@@ -367,7 +389,8 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
             if (block == null) {
                 return false;
             }
-            Optional<JsonBlockModel> itemModel = this.getExplicitItemModel(stack, block)
+            Optional<JsonBlockModel> itemModel = this.getDefinedItemModel(stack, null, JsonModelDisplayContext.GUI);
+            if (itemModel.isEmpty()) itemModel = this.getExplicitItemModel(stack, block)
                     .map(model -> this.resolveItemModel(model, stack, null));
             if (itemModel.isPresent()) {
                 JsonBlockModel model = itemModel.get();
@@ -405,7 +428,7 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
             return rendered;
         }
 
-        Optional<JsonBlockModel> model = this.getItemModel(stack);
+        Optional<JsonBlockModel> model = this.getItemModel(stack, null, JsonModelDisplayContext.GUI);
         if (model.isEmpty()) {
             return false;
         }
@@ -417,7 +440,7 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
             JsonBlockModelRenderer.renderBuiltInEntityIntoGui(model.get(), stack, x, y, zLevel, renderer);
             return true;
         }
-        if (model.get().getElements().isEmpty()) {
+        if (model.get().getElements().isEmpty() && !model.get().isGeneratedItem()) {
             return false;
         }
 
@@ -443,7 +466,38 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
     }
 
     public Optional<JsonBlockModel> getItemModel(ItemStack stack, EntityLivingBase entity) {
-        return this.getBaseItemModel(stack).map(model -> this.resolveItemModel(model, stack, entity));
+        return this.getItemModel(stack, entity, JsonModelRenderContext.currentOr(JsonModelDisplayContext.NONE));
+    }
+
+    public Optional<JsonBlockModel> getItemModel(ItemStack stack, EntityLivingBase entity, JsonModelDisplayContext context) {
+        if (stack == null || stack.getItem() == null) return Optional.empty();
+        Optional<JsonBlockModel> modern = this.getDefinedItemModel(stack, entity, context);
+        return modern.isPresent() ? modern : this.getBaseItemModel(stack).map(model -> this.resolveItemModel(model, stack, entity));
+    }
+
+    private Optional<JsonBlockModel> getDefinedItemModel(ItemStack stack, EntityLivingBase entity, JsonModelDisplayContext context) {
+        JsonItemDefinitionBinding selected = null;
+        for (List<JsonItemDefinitionBinding> bindings : this.itemDefinitions.values()) for (JsonItemDefinitionBinding binding : bindings)
+            if (binding.item() == stack.getItem() && binding.subtype().test(stack.getItemSubtype())) selected = binding;
+        if (selected != null) {
+            Optional<JsonItemDefinition> definition = this.loadItemDefinition(selected.definition());
+            if (definition.isPresent()) {
+                JsonItemDefinition.Selection choice = definition.get().resolve(new JsonLegacyItemProperties(stack, entity, context));
+                if (choice != null) return this.loadModel(choice.model()).map(model -> model.withItemTints(choice.tints()));
+            }
+        }
+        return Optional.empty();
+    }
+
+    private Optional<JsonItemDefinition> loadItemDefinition(Identifier id) {
+        return this.itemDefinitionCache.computeIfAbsent(id, key -> {
+            ResourceLocation location = new ResourceLocation(key.getNamespace(), "items/" + key.getPath() + ".json");
+            try (InputStream stream = Minecraft.getMinecraft().getResourceManager().getResource(location).getInputStream();
+                 InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
+                return Optional.of(JsonItemDefinition.read(new JsonParser().parse(reader).getAsJsonObject()));
+            } catch (IOException exception) { return Optional.empty(); }
+            catch (RuntimeException exception) { LOGGER.warn("Failed to load modern item definition {}", key, exception); return Optional.empty(); }
+        });
     }
 
     private Optional<JsonBlockModel> getBaseItemModel(ItemStack stack) {
@@ -583,6 +637,16 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
         } else if (textureType == ITEM_TEXTURE_MAP) {
             this.collectItemTextureIcons(iconNames, ITEM_TEXTURE_MAP);
         }
+
+        for (List<Identifier> models : this.auxiliaryModels.values()) {
+            for (Identifier id : models) this.loadModel(id).ifPresent(model ->
+                    collectTextureIcons(model, textureType, ITEM_TEXTURE_MAP, iconNames));
+        }
+        for (List<JsonItemDefinitionBinding> bindings : this.itemDefinitions.values()) for (JsonItemDefinitionBinding binding : bindings)
+            this.loadItemDefinition(binding.definition()).ifPresent(definition -> {
+                for (Identifier id : definition.modelIds()) this.loadModel(id).ifPresent(model ->
+                        collectTextureIcons(model, textureType, ITEM_TEXTURE_MAP, iconNames));
+            });
 
         for (String iconName : iconNames) {
             textureMap.registerIcon(iconName);
@@ -771,6 +835,14 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
         if (resolver != null) {
             resolver.addProperties(block, blockAccess, x, y, z, metadata, properties);
         }
+        return properties;
+    }
+
+    /** Only properties supplied by a registered resolver; no metadata heuristics. */
+    public Map<String, String> getDeclaredBlockStateProperties(Block block, IBlockAccess blockAccess, int x, int y, int z, int metadata) {
+        Map<String, String> properties = new LinkedHashMap<>();
+        JsonBlockStatePropertyResolver resolver = this.blockStatePropertyResolvers.get(block);
+        if (resolver != null) resolver.addProperties(block, blockAccess, x, y, z, metadata, properties);
         return properties;
     }
 

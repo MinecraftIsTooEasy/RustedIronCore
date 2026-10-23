@@ -3,8 +3,12 @@ package moddedmite.rustedironcore.api.model;
 import huix.glacier.util.Identifier;
 import net.minecraft.Block;
 import net.minecraft.Item;
+import java.util.Collection;
 
 public interface JsonModelRegistry {
+
+    /** Replaces an owner's model texture dependencies without claiming any block or item renderer. */
+    void registerAuxiliaryModels(String owner, Collection<Identifier> modelIds);
 
     void registerBlockModel(Block block, String modelId);
 
@@ -47,6 +51,8 @@ public interface JsonModelRegistry {
     void registerItemModelPredicate(Block block, String property, JsonItemModelPredicate predicate);
 
     void registerItemModelPredicate(Block block, Identifier property, JsonItemModelPredicate predicate);
+
+    void registerItemDefinitions(String owner, Collection<JsonItemDefinitionBinding> bindings);
 
     void registerBuiltInRenderer(Item item, BuiltInEntityRenderer renderer);
 

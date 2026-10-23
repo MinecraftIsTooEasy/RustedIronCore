@@ -17,6 +17,11 @@ public final class JsonModelTransforms {
             return;
         }
 
+        apply(transform);
+    }
+
+    /** Applies a resolved transform, including the standard fallback parent transforms. */
+    public static void apply(JsonDisplayTransform transform) {
         float[] translation = transform.getTranslation();
         GL11.glTranslatef(
                 translation[0] * PIXEL_SCALE,
@@ -83,5 +88,4 @@ public final class JsonModelTransforms {
         GL11.glRotatef(-rotation[0], 1.0F, 0.0F, 0.0F);
     }
 }
-
 
