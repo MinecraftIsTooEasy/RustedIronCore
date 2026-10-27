@@ -76,6 +76,37 @@ public final class LegacyResourcePaths {
         return result;
     }
 
+    /**
+     * Adds modern armor texture paths only for callers that validate an authored
+     * model texture-size contract. Vanilla MITE armor renderers keep using their
+     * exact 64x32 texture unless a custom model explicitly requires another size.
+     */
+    public static List<String> textureContractCandidates(String domain, String path) {
+        List<String> result = new ArrayList<>(candidates(domain, path));
+        if (!domain.equals("minecraft")) return result;
+        String metadata = path.endsWith(".mcmeta") ? ".mcmeta" : "";
+        String image = metadata.isEmpty() ? path : path.substring(0, path.length() - metadata.length());
+        if (image.startsWith("textures/models/armor/")) addArmorAliases(result, image, metadata);
+        return result;
+    }
+
+    private static void addArmorAliases(List<String> result, String image, String metadata) {
+        String fileName = image.substring("textures/models/armor/".length());
+        String[] suffixes = {
+                "_layer_1_overlay.png", "_layer_2_overlay.png", "_layer_1.png", "_layer_2.png"
+        };
+        for (String suffix : suffixes) {
+            if (!fileName.endsWith(suffix)) continue;
+            boolean leggings = suffix.contains("_layer_2");
+            boolean overlay = suffix.contains("_overlay");
+            String material = fileName.substring(0, fileName.length() - suffix.length());
+            String equipmentType = leggings ? "humanoid_leggings" : "humanoid";
+            String textureName = material + (overlay ? "_overlay" : "") + ".png";
+            add(result, "textures/entity/equipment/" + equipmentType + "/" + textureName + metadata);
+            return;
+        }
+    }
+
     public static String find(String domain, String path, Predicate<String> exists) {
         for (String candidate : candidates(domain, path)) if (exists.test(candidate)) return candidate;
         return null;

@@ -2,6 +2,8 @@ package moddedmite.rustedironcore.mixin.client.network;
 
 import moddedmite.rustedironcore.api.event.Handlers;
 import moddedmite.rustedironcore.api.event.handler.EntityTrackerHandler;
+import moddedmite.rustedironcore.internal.chat.ChatClickSupport;
+import moddedmite.rustedironcore.internal.client.chat.ChatGuiAccess;
 import moddedmite.rustedironcore.network.PacketByteBuf;
 import moddedmite.rustedironcore.network.PacketReader;
 import moddedmite.rustedironcore.network.PacketSupplier;
@@ -27,6 +29,19 @@ public abstract class NetClientHandlerMixin {
 
     @Shadow
     protected abstract Entity getEntityByID(int par1);
+
+    @Inject(method = "handleChat", at = @At("HEAD"), cancellable = true)
+    private void readChatComponents(Packet3Chat packet, CallbackInfo ci) {
+        ChatMessageComponent component = ChatMessageComponent.createFromJson(packet.message);
+        boolean removedUnsafeEvents = !this.mc.isIntegratedServerRunning()
+                && ChatClickSupport.removeClickEventsNotAllowedFromServer(component);
+        if (!removedUnsafeEvents && !ChatClickSupport.hasChatInteraction(component)
+                && !ChatClickSupport.hasTextComponent(component)) {
+            return;
+        }
+        ((ChatGuiAccess) this.mc.ingameGUI.getChatGUI()).ric$printChatMessage(component);
+        ci.cancel();
+    }
 
     @Inject(method = "handleCustomPayload", at = @At("RETURN"))
     private void handleCustomPayload(Packet250CustomPayload payload, CallbackInfo ci) {

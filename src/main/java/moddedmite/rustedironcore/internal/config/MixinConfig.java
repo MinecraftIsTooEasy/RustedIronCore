@@ -27,7 +27,9 @@ public class MixinConfig implements IMixinConfigPlugin {
         if (mixinClassName.contains("GuiContainerMixin")) return Platform.isExperimental();
         if (mixinClassName.contains("GuiCraftingMixin")) return Platform.isExperimental();
         if (mixinClassName.contains("ItemBlockMixin")) return Platform.isExperimental();
-        if (mixinClassName.contains("ClientPlayerMixin")) return Platform.isExperimental();
+        if (mixinClassName.equals("moddedmite.rustedironcore.mixin.client.player.ClientPlayerMixin")) {
+            return Platform.isExperimental();
+        }
         return true;
     }
 

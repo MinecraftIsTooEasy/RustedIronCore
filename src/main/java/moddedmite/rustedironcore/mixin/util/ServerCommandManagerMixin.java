@@ -4,6 +4,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import moddedmite.rustedironcore.api.event.Handlers;
 import moddedmite.rustedironcore.api.event.events.CommandRegisterEvent;
+import moddedmite.rustedironcore.internal.command.CommandSuggestionDispatcher;
 import net.minecraft.CommandHandler;
 import net.minecraft.IAdminCommand;
 import net.minecraft.ServerCommandManager;
@@ -14,7 +15,9 @@ import org.spongepowered.asm.mixin.injection.At;
 public abstract class ServerCommandManagerMixin extends CommandHandler implements IAdminCommand {
     @WrapOperation(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/CommandBase;setAdminCommander(Lnet/minecraft/IAdminCommand;)V"))
     private void onCommandRegister(IAdminCommand iAdminCommand, Operation<Void> original) {
-        Handlers.Command.publish(new CommandRegisterEvent(this::registerCommand));
+        CommandSuggestionDispatcher.beginRegistration();
+        Handlers.Command.publish(new CommandRegisterEvent(this::registerCommand, CommandSuggestionDispatcher::register));
         original.call(iAdminCommand);
+        CommandSuggestionDispatcher.registerLegacyCommands(this.getCommands());
     }
 }

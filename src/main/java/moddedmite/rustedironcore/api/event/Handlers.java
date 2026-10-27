@@ -60,6 +60,10 @@ public class Handlers {
      */
     public static final SmeltingHandler Smelting = new SmeltingHandler();
     /**
+     * Controls whether item stacks can be converted into player experience.
+     */
+    public static final SacrificeHandler Sacrifice = new SacrificeHandler();
+    /**
      * You should still register your spawn entry at each biome.
      * This only take over the spawn condition logic for compat: {@link WorldServer#getSuitableCreature}
      * <br>
@@ -178,6 +182,11 @@ public class Handlers {
      */
     @Environment(EnvType.CLIENT)
     public static final TooltipHandler Tooltip = new TooltipHandler();
+    /**
+     * Registers the effects shown in food item tooltips.
+     */
+    @Environment(EnvType.CLIENT)
+    public static final FoodEffectTooltipHandler FoodEffectTooltip = new FoodEffectTooltipHandler();
     /**
      * Handles custom dimensions.
      */

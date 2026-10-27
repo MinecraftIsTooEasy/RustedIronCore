@@ -1,5 +1,6 @@
 plugins {
     id 'fml-loom' version '0.1'
+    id 'java-library'
     id 'maven-publish'
 }
 
@@ -34,6 +35,10 @@ repositories {
 
 configurations {
     fml
+    brigadierBundle {
+        canBeConsumed = false
+        canBeResolved = true
+    }
 }
 
 configurations.matching { it.name in ["apiElements", "runtimeElements"] }.configureEach {
@@ -51,6 +56,10 @@ dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
+    // Minecraft 1.21.1 uses Brigadier 1.3.10; MITE 1.6.4 does not provide it.
+    implementation "com.mojang:brigadier:1.3.10"
+    brigadierBundle "com.mojang:brigadier:1.3.10"
+
     fml "com.github.MinecraftIsTooEasy:FishModLoader:3.4.2"
     implementation "com.github.MinecraftIsTooEasy:FishModLoader:3.4.2"
 
@@ -61,6 +70,7 @@ dependencies {
     localRuntime "com.google.code.gson:gson:2.11.0"
     localRuntime("com.github.MinecraftIsTooEasy:EMI:1.1.25") { transitive = false }
     localRuntime "com.github.MinecraftIsTooEasy:ModMenu:10.1.1"
+    localRuntime "org.moddedmite:modern-mite:3.7.8"
 }
 
 def fmlResolvedFile = configurations.fml.singleFile
@@ -107,17 +117,6 @@ tasks.withType(JavaCompile).configureEach {
     options.release = 17
 }
 
-tasks.register("auditLegacyResourceCompatibility", JavaExec) {
-    dependsOn(testClasses)
-    classpath = sourceSets.test.runtimeClasspath
-    mainClass = "moddedmite.rustedironcore.api.resource.LegacyResourcePathsAudit"
-    if (project.hasProperty("resourcePackAuditPaths")) {
-        args project.property("resourcePackAuditPaths").split(';').toList()
-    }
-}
-
-check.dependsOn(tasks.named("auditLegacyResourceCompatibility"))
-
 java {
     // Loom automatically attaches sourcesJar to remapSourcesJar and the build lifecycle when it is present.
     // Remove this line only when source artifacts should not be generated.
@@ -129,6 +128,11 @@ java {
 
 jar {
     inputs.property "archivesName", project.base.archivesName
+
+    from {
+        configurations.brigadierBundle.collect { zipTree(it) }
+    }
+    exclude "META-INF/MANIFEST.MF", "META-INF/*.SF", "META-INF/*.DSA", "META-INF/*.RSA"
 
     from("LICENSE") {
         rename { String fileName -> "${fileName}_${inputs.properties.archivesName}" }

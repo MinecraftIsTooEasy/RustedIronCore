@@ -38,3 +38,9 @@ biome.jungleHills.name=Jungle Hills
 biome.desertRiver.name=Desert River
 biome.jungleRiver.name=Jungle River
 biome.swampRiver.name=Swamp River
+
+ric.hud.advancement.task=Advancement Made!
+ric.hud.advancement.goal=Goal Reached!
+ric.hud.advancement.challenge=Challenge Complete!
+ric.hud.recipe.title=New Recipes Unlocked!
+ric.hud.recipe.description=Check your recipe book

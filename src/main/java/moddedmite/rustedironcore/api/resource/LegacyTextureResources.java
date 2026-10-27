@@ -38,8 +38,8 @@ public final class LegacyTextureResources {
     /**
      * Selects a resource that satisfies a model's authored texture contract.
      *
-     * Legacy entity renderers address one texture name while modern packs often
-     * move the image into a directory and change its atlas dimensions.  A path
+     * Legacy CEM renderers address one texture name while modern packs often
+     * move the image into a directory and change its atlas dimensions. A path
      * alias alone cannot make the UV contract correct: this method considers
      * every legacy/modern candidate, reads the image dimensions, and chooses
      * the highest-priority candidate whose dimensions match the model.
@@ -51,7 +51,9 @@ public final class LegacyTextureResources {
     public static ResourceLocation findMatching(ResourceManager manager, ResourceLocation original,
                                                 int expectedWidth, int expectedHeight) {
         if (manager == null || original == null || expectedWidth <= 0 || expectedHeight <= 0) return null;
-        List<ResourceLocation> candidates = candidates(original);
+        List<ResourceLocation> candidates = LegacyResourcePaths.textureContractCandidates(
+                original.getResourceDomain(), original.getResourcePath()).stream()
+                .map(path -> new ResourceLocation(original.getResourceDomain(), path, false)).toList();
         ResourceLocation selected = null;
         int selectedRank = -1;
         for (ResourceLocation candidate : candidates) {

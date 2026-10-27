@@ -1,6 +1,7 @@
 package moddedmite.rustedironcore.api.event.handler;
 
 import moddedmite.rustedironcore.api.event.AbstractHandler;
+import moddedmite.rustedironcore.api.event.Handlers;
 import moddedmite.rustedironcore.api.event.listener.ITooltipListener;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -26,5 +27,6 @@ public class TooltipHandler extends AbstractHandler<ITooltipListener> {
     }
     public void onTooltipTail(ItemStack stack, List<String> tooltip, EntityPlayer player, boolean detailed, Slot slot) {
         this.listeners.forEach(x -> x.onTooltipTail(stack, tooltip, player, detailed, slot));
+        Handlers.FoodEffectTooltip.appendTooltip(stack, tooltip);
     }
 }

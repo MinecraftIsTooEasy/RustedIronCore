@@ -59,6 +59,13 @@ public final class ResourceSoundPlayer {
     }
 
     public static void play(ResourceLocation file, float volume, float pitch) {
+        if (resolve(file) != null) {
+            Minecraft.getMinecraft().sndManager.playSoundFX("ric.resource:" + file, volume, pitch);
+        }
+    }
+
+    /** Resolve an original OGG for either sound effects or the music source. */
+    public static SoundPoolEntry resolve(ResourceLocation file) {
         Minecraft client = Minecraft.getMinecraft();
         String path = file.getResourcePath();
         if (!path.startsWith("sounds/") || !path.endsWith(".ogg"))
@@ -73,9 +80,10 @@ public final class ResourceSoundPlayer {
                     ENTRIES.put(token, new SoundPoolEntry(sound, ((SoundPoolInvoker) pool).ric$getSoundUrl(sound)));
                 }
             }
-            client.sndManager.playSoundFX(token, volume, pitch);
+            return ENTRIES.get(token);
         } catch (IOException missing) {
             ENTRIES.remove(token);
+            return null;
         }
     }
 

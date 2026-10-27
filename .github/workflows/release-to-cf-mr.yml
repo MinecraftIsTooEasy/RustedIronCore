@@ -25,21 +25,51 @@ jobs:
           gradle-version: 9.5.0
         name: Set up Gradle
 
-      - name: Add permission
-        run: chmod +x ./gradlew
-
-      - name: Get Changes between Tags
-        id: changes
-        uses: simbo/changes-between-tags-action@v1
-        with:
-          validate-tag: 'false'
-
       - name: Resolve release version
         id: version
         shell: bash
         run: |
-          TAG='${{ steps.changes.outputs.tag }}'
+          set -euo pipefail
+          # Sort without the optional v prefix, retaining the original tag for checkout.
+          mapfile -t TAGS < <(
+            git tag --list |
+              awk '/^v?[0-9]+\.[0-9]+\.[0-9]+$/ {
+                version = $0
+                sub(/^v/, "", version)
+                print version, $0
+              }' |
+              LC_ALL=C sort -k1,1Vr -k2,2 |
+              awk '!seen[$1]++ { print $2 }'
+          )
+          if (( ${#TAGS[@]} == 0 )); then
+            echo "::error::No release tag found; expected 1.2.3 or v1.2.3."
+            exit 1
+          fi
+          TAG="${TAGS[0]}"
+          PREVIOUS_TAG="${TAGS[1]:-}"
+          git checkout --detach "refs/tags/$TAG"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
           echo "value=${TAG#v}" >> "$GITHUB_OUTPUT"
+          echo "previous_tag=$PREVIOUS_TAG" >> "$GITHUB_OUTPUT"
+
+      - name: Get Changes between Tags
+        id: changes
+        shell: bash
+        env:
+          RELEASE_TAG: ${{ steps.version.outputs.tag }}
+          PREVIOUS_TAG: ${{ steps.version.outputs.previous_tag }}
+        run: |
+          set -euo pipefail
+          CHANGELOG_FILE="$RUNNER_TEMP/ric-release-changelog.md"
+          if [[ -n "$PREVIOUS_TAG" ]]; then
+            git log --pretty=format:'- %h %s' "refs/tags/$PREVIOUS_TAG..refs/tags/$RELEASE_TAG" > "$CHANGELOG_FILE"
+          else
+            git log --pretty=format:'- %h %s' "refs/tags/$RELEASE_TAG" > "$CHANGELOG_FILE"
+          fi
+          echo "file=$CHANGELOG_FILE" >> "$GITHUB_OUTPUT"
+
+      - name: Add permission
+        run: chmod +x ./gradlew
 
       - name: Ensure jar in fml-loom cache
         run: |
@@ -86,5 +116,6 @@ jobs:
           game-versions: 1.6.4
           java: |
             17
+          name: ${{ steps.version.outputs.value }}
           version: ${{ steps.version.outputs.value }}
-          changelog: ${{ steps.changes.outputs.changes }}
+          changelog-file: ${{ steps.changes.outputs.file }}

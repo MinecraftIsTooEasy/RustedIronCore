@@ -38,3 +38,9 @@ biome.jungleHills.name=丛林丘陵
 biome.desertRiver.name=沙漠河流
 biome.jungleRiver.name=丛林河流
 biome.swampRiver.name=沼泽河流
+
+ric.hud.advancement.task=进度已达成！
+ric.hud.advancement.goal=目标已达成！
+ric.hud.advancement.challenge=挑战已完成！
+ric.hud.recipe.title=新配方已解锁！
+ric.hud.recipe.description=请检查你的配方书

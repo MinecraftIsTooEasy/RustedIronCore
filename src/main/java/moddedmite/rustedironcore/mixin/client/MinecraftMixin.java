@@ -3,6 +3,8 @@ package moddedmite.rustedironcore.mixin.client;
 import moddedmite.rustedironcore.api.event.Handlers;
 import moddedmite.rustedironcore.api.model.JsonBlockModelManager;
 import moddedmite.rustedironcore.api.sound.ResourceSoundPlayer;
+import moddedmite.rustedironcore.internal.client.chat.ComponentTranslationManager;
+import moddedmite.rustedironcore.internal.client.hud.ClientHud;
 import net.minecraft.*;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -29,12 +31,18 @@ public abstract class MinecraftMixin {
     private void addGui(CallbackInfo ci) {
         Handlers.Initialization.onClientStarted(Minecraft.getMinecraft());
         ((ReloadableResourceManager) this.getResourceManager()).registerReloadListener(JsonBlockModelManager.INSTANCE);
+        ((ReloadableResourceManager) this.getResourceManager()).registerReloadListener(ComponentTranslationManager.INSTANCE);
         ((ReloadableResourceManager) this.getResourceManager()).registerReloadListener(manager -> ResourceSoundPlayer.clearCache());
     }
 
     @Inject(method = "runTick", at = @At("RETURN"))
     private void onTick(CallbackInfo ci) {
         Handlers.Tick.onClientTick(Minecraft.getMinecraft());
+    }
+
+    @Inject(method = "runGameLoop", at = @At(value = "INVOKE", target = "Lnet/minecraft/GuiAchievement;updateAchievementWindow()V", shift = At.Shift.AFTER))
+    private void renderModernToasts(CallbackInfo ci) {
+        ClientHud.renderToasts();
     }
 
     @Inject(method = "launchIntegratedServer", at = @At(value = "INVOKE", target = "Lnet/minecraft/LoadingScreenRenderer;displayProgressMessage(Ljava/lang/String;)V"))
@@ -44,6 +52,7 @@ public abstract class MinecraftMixin {
 
     @Inject(method = "loadWorld(Lnet/minecraft/WorldClient;Ljava/lang/String;)V", at = @At("HEAD"))
     private void onWorldLoadStart(WorldClient par1WorldClient, String par2Str, CallbackInfo ci) {
+        if (par1WorldClient == null) ClientHud.reset();
         if (this.theWorld != null) {
             Handlers.WorldLoad.onWorldUnload(this.theWorld);
         }

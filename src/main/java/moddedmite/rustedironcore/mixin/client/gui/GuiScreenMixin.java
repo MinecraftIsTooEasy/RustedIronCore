@@ -1,6 +1,7 @@
 package moddedmite.rustedironcore.mixin.client.gui;
 
 import moddedmite.rustedironcore.api.event.Handlers;
+import moddedmite.rustedironcore.internal.client.chat.BookScreenAccess;
 import net.minecraft.GuiButton;
 import net.minecraft.GuiScreen;
 import org.spongepowered.asm.mixin.Mixin;
@@ -45,8 +46,12 @@ public class GuiScreenMixin {
 		Handlers.Screen.onButtonAction((GuiScreen) (Object) this, this.buttonList, button);
 	}
 
-	@Inject(method = "mouseClicked", at = @At("HEAD"))
+	@Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
 	private void onMouseClicked(int mouseX, int mouseY, int mouseButton, CallbackInfo ci) {
+		if (this instanceof BookScreenAccess bookScreenAccess && bookScreenAccess.ric$handleBookComponentClick(mouseX, mouseY, mouseButton)) {
+			ci.cancel();
+			return;
+		}
 		Handlers.Screen.onMouseClicked((GuiScreen) (Object) this, mouseX, mouseY, mouseButton);
 	}
 

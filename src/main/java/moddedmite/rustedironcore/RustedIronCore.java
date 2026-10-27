@@ -49,9 +49,9 @@ public class RustedIronCore implements ModInitializer {
     private void registerInternals() {
         Handlers.PlayerEvent.register(new PlayerEventListener());
         Handlers.Tick.register(new TickListener());
+        Handlers.Command.register(new CommandRegistry());
         if (RICConfig.UseCustomDimension.get()) {
             Handlers.Dimension.register(new DimensionRegistry());
-            Handlers.Command.register(new CommandRegistry());
         }
     }
 
