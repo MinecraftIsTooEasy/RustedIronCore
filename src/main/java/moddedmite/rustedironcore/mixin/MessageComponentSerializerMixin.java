@@ -101,7 +101,7 @@ public class MessageComponentSerializerMixin {
         }
     }
 
-    @Inject(method = "serializeComponent", at = @At("RETURN"))
+    @Inject(method = "serializeComponent", at = @At("RETURN"), cancellable = true)
     private void writeClickEvent(ChatMessageComponent component, Type type, JsonSerializationContext context,
                                  CallbackInfoReturnable<JsonElement> cir) {
         if (!cir.getReturnValue().isJsonObject()) {

@@ -1,6 +1,7 @@
 package moddedmite.rustedironcore.mixin.client.render;
 
 import moddedmite.rustedironcore.internal.client.texture.InterpolatedAnimationMetadata;
+import moddedmite.rustedironcore.internal.client.texture.InterpolatedSprite;
 import net.minecraft.AnimationMetadataSection;
 import net.minecraft.Resource;
 import net.minecraft.TextureAtlasSprite;
@@ -15,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.List;
 
 @Mixin(TextureAtlasSprite.class)
-public abstract class TextureAtlasSpriteMixin {
+public abstract class TextureAtlasSpriteMixin implements InterpolatedSprite {
 
     @Shadow
     protected List<int[]> framesTextureData;
@@ -41,7 +42,11 @@ public abstract class TextureAtlasSpriteMixin {
 
     @Inject(method = "loadSprite", at = @At("RETURN"))
     private void retainInterpolateMetadata(Resource resource, CallbackInfo ci) {
-        AnimationMetadataSection sourceMetadata = (AnimationMetadataSection) resource.getMetadata("animation");
+        this.rustedIronCore$retainInterpolation((AnimationMetadataSection) resource.getMetadata("animation"));
+    }
+
+    @Override
+    public void rustedIronCore$retainInterpolation(AnimationMetadataSection sourceMetadata) {
         this.rustedIronCore$interpolateFrames = sourceMetadata != null
                 && ((InterpolatedAnimationMetadata) sourceMetadata).rustedIronCore$interpolateFrames();
     }

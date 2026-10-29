@@ -1,22 +1,24 @@
 package moddedmite.rustedironcore.internal.config;
 
 import moddedmite.rustedironcore.api.util.Platform;
-import org.objectweb.asm.tree.ClassNode;
-import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
-import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 
 import java.util.List;
-import java.util.Set;
 
-public class MixinConfig implements IMixinConfigPlugin {
-    @Override
-    public void onLoad(String s) {
+import static moddedmite.rustedironcore.internal.compat.FmlRuntime.Route.LEGACY;
+import static moddedmite.rustedironcore.internal.compat.FmlRuntime.Route.NATIVE;
 
-    }
-
-    @Override
-    public String getRefMapperConfig() {
-        return null;
+public class MixinConfig extends RoutedMixinPlugin {
+    public MixinConfig() {
+        super(List.of(
+                new Routed("client.render.RenderBipedMixin", "special", LEGACY),
+                new Routed("client.render.RenderPlayerMixin", "special", LEGACY),
+                new Routed("client.FontRendererColorMixin", "text", LEGACY),
+                new Routed("client.vulkan.FontRendererVulkanMixin", "text", NATIVE),
+                new Routed("client.render.RenderGlobalMixin", "sky", LEGACY),
+                new Routed("client.vulkan.RenderGlobalVulkanMixin", "sky", NATIVE),
+                new Routed("client.render.TextureMapAtlasMixin", "texture", LEGACY),
+                new Routed("client.vulkan.TextureMapVulkanMixin", "texture", NATIVE),
+                new Routed("client.vulkan.TextureAtlasSpriteVulkanMixin", "texture", NATIVE)));
     }
 
     @Override
@@ -31,25 +33,5 @@ public class MixinConfig implements IMixinConfigPlugin {
             return Platform.isExperimental();
         }
         return true;
-    }
-
-    @Override
-    public void acceptTargets(Set<String> set, Set<String> set1) {
-
-    }
-
-    @Override
-    public List<String> getMixins() {
-        return null;
-    }
-
-    @Override
-    public void preApply(String s, ClassNode classNode, String s1, IMixinInfo iMixinInfo) {
-
-    }
-
-    @Override
-    public void postApply(String s, ClassNode classNode, String s1, IMixinInfo iMixinInfo) {
-
     }
 }
