@@ -25,13 +25,15 @@ public abstract class GuiTextFieldMixin {
 
         int textStart = ((GuiTextFieldAccessor) input).ric$getLineScrollOffset();
         String formattedText = ChatInputTextFormatter.format(suggestions, text, textStart, color);
-        int endX = original.call(renderer, formattedText, x, y, color);
-        if (input.getCursorPosition() == input.getText().length()) {
+        original.call(renderer, formattedText, x, y, color);
+        int textWidth = renderer.getStringWidth(text);
+        // GuiTextField expects the text advance plus one shadow pixel, even with BGS's half-pixel shadow.
+        int endX = x + textWidth + 1;
+        if (input.getCursorPosition() == input.getText().length()
+                && textStart + text.length() == input.getText().length()) {
             String suffix = suggestions.ric$getInputSuggestionSuffix();
             if (suffix != null) {
-                String visibleText = renderer.trimStringToWidth(
-                        input.getText().substring(textStart), input.getWidth());
-                int availableWidth = Math.max(0, input.getWidth() - renderer.getStringWidth(visibleText) + 1);
+                int availableWidth = Math.max(0, input.getWidth() - textWidth);
                 String visibleSuffix = renderer.trimStringToWidth(suffix, availableWidth);
                 if (!visibleSuffix.isEmpty()) {
                     renderer.drawStringWithShadow(visibleSuffix, endX - 1, y, 0xFF808080);

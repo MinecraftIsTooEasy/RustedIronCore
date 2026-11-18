@@ -9,6 +9,7 @@ import moddedmite.rustedironcore.internal.client.chat.ChatCommandSuggestions;
 import moddedmite.rustedironcore.internal.client.chat.ChatCommandSuggestionsAccess;
 import moddedmite.rustedironcore.internal.client.chat.ChatGuiAccess;
 import moddedmite.rustedironcore.internal.client.chat.ChatInteractionHit;
+import moddedmite.rustedironcore.internal.client.chat.ChatInteractionRenderer;
 import moddedmite.rustedironcore.internal.command.CommandSuggestionResult;
 import net.minecraft.ChatAllowedCharacters;
 import net.minecraft.ChatClickData;
@@ -87,7 +88,7 @@ public abstract class GuiChatMixin extends GuiScreen implements ChatCommandSugge
     }
 
     @Inject(method = "drawScreen", at = @At("RETURN"))
-    private void renderCommandSuggestions(int mouseX, int mouseY, float partialTick, CallbackInfo ci) {
+    private void renderChatOverlays(int mouseX, int mouseY, float partialTick, CallbackInfo ci) {
         if (this.ric$commandSuggestions != null) {
             boolean depthTestEnabled = GL11.glIsEnabled(GL11.GL_DEPTH_TEST);
             GL11.glDisable(GL11.GL_DEPTH_TEST);
@@ -99,6 +100,11 @@ public abstract class GuiChatMixin extends GuiScreen implements ChatCommandSugge
                 GL11.glPopMatrix();
                 if (depthTestEnabled) GL11.glEnable(GL11.GL_DEPTH_TEST);
             }
+        }
+        ChatInteractionHit hit = ((ChatGuiAccess) this.mc.ingameGUI.getChatGUI()).ric$getInteractionAt(mouseX, mouseY);
+        if (hit != null) {
+            ChatInteractionRenderer.renderHoverTooltip(this.fontRenderer, hit.span().hoverEvent(), mouseX, mouseY,
+                    this.width, this.height);
         }
     }
 

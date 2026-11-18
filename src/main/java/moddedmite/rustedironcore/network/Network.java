@@ -10,6 +10,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class Network {
+
     private static BiConsumer<ServerPlayer, Packet> clientSender;
 
     private static Consumer<Packet> serverSender;
@@ -26,6 +27,15 @@ public class Network {
      * */
     public static void initClient(Consumer<Packet> sender) {
         serverSender = sender;
+    }
+
+    /**
+     * Advances the player's native container window ID and returns the new value.
+     */
+    @Environment(EnvType.SERVER)
+    public static int nextWindowId(ServerPlayer player) {
+        player.incrementWindowID();
+        return player.currentWindowId;
     }
 
     @Environment(EnvType.SERVER)

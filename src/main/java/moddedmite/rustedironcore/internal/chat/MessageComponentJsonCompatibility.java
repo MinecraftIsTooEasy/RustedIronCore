@@ -6,6 +6,7 @@ import com.google.gson.JsonPrimitive;
 import moddedmite.rustedironcore.api.chat.ChatClickAction;
 import moddedmite.rustedironcore.api.chat.ChatClickEvent;
 import moddedmite.rustedironcore.api.chat.TextColor;
+import moddedmite.rustedironcore.api.chat.TextHoverEvent;
 
 import javax.annotation.Nullable;
 
@@ -66,6 +67,13 @@ public final class MessageComponentJsonCompatibility {
             clickEvent.addProperty("action", event.action().getSerializedName());
             clickEvent.addProperty("value", event.value());
             object.add("clickEvent", clickEvent);
+        }
+        TextHoverEvent hover = access.ric$getHoverEvent();
+        if (hover != null) {
+            JsonObject hoverEvent = new JsonObject();
+            hoverEvent.addProperty("action", hover.action().getSerializedName());
+            hoverEvent.add("contents", hover.contents());
+            object.add("hoverEvent", hoverEvent);
         }
         String insertion = access.ric$getInsertion();
         if (insertion != null) object.addProperty("insertion", insertion);

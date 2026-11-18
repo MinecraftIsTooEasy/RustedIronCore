@@ -7,6 +7,8 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
+import com.mojang.brigadier.suggestion.Suggestions;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import net.minecraft.ICommand;
 import net.minecraft.ICommandSender;
@@ -18,8 +20,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 public final class CommandSuggestionDispatcher {
 
@@ -106,7 +110,7 @@ public final class CommandSuggestionDispatcher {
         return (context, builder) -> {
             String[] input = context.getInput().split(" ", -1);
             ICommand command = legacyCommands.get(input[0]);
-            if (command == null || !commandName.equals(command.getCommandName())) {
+            if (command == null || !commandName.equals(command.getCommandName()) || !canUse(context.getSource(), command)) {
                 return builder.buildFuture();
             }
             String[] arguments = Arrays.copyOfRange(input, 1, input.length);
@@ -138,7 +142,7 @@ public final class CommandSuggestionDispatcher {
         int commandCursor = cursor - 1;
         ParseResults<ICommandSender> suggestionParse = commandCursor == command.length()
                 ? parse : dispatcher.parse(command.substring(0, commandCursor), source);
-        var suggestions = dispatcher.getCompletionSuggestions(suggestionParse, commandCursor).join();
+        Suggestions suggestions = permittedSuggestions(suggestionParse, commandCursor);
         List<CommandSuggestionEntry> values = new ArrayList<>(Math.min(suggestions.getList().size(), MAX_SUGGESTIONS));
         int completionEnd = cursor == input.length() ? cursor : CommandSuggestionRange.tokenEnd(input, cursor);
         for (var suggestion : suggestions.getList()) {
@@ -193,6 +197,36 @@ public final class CommandSuggestionDispatcher {
         if (cursor != input.length()) errorMessage = null;
         int usageStart = errorMessage == null ? suggestionContext.startPos + 1 : 0;
         return new CommandSuggestionResult(values, syntax, usage, usageStart, errorMessage);
+    }
+
+    private static Suggestions permittedSuggestions(ParseResults<ICommandSender> parse, int cursor) {
+        var context = parse.getContext();
+        var suggestionContext = context.findSuggestionContext(cursor);
+        String fullInput = parse.getReader().getString();
+        String input = fullInput.substring(0, cursor);
+        String lowerCaseInput = input.toLowerCase(Locale.ROOT);
+        int start = Math.min(suggestionContext.startPos, cursor);
+        List<CompletableFuture<Suggestions>> pending = new ArrayList<>();
+        for (var child : suggestionContext.parent.getChildren()) {
+            if (!child.canUse(context.getSource())) continue;
+            try {
+                pending.add(child.listSuggestions(context.build(input), new SuggestionsBuilder(input, lowerCaseInput, start)));
+            } catch (CommandSyntaxException ignored) {
+                // Brigadier skips providers that cannot suggest for the current input.
+            }
+        }
+        CompletableFuture.allOf(pending.toArray(CompletableFuture<?>[]::new)).join();
+        return Suggestions.merge(fullInput, pending.stream().map(CompletableFuture::join).toList());
+    }
+
+    public static boolean allowsLegacyFallback(String input, int cursor, ICommandSender source) {
+        String command = input.substring(1, Math.max(1, Math.min(cursor, input.length())));
+        String name = command.split(" ", 2)[0];
+        if (!canUseLegacyCommand(source, name)) return false;
+        var parse = dispatcher.parse(command, source);
+        var parent = parse.getContext().findSuggestionContext(command.length()).parent;
+        // An empty result from a restricted branch must not reopen it through the legacy API.
+        return parent.canUse(source) && parent.getChildren().stream().allMatch(child -> child.canUse(source));
     }
 
     private static boolean canUse(ICommandSender source, ICommand command) {

@@ -2,6 +2,7 @@ package moddedmite.rustedironcore.internal.event.listeners;
 
 import moddedmite.rustedironcore.api.event.events.CommandRegisterEvent;
 import moddedmite.rustedironcore.internal.command.TellRawCommand;
+import moddedmite.rustedironcore.internal.command.AdvancementCommand;
 import moddedmite.rustedironcore.internal.command.DimensionCommand;
 import moddedmite.rustedironcore.internal.command.CommandSuggestionDispatcher;
 import moddedmite.rustedironcore.internal.command.MiteCommandTrees;
@@ -15,6 +16,7 @@ public class CommandRegistry implements Consumer<CommandRegisterEvent> {
     @Override
     public void accept(CommandRegisterEvent event) {
         event.register(new TellRawCommand());
+        AdvancementCommand.register(event);
         MiteCommandTrees.register(CommandSuggestionDispatcher::registerBuiltin,
                 CommandSuggestionDispatcher::registerStandalone);
         if (RICConfig.UseCustomDimension.get()) {

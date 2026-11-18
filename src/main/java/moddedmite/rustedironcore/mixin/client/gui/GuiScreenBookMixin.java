@@ -1,14 +1,12 @@
 package moddedmite.rustedironcore.mixin.client.gui;
 
 import moddedmite.rustedironcore.api.chat.TextComponent;
-import moddedmite.rustedironcore.api.chat.TextComponentSerializer;
 import moddedmite.rustedironcore.api.chat.TextStyle;
-import moddedmite.rustedironcore.api.chat.TextHoverEvent;
 import moddedmite.rustedironcore.internal.client.chat.BookClickEventContext;
 import moddedmite.rustedironcore.internal.client.chat.BookClickEventHandler;
 import moddedmite.rustedironcore.internal.client.chat.BookPageText;
 import moddedmite.rustedironcore.internal.client.chat.BookScreenAccess;
-import moddedmite.rustedironcore.internal.client.chat.ChatHoverTooltipRenderer;
+import moddedmite.rustedironcore.internal.client.chat.ChatInteractionRenderer;
 import moddedmite.rustedironcore.internal.client.chat.MiteTextComponentAdapter;
 import net.minecraft.FontRenderer;
 import net.minecraft.GuiChat;
@@ -27,8 +25,6 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
 
 @Mixin(GuiScreenBook.class)
 public abstract class GuiScreenBookMixin extends GuiScreen implements BookScreenAccess, BookClickEventContext {
@@ -64,18 +60,9 @@ public abstract class GuiScreenBookMixin extends GuiScreen implements BookScreen
     private void renderBookComponentHover(int mouseX, int mouseY, float partialTick, CallbackInfo ci) {
         TextStyle style = BookPageText.styleAt(this.ric$visiblePage, this.fontRenderer, this.width,
                 this.bookImageWidth, mouseX, mouseY);
-        if (style != null && style.getHoverEvent() != null
-                && style.getHoverEvent().action() == TextHoverEvent.Action.SHOW_TEXT) {
-            try {
-                TextComponent tooltip = TextComponentSerializer.fromJson(style.getHoverEvent().contents());
-                List<String> lines = new ArrayList<>();
-                for (Object line : this.fontRenderer.listFormattedStringToWidth(MiteTextComponentAdapter.toFormattedString(tooltip), 200)) {
-                    lines.add((String) line);
-                }
-                ChatHoverTooltipRenderer.render(this.fontRenderer, lines, mouseX, mouseY, this.width, this.height);
-            } catch (UnsupportedOperationException ignored) {
-                // Unsupported tooltip content is retained by the component model but has no MITE renderer.
-            }
+        if (style != null) {
+            ChatInteractionRenderer.renderHoverTooltip(this.fontRenderer, style.getHoverEvent(), mouseX, mouseY,
+                    this.width, this.height);
         }
     }
 

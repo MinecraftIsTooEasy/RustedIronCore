@@ -14,6 +14,7 @@ import net.minecraft.ResourceLocation;
 import net.minecraft.ScaledResolution;
 import net.minecraft.Tessellator;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -95,14 +96,17 @@ public final class HudGraphics extends Gui {
         int alpha = (int) (textBackgroundOpacity * 255) * (color >>> 24) / 255;
         if (alpha > 0) {
             fill(x - 2, y - 2, x + getFont().getStringWidth(text) + 2, y + 11, alpha << 24);
-            // Legacy Gui.drawRect disables blending after drawing; modern GuiGraphics keeps it available.
-            GL11.glEnable(GL11.GL_BLEND);
         }
         return getFont().drawString(text, x, y, color, true);
     }
 
     public void fill(int left, int top, int right, int bottom, int color) {
-        drawRect(left, top, right, bottom, color);
+        GL11.glPushAttrib(GL11.GL_ENABLE_BIT | GL11.GL_COLOR_BUFFER_BIT | GL11.GL_CURRENT_BIT);
+        try {
+            drawRect(left, top, right, bottom, color);
+        } finally {
+            GL11.glPopAttrib();
+        }
     }
 
     public void blit(ResourceLocation texture, int x, int y, int u, int v, int width, int height) {
@@ -111,24 +115,44 @@ public final class HudGraphics extends Gui {
 
     public void blit(ResourceLocation texture, int x, int y, int u, int v, int width, int height,
                      int textureWidth, int textureHeight) {
+        blit(texture, x, y, u, v, width, height, width, height, textureWidth, textureHeight);
+    }
+
+    public void blit(ResourceLocation texture, int x, int y, int u, int v, int width, int height,
+                     int sourceWidth, int sourceHeight, int textureWidth, int textureHeight) {
         minecraft.getTextureManager().bindTexture(texture);
         GL11.glColor4f(1, 1, 1, 1);
         Tessellator vertices = Tessellator.instance;
         vertices.startDrawingQuads();
-        vertices.addVertexWithUV(x, y + height, zLevel, (double) u / textureWidth, (double) (v + height) / textureHeight);
-        vertices.addVertexWithUV(x + width, y + height, zLevel, (double) (u + width) / textureWidth, (double) (v + height) / textureHeight);
-        vertices.addVertexWithUV(x + width, y, zLevel, (double) (u + width) / textureWidth, (double) v / textureHeight);
+        vertices.addVertexWithUV(x, y + height, zLevel, (double) u / textureWidth, (double) (v + sourceHeight) / textureHeight);
+        vertices.addVertexWithUV(x + width, y + height, zLevel, (double) (u + sourceWidth) / textureWidth, (double) (v + sourceHeight) / textureHeight);
+        vertices.addVertexWithUV(x + width, y, zLevel, (double) (u + sourceWidth) / textureWidth, (double) v / textureHeight);
         vertices.addVertexWithUV(x, y, zLevel, (double) u / textureWidth, (double) v / textureHeight);
         vertices.draw();
     }
 
     public void renderItem(ItemStack item, int x, int y) {
-        GL11.glPushAttrib(GL11.GL_ENABLE_BIT | GL11.GL_LIGHTING_BIT | GL11.GL_DEPTH_BUFFER_BIT | GL11.GL_CURRENT_BIT);
+        GL11.glPushAttrib(GL11.GL_ENABLE_BIT | GL11.GL_LIGHTING_BIT | GL11.GL_DEPTH_BUFFER_BIT
+                | GL11.GL_CURRENT_BIT | GL11.GL_COLOR_BUFFER_BIT | GL11.GL_TEXTURE_BIT);
+        pushPose();
+        float previousZLevel = itemRenderer.zLevel;
         try {
+            itemRenderer.zLevel = 100.0F;
             RenderHelper.enableGUIStandardItemLighting();
+            GL11.glEnable(GL12.GL_RESCALE_NORMAL);
+            GL11.glEnable(GL11.GL_TEXTURE_2D);
+            GL11.glEnable(GL11.GL_ALPHA_TEST);
+            GL11.glAlphaFunc(GL11.GL_GREATER, 0.1F);
+            GL11.glEnable(GL11.GL_BLEND);
+            GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
             GL11.glEnable(GL11.GL_DEPTH_TEST);
+            GL11.glDepthFunc(GL11.GL_LEQUAL);
+            GL11.glDepthMask(true);
+            GL11.glColor4f(1, 1, 1, 1);
             itemRenderer.renderItemAndEffectIntoGUI(getFont(), minecraft.getTextureManager(), item, x, y);
         } finally {
+            itemRenderer.zLevel = previousZLevel;
+            popPose();
             GL11.glPopAttrib();
         }
     }

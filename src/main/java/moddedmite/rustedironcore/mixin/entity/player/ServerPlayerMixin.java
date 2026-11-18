@@ -1,11 +1,21 @@
 package moddedmite.rustedironcore.mixin.entity.player;
 
+import moddedmite.rustedironcore.internal.advancement.AdvancementEvents;
+
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.sugar.Local;
 import moddedmite.rustedironcore.Constants;
+import moddedmite.rustedironcore.api.block.Bed;
 import moddedmite.rustedironcore.api.event.Handlers;
 import moddedmite.rustedironcore.api.player.ServerPlayerAPI;
 import moddedmite.rustedironcore.internal.network.packets.S2CUpdateNutrition;
 import moddedmite.rustedironcore.network.Network;
-import net.minecraft.*;
+import net.minecraft.DamageSource;
+import net.minecraft.EntityPlayer;
+import net.minecraft.Item;
+import net.minecraft.ItemInWorldManager;
+import net.minecraft.ServerPlayer;
+import net.minecraft.World;
 import net.minecraft.server.MinecraftServer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -17,6 +27,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ServerPlayer.class)
 public abstract class ServerPlayerMixin extends EntityPlayer implements ServerPlayerAPI {
+
     @Shadow
     private int phytonutrients;
     @Shadow
@@ -38,6 +49,12 @@ public abstract class ServerPlayerMixin extends EntityPlayer implements ServerPl
 
     public ServerPlayerMixin(World par1World, String par2Str) {
         super(par1World, par2Str);
+    }
+
+    @ModifyExpressionValue(method = "tryToSleepInBedAt(III)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/BlockBed;j(I)I"))
+    private int resolveBedDirection(int original, @Local(argsOnly = true, ordinal = 0) int x, @Local(argsOnly = true, ordinal = 1) int y, @Local(argsOnly = true, ordinal = 2) int z) {
+        Bed bed = Bed.getBed(worldObj, x, y, z);
+        return bed == null ? original : bed.getBedDirection(worldObj, x, y, z);
     }
 
     @Inject(method = "<init>", at = @At("RETURN"))
@@ -107,6 +124,7 @@ public abstract class ServerPlayerMixin extends EntityPlayer implements ServerPl
 
     @Inject(method = "travelToDimension", at = @At("HEAD"))
     private void onDimensionTravel(int par1, CallbackInfo ci) {
+        AdvancementEvents.beforeDimensionChange(this);
         Handlers.Achievement.onDimensionTravel(this, this.dimension, par1);
     }
 

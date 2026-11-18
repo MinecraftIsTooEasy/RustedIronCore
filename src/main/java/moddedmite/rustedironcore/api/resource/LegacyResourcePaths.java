@@ -18,6 +18,8 @@ public final class LegacyResourcePaths {
             "wood_shovel", "wooden_shovel", "gold_horse_armor", "golden_horse_armor");
     private static final List<List<String>> ENTITY_NAMES = List.of(
             List.of("bat", "bat/bat"),
+            List.of("iron_golem", "iron_golem/iron_golem"),
+            List.of("snowman", "snow_golem"),
             List.of("chicken", "chicken/chicken", "chicken/chicken_temperate"),
             List.of("cow/cow", "cow/cow_temperate"),
             List.of("cow/mooshroom", "cow/mooshroom_red", "cow/red_mooshroom"),
@@ -26,6 +28,7 @@ public final class LegacyResourcePaths {
             List.of("villager/villager", "villager/farmer", "villager/librarian", "villager/priest",
                     "villager/smith", "villager/butcher"),
             List.of("sheep/sheep_fur", "sheep/sheep_wool"),
+            List.of("zombie/zombie_villager", "zombie_villager/zombie_villager"),
             List.of("zombie_pigman", "piglin/zombified_piglin", "zombie/hill_pigman"));
     private static final List<String> ENTITY_ROOTS = List.of(
             "textures/entity/", "optifine/random/entity/", "optifine/mob/", "mcpatcher/mob/");

@@ -17,8 +17,78 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 public final class NbtPathEvaluator {
+
+    /** Compiles an SNBT compound for subset matching, including unordered list patterns. */
+    public static Predicate<NBTBase> predicate(String snbt) {
+        Object pattern = new SnbtParser(snbt).parse();
+        if (!(pattern instanceof Map)) throw new IllegalArgumentException("Expected an SNBT compound");
+        return actual -> actual != null && matches(pattern, actual);
+    }
+
+    public static Predicate<NBTBase> exactPredicate(String snbt) {
+        Object pattern = new SnbtParser(snbt).parse();
+        if (!(pattern instanceof Map)) throw new IllegalArgumentException("Expected an SNBT compound");
+        return actual -> actual != null && valueEquals(pattern, toValue(actual));
+    }
+
+    public static NBTTagCompound parseCompound(String snbt) {
+        Object value = new SnbtParser(snbt).parse();
+        if (!(value instanceof Map)) throw new IllegalArgumentException("Expected an SNBT compound");
+        return (NBTTagCompound) toTag("", value);
+    }
+
+    private static NBTBase toTag(String name, Object value) {
+        if (value instanceof Map<?, ?> map) {
+            NBTTagCompound compound = new NBTTagCompound(name);
+            map.forEach((key, child) -> compound.setTag((String) key, toTag((String) key, child)));
+            return compound;
+        }
+        if (value instanceof List<?> values) {
+            NBTTagList list = new NBTTagList(name);
+            byte type = 0;
+            for (Object child : values) {
+                NBTBase tag = toTag("", child);
+                if (type != 0 && type != tag.getId()) throw new IllegalArgumentException("NBT lists require a single tag type");
+                type = tag.getId();
+                list.appendTag(tag);
+            }
+            return list;
+        }
+        if (value instanceof TypedArray array) {
+            if (array.type() == 'B') {
+                byte[] bytes = new byte[array.values().size()];
+                for (int i = 0; i < bytes.length; i++) bytes[i] = arrayNumber(array.values().get(i), 'b').byteValue();
+                return new NBTTagByteArray(name, bytes);
+            }
+            if (array.type() == 'I') {
+                int[] ints = new int[array.values().size()];
+                for (int i = 0; i < ints.length; i++) ints[i] = arrayNumber(array.values().get(i), 'i').intValue();
+                return new NBTTagIntArray(name, ints);
+            }
+            throw new IllegalArgumentException("Long NBT arrays are unavailable in MITE");
+        }
+        if (value instanceof NumberValue number) {
+            Number numeric = (Number) number.value();
+            return switch (number.type()) {
+                case 'b' -> new NBTTagByte(name, numeric.byteValue());
+                case 's' -> new NBTTagShort(name, numeric.shortValue());
+                case 'i' -> new NBTTagInt(name, numeric.intValue());
+                case 'l' -> new NBTTagLong(name, numeric.longValue());
+                case 'f' -> new NBTTagFloat(name, numeric.floatValue());
+                case 'd' -> new NBTTagDouble(name, numeric.doubleValue());
+                default -> throw new IllegalArgumentException("Unknown NBT number type");
+            };
+        }
+        return new NBTTagString(name, (String) value);
+    }
+
+    private static Number arrayNumber(Object value, char type) {
+        if (!(value instanceof NumberValue number) || number.type() != type) throw new IllegalArgumentException("Unexpected numeric type in NBT array");
+        return (Number) number.value();
+    }
 
     public static List<NBTBase> get(NBTBase root, String path) {
         try {

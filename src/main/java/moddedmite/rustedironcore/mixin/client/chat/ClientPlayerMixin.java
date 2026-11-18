@@ -21,7 +21,7 @@ public abstract class ClientPlayerMixin extends AbstractClientPlayer {
 
     @Inject(method = "sendChatToPlayer", at = @At("HEAD"), cancellable = true)
     private void printComponentWithChatInteraction(ChatMessageComponent component, CallbackInfo ci) {
-        if (!ChatClickSupport.hasChatInteraction(component) && !ChatClickSupport.hasTextComponent(component)) {
+        if (ChatClickSupport.canUseVanillaChat(component)) {
             return;
         }
         ((ChatGuiAccess) Minecraft.getMinecraft().ingameGUI.getChatGUI())

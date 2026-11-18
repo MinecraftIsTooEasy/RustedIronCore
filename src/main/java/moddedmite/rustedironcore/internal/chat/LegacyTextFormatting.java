@@ -75,6 +75,31 @@ public final class LegacyTextFormatting {
         return index;
     }
 
+    public static String activeFormatting(String text) {
+        StringBuilder result = new StringBuilder();
+        for (int index = 0; index + 1 < text.length();) {
+            if (text.charAt(index) != CODE) {
+                index++;
+                continue;
+            }
+            if (isRgbCodeAt(text, index)) {
+                result.setLength(0);
+                result.append(text, index, index + 14);
+                index += 14;
+                continue;
+            }
+            char code = Character.toLowerCase(text.charAt(index + 1));
+            if (isLegacyColor(code) || code == 'r') {
+                result.setLength(0);
+            }
+            if (isLegacyColor(code) || code >= 'k' && code <= 'o') {
+                result.append(CODE).append(code);
+            }
+            index += 2;
+        }
+        return result.toString();
+    }
+
     public static String preserveLastRgbColor(String text, String legacyFormatting) {
         int rgbIndex = -1;
         for (int index = 0; index + 1 < text.length();) {
@@ -88,7 +113,7 @@ public final class LegacyTextFormatting {
                 continue;
             }
             char code = Character.toLowerCase(text.charAt(index + 1));
-            if (isLegacyColor(code)) {
+            if (isLegacyColor(code) || code == 'r') {
                 rgbIndex = -1;
             }
             index += 2;

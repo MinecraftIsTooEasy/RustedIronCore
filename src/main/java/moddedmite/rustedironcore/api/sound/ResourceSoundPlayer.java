@@ -2,7 +2,6 @@ package moddedmite.rustedironcore.api.sound;
 
 import com.google.gson.JsonParser;
 import moddedmite.rustedironcore.api.util.LogUtil;
-import moddedmite.rustedironcore.mixin.client.audio.SoundPoolInvoker;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.Minecraft;
@@ -18,6 +17,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.DoubleSupplier;
 import org.apache.logging.log4j.Logger;
 
 /** Plays an explicitly requested OGG resource through the normal client volume/mute/source lifecycle. */
@@ -31,15 +31,24 @@ public final class ResourceSoundPlayer {
 
     /** Plays a sounds.json event, including the selected packs' append/replace mappings. */
     public static void playEvent(ResourceLocation event, float volume, float pitch) {
-        if (!eventsLoaded) loadEvents(Minecraft.getMinecraft().getResourceManager());
-        JsonSoundEvents.Selection selected = EVENTS.resolve(event.toString(), () -> ThreadLocalRandom.current().nextDouble());
+        JsonSoundEvents.Selection selected = selectEvent(event);
         if (selected == null) return;
         ResourceLocation sound = new ResourceLocation(selected.file(), false);
         play(new ResourceLocation(sound.getResourceDomain(), "sounds/" + sound.getResourcePath() + ".ogg", false),
                 volume * selected.volume(), pitch * selected.pitch());
     }
 
-    private static void loadEvents(ResourceManager resources) {
+    public static JsonSoundEvents.Selection selectEvent(ResourceLocation event) {
+        if (!eventsLoaded) reload(Minecraft.getMinecraft().getResourceManager());
+        return EVENTS.resolve(event.toString(), () -> ThreadLocalRandom.current().nextDouble());
+    }
+
+    static JsonSoundEvents.Selection selectEvent(ResourceLocation event, DoubleSupplier random) {
+        return EVENTS.resolve(event.toString(), random);
+    }
+
+    public static void reload(ResourceManager resources) {
+        clearCache();
         for (Object domain : resources.getResourceDomains()) {
             String namespace = (String) domain;
             try {
@@ -66,18 +75,22 @@ public final class ResourceSoundPlayer {
 
     /** Resolve an original OGG for either sound effects or the music source. */
     public static SoundPoolEntry resolve(ResourceLocation file) {
-        Minecraft client = Minecraft.getMinecraft();
+        return resolve(Minecraft.getMinecraft().getResourceManager(), file);
+    }
+
+    static SoundPoolEntry resolve(ResourceManager resources, ResourceLocation file) {
         String path = file.getResourcePath();
         if (!path.startsWith("sounds/") || !path.endsWith(".ogg"))
             throw new IllegalArgumentException("Expected a sounds/*.ogg resource: " + file);
         String token = "ric.resource:" + file;
         try {
             // Test availability after every reload; removed pack files must not leave stale sounds.
-            try (var stream = client.getResourceManager().getResource(file).getInputStream()) {
+            try (var stream = resources.getResource(file).getInputStream()) {
                 if (!ENTRIES.containsKey(token)) {
-                    SoundPool pool = new SoundPool(client.getResourceManager(), "sounds", false);
+                    SoundPool pool = new SoundPool(resources, "sounds", false);
                     String sound = file.getResourceDomain() + ":" + path.substring("sounds/".length());
-                    ENTRIES.put(token, new SoundPoolEntry(sound, ((SoundPoolInvoker) pool).ric$getSoundUrl(sound)));
+                    pool.addSound(sound);
+                    ENTRIES.put(token, pool.getRandomSound());
                 }
             }
             return ENTRIES.get(token);
@@ -88,7 +101,9 @@ public final class ResourceSoundPlayer {
     }
 
     public static SoundPoolEntry lookup(String token) {
-        return ENTRIES.get(token);
+        SoundPoolEntry cached = ENTRIES.get(token);
+        if (cached != null || !token.startsWith("ric.resource:")) return cached;
+        return resolve(new ResourceLocation(token.substring("ric.resource:".length()), false));
     }
 
     /** The cached resource URLs belong to the pack stack from the last reload. */

@@ -39,10 +39,14 @@ public final class JsonBlockModelRenderer {
     }
 
     public static boolean renderBlockAsItem(JsonBlockModel model, JsonBlockState.Variant variant, Block block, int metadata, float brightness, JsonModelDisplayContext context) {
+        return renderBlockAsItem(model, variant, block, new ItemStack(block, 1, metadata), brightness, context);
+    }
+
+    public static boolean renderBlockAsItem(JsonBlockModel model, JsonBlockState.Variant variant, Block block, ItemStack stack, float brightness, JsonModelDisplayContext context) {
         GL11.glPushMatrix();
         JsonModelTransforms.apply(model, context);
         GL11.glTranslatef(-0.5F, -0.5F, -0.5F);
-        renderBlockAsItemGeometry(model, variant, block, metadata, brightness);
+        renderBlockAsItemGeometry(model, variant, block, stack, brightness);
         GL11.glPopMatrix();
         return true;
     }
@@ -50,12 +54,17 @@ public final class JsonBlockModelRenderer {
     /** Draws block-model vertices in the current matrix without applying the model's item display transform. */
     public static void renderBlockAsItemGeometry(JsonBlockModel model, JsonBlockState.Variant variant,
                                                  Block block, int metadata, float brightness) {
+        renderBlockAsItemGeometry(model, variant, block, new ItemStack(block, 1, metadata), brightness);
+    }
+
+    public static void renderBlockAsItemGeometry(JsonBlockModel model, JsonBlockState.Variant variant,
+                                                 Block block, ItemStack stack, float brightness) {
         Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.locationBlocksTexture);
         Tessellator tessellator = Tessellator.instance;
         for (JsonModelElement element : model.getElements()) {
             renderElement(tessellator, model, variant, null, block, null, element,
-                    0.0F, 0.0F, 0.0F, metadata, null,
-                    brightness, brightness, brightness, BLOCK_TEXTURE_MAP, true, false);
+                    0.0F, 0.0F, 0.0F, stack.getItemSubtype(), null,
+                    brightness, brightness, brightness, BLOCK_TEXTURE_MAP, true, false, stack);
         }
     }
 
@@ -114,7 +123,6 @@ public final class JsonBlockModelRenderer {
     }
 
     public static boolean renderItem(JsonBlockModel model, ItemStack stack, Icon fallbackIcon, JsonModelDisplayContext context) {
-        Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.locationItemsTexture);
         GL11.glPushMatrix();
         JsonModelTransforms.apply(model, context);
         if (model.isGeneratedItem()) {
@@ -124,9 +132,8 @@ public final class JsonBlockModelRenderer {
         }
         GL11.glTranslatef(-0.5F, -0.5F, -0.5F);
 
-        Tessellator tessellator = Tessellator.instance;
         for (JsonModelElement element : model.getElements()) {
-            renderElement(tessellator, model, JsonBlockState.EMPTY_VARIANT, null, null, fallbackIcon, element, 0.0F, 0.0F, 0.0F, stack.getItemSubtype(), null, 1.0F, 1.0F, 1.0F, ITEM_TEXTURE_MAP, true, false, stack);
+            renderItemElementGeometry(model, element, stack);
         }
 
         GL11.glPopMatrix();
@@ -134,7 +141,6 @@ public final class JsonBlockModelRenderer {
     }
 
     public static boolean renderItemIntoGui(JsonBlockModel model, ItemStack stack, int x, int y, float zLevel) {
-        Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.locationItemsTexture);
         GL11.glPushMatrix();
         beginGuiRenderState();
         try {
@@ -147,10 +153,8 @@ public final class JsonBlockModelRenderer {
             }
             GL11.glTranslatef(-0.5F, -0.5F, -0.5F);
 
-            Tessellator tessellator = Tessellator.instance;
-            Icon fallbackIcon = stack.getIconIndex();
             for (JsonModelElement element : model.getElements()) {
-                renderElement(tessellator, model, JsonBlockState.EMPTY_VARIANT, null, null, fallbackIcon, element, 0.0F, 0.0F, 0.0F, stack.getItemSubtype(), null, 1.0F, 1.0F, 1.0F, ITEM_TEXTURE_MAP, true, false, stack);
+                renderItemElementGeometry(model, element, stack);
             }
             return true;
         } finally {
@@ -208,6 +212,10 @@ public final class JsonBlockModelRenderer {
     }
 
     public static boolean renderBlockAsItemInGui(JsonBlockModel model, JsonBlockState.Variant variant, Block block, int metadata, int x, int y, float zLevel) {
+        return renderBlockAsItemInGui(model, variant, block, new ItemStack(block, 1, metadata), x, y, zLevel);
+    }
+
+    public static boolean renderBlockAsItemInGui(JsonBlockModel model, JsonBlockState.Variant variant, Block block, ItemStack stack, int x, int y, float zLevel) {
         Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.locationBlocksTexture);
         GL11.glPushMatrix();
         beginGuiRenderState();
@@ -220,8 +228,8 @@ public final class JsonBlockModelRenderer {
             Tessellator tessellator = Tessellator.instance;
             for (JsonModelElement element : model.getElements()) {
                 renderElement(tessellator, model, variant, null, block, null, element,
-                        0.0F, 0.0F, 0.0F, metadata, null,
-                        1.0F, 1.0F, 1.0F, BLOCK_TEXTURE_MAP, true, false);
+                        0.0F, 0.0F, 0.0F, stack.getItemSubtype(), null,
+                        1.0F, 1.0F, 1.0F, BLOCK_TEXTURE_MAP, true, false, stack);
             }
             return true;
         } finally {
@@ -370,9 +378,9 @@ public final class JsonBlockModelRenderer {
         if (face.getTintIndex() >= 0) {
             if (stack != null) {
                 int color = model.itemTintColor(stack, face.getTintIndex());
-                red = ((color >> 16) & 255) / 255f;
-                green = ((color >> 8) & 255) / 255f;
-                blue = (color & 255) / 255f;
+                red *= ((color >> 16) & 255) / 255f;
+                green *= ((color >> 8) & 255) / 255f;
+                blue *= (color & 255) / 255f;
             }
             tessellator.setColorOpaque_F(red * shade, green * shade, blue * shade);
         } else {

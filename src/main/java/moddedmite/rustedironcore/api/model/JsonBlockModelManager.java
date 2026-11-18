@@ -239,7 +239,7 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
         }
     }
 
-    private BuiltInEntityRenderer getBuiltInRenderer(ItemStack stack) {
+    BuiltInEntityRenderer getBuiltInRenderer(ItemStack stack) {
         if (stack == null) return null;
         Item item = stack.getItem();
         BuiltInEntityRenderer renderer = this.builtInRenderersByMetadata.get(itemMetadataKey(item, stack.getItemSubtype()));
@@ -306,7 +306,7 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
                 JsonBlockModelRenderer.renderBuiltInEntityAsBlockItem(model, entity, stack, renderer, context);
                 return true;
             }
-            return renderBlockItemModel(model, stack, block, stack.getItemSubtype(), brightness, context);
+            return renderBlockItemModel(model, stack, block, brightness, context);
         }
 
         if (!this.jsonBlocks.contains(block)) {
@@ -327,7 +327,7 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
                     rendered = true;
                 }
             } else if (!model.getElements().isEmpty()) {
-                JsonBlockModelRenderer.renderBlockAsItem(selection.model(), selection.variant(), block, metadata, brightness, context);
+                JsonBlockModelRenderer.renderBlockAsItem(selection.model(), selection.variant(), block, stack, brightness, context);
                 rendered = true;
             }
         }
@@ -421,7 +421,7 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
                         rendered = true;
                     }
                 } else if (!model.getElements().isEmpty()) {
-                    JsonBlockModelRenderer.renderBlockAsItemInGui(selection.model(), selection.variant(), block, stack.getItemSubtype(), x, y, zLevel);
+                    JsonBlockModelRenderer.renderBlockAsItemInGui(selection.model(), selection.variant(), block, stack, x, y, zLevel);
                     rendered = true;
                 }
             }
@@ -473,6 +473,27 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
         if (stack == null || stack.getItem() == null) return Optional.empty();
         Optional<JsonBlockModel> modern = this.getDefinedItemModel(stack, entity, context);
         return modern.isPresent() ? modern : this.getBaseItemModel(stack).map(model -> this.resolveItemModel(model, stack, entity));
+    }
+
+    List<BlockModelSelection> getItemModelSelections(ItemStack stack, JsonModelDisplayContext context) {
+        if (!stack.isBlock()) {
+            return this.getItemModel(stack, null, context)
+                    .map(model -> List.of(new BlockModelSelection(model, JsonBlockState.EMPTY_VARIANT)))
+                    .orElseGet(List::of);
+        }
+
+        Block block = stack.getItemAsBlock().getBlock();
+        Optional<JsonBlockModel> model = this.getDefinedItemModel(stack, null, context);
+        if (model.isEmpty()) {
+            model = this.getExplicitItemModel(stack, block)
+                    .map(base -> this.resolveItemModel(base, stack, null));
+        }
+        if (model.isPresent()) {
+            return List.of(new BlockModelSelection(model.get(), JsonBlockState.EMPTY_VARIANT));
+        }
+        return this.jsonBlocks.contains(block)
+                ? this.getBlockModelSelections(block, null, 0, 0, 0, stack.getItemSubtype())
+                : List.of();
     }
 
     private Optional<JsonBlockModel> getDefinedItemModel(ItemStack stack, EntityLivingBase entity, JsonModelDisplayContext context) {
@@ -604,14 +625,14 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
         return Optional.empty();
     }
 
-    private static boolean renderBlockItemModel(JsonBlockModel model, ItemStack stack, Block block, int metadata, float brightness, JsonModelDisplayContext context) {
+    private static boolean renderBlockItemModel(JsonBlockModel model, ItemStack stack, Block block, float brightness, JsonModelDisplayContext context) {
         if (model.isGeneratedItem()) {
             return JsonBlockModelRenderer.renderItem(model, stack, stack.getIconIndex(), context);
         }
         if (model.getElements().isEmpty()) {
             return false;
         }
-        return JsonBlockModelRenderer.renderBlockAsItem(model, JsonBlockState.EMPTY_VARIANT, block, metadata, brightness, context);
+        return JsonBlockModelRenderer.renderBlockAsItem(model, JsonBlockState.EMPTY_VARIANT, block, stack, brightness, context);
     }
 
     private static boolean renderBlockItemModelIntoGui(JsonBlockModel model, ItemStack stack, Block block, int x, int y, float zLevel) {
@@ -621,7 +642,7 @@ public final class JsonBlockModelManager implements ResourceManagerReloadListene
         if (model.getElements().isEmpty()) {
             return false;
         }
-        return JsonBlockModelRenderer.renderBlockAsItemInGui(model, JsonBlockState.EMPTY_VARIANT, block, stack.getItemSubtype(), x, y, zLevel);
+        return JsonBlockModelRenderer.renderBlockAsItemInGui(model, JsonBlockState.EMPTY_VARIANT, block, stack, x, y, zLevel);
     }
 
     Optional<JsonBlockModel> loadModelById(Identifier modelId) {

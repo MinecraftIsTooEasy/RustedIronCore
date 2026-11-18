@@ -72,6 +72,6 @@ public final class JsonDisplayTransforms {
         if (context == JsonModelDisplayContext.THIRD_PERSON_LEFT_HAND) {
             return this.transforms.get(JsonModelDisplayContext.THIRD_PERSON_RIGHT_HAND);
         }
-        return this.transforms.get(JsonModelDisplayContext.FIXED);
+        return context == JsonModelDisplayContext.GROUND ? null : this.transforms.get(JsonModelDisplayContext.FIXED);
     }
 }

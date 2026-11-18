@@ -41,8 +41,6 @@ public final class ChatCommandSuggestions {
     private String pendingCompletionInput;
     private int requestedCursor;
     private int requestId;
-    private int pendingCompletionStart;
-    private int pendingCompletionEnd;
     private int offset;
     private int current;
     private int rectX;
@@ -70,9 +68,7 @@ public final class ChatCommandSuggestions {
         int cursor = this.input.getCursorPosition();
         this.requestedInput = text;
         this.requestedCursor = cursor;
-        if (this.pendingCompletionInput != null && !this.pendingCompletionInput.equals(text)) {
-            this.pendingCompletionInput = null;
-        }
+        this.pendingCompletionInput = null;
         this.retainMatchingSuggestions(text);
         this.requestId = NEXT_REQUEST_ID.incrementAndGet();
         this.allowSuggestions = !text.equals(this.initialInput);
@@ -103,19 +99,23 @@ public final class ChatCommandSuggestions {
             return;
         }
 
-        boolean popupWasVisible = this.isVisible();
-        String previouslySelected = this.suggestions.isEmpty()
-                ? null : this.apply(this.suggestions.get(this.current));
         this.requestPending = false;
-        this.originalContents = input;
         this.syntaxInput = input;
-        this.suggestions = this.sortSuggestions(result.suggestions());
         this.syntax = result.syntax();
         this.syntaxReady = true;
-        if (input.equals(this.pendingCompletionInput)) this.pendingCompletionInput = null;
         this.usage = result.usage();
         this.usageStart = result.usageStart();
         this.errorMessage = result.errorMessage();
+        if (input.equals(this.pendingCompletionInput)) {
+            this.pendingCompletionInput = null;
+            return;
+        }
+
+        boolean popupWasVisible = this.isVisible();
+        String previouslySelected = this.suggestions.isEmpty()
+                ? null : this.apply(this.suggestions.get(this.current));
+        this.originalContents = input;
+        this.suggestions = this.sortSuggestions(result.suggestions());
         this.current = 0;
         if (previouslySelected != null) {
             for (int index = 0; index < this.suggestions.size(); index++) {
@@ -143,6 +143,7 @@ public final class ChatCommandSuggestions {
         this.tabCycles = false;
         this.tabRequested = false;
         this.requestPending = false;
+        this.pendingCompletionInput = null;
         this.requestId = NEXT_REQUEST_ID.incrementAndGet();
     }
 
@@ -262,17 +263,10 @@ public final class ChatCommandSuggestions {
 
     public int inputTextColor(int inputPosition, int defaultColor) {
         String currentInput = this.input.getText();
-        if (currentInput.equals(this.pendingCompletionInput)
-                && inputPosition >= this.pendingCompletionStart && inputPosition < this.pendingCompletionEnd) {
-            return 0xFFAAAAAA;
-        }
         if (!this.syntaxReady || !this.syntaxInput.startsWith("/") || !currentInput.startsWith("/")) {
             return defaultColor;
         }
-        if (inputPosition >= sharedPrefixLength(this.syntaxInput, currentInput)) {
-            if (!currentInput.startsWith(this.syntaxInput) || this.syntaxInput.isEmpty()) return defaultColor;
-            inputPosition = this.syntaxInput.length() - 1;
-        }
+        inputPosition = ChatInputTextFormatter.syntaxPosition(this.syntaxInput, currentInput, inputPosition);
         for (CommandSyntaxSpan span : this.syntax) {
             if (inputPosition >= span.start() && inputPosition < span.end()) {
                 if (span.kind() == CommandSyntaxKind.ERROR) return 0xFFFF5555;
@@ -348,13 +342,6 @@ public final class ChatCommandSuggestions {
         return 0;
     }
 
-    private static int sharedPrefixLength(String first, String second) {
-        int length = Math.min(first.length(), second.length());
-        int index = 0;
-        while (index < length && first.charAt(index) == second.charAt(index)) index++;
-        return index;
-    }
-
     private void updateBounds() {
         if (this.suggestions.isEmpty()) return;
         FontRenderer font = this.minecraft.fontRenderer;
@@ -407,13 +394,12 @@ public final class ChatCommandSuggestions {
         int cursor = suggestion.start() + suggestion.text().length();
         this.input.setCursorPosition(cursor);
         this.pendingCompletionInput = completed;
-        this.pendingCompletionStart = suggestion.start();
-        this.pendingCompletionEnd = suggestion.start() + suggestion.text().length();
+        this.requestedInput = completed;
+        this.requestedCursor = cursor;
+        this.requestId = NEXT_REQUEST_ID.incrementAndGet();
 
-        // Vanilla keeps the current SuggestionsList alive after a completion so
-        // repeated Tab presses cycle through the same branch candidates. A
-        // normal edit will call refresh() and request suggestions for the new
-        // input.
+        // Keep the current candidates for Tab cycling while refreshing syntax.
+        Network.sendToServer(new C2SRequestChatSuggestions(this.requestId, completed, cursor));
         this.tabCycles = true;
     }
 
@@ -428,10 +414,7 @@ public final class ChatCommandSuggestions {
         String tooltip = this.suggestions.get(this.current).tooltip();
         if (tooltip == null) return;
         FontRenderer font = this.minecraft.fontRenderer;
-        List<?> wrappedLines = font.listFormattedStringToWidth(tooltip, 200);
-        List<String> lines = new ArrayList<>(wrappedLines.size());
-        for (Object line : wrappedLines) lines.add((String) line);
-        ChatHoverTooltipRenderer.render(font, lines, mouseX, mouseY, this.screen.width, this.screen.height);
+        ChatHoverTooltipRenderer.render(font, List.of(tooltip), mouseX, mouseY, this.screen.width, this.screen.height);
     }
 
     private void renderUsage() {

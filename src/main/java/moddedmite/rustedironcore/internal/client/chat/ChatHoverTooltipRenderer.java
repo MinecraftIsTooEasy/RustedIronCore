@@ -1,5 +1,6 @@
 package moddedmite.rustedironcore.internal.client.chat;
 
+import moddedmite.rustedironcore.api.chat.TextComponent;
 import net.minecraft.FontRenderer;
 import net.minecraft.Gui;
 import org.lwjgl.opengl.GL11;
@@ -15,6 +16,12 @@ public final class ChatHoverTooltipRenderer extends Gui {
 
     private ChatHoverTooltipRenderer() {}
 
+    public static void render(FontRenderer fontRenderer, TextComponent text, int mouseX, int mouseY, int screenWidth, int screenHeight) {
+        List<String> lines = new TextLineSplitter(fontRenderer::getStringWidth)
+                .splitLines(text, Math.max(screenWidth / 2, 200));
+        render(fontRenderer, lines, mouseX, mouseY, screenWidth, screenHeight);
+    }
+
     public static void render(FontRenderer fontRenderer, List<String> lines, int mouseX, int mouseY,
                               int screenWidth, int screenHeight) {
         if (lines.isEmpty()) {
@@ -22,10 +29,11 @@ public final class ChatHoverTooltipRenderer extends Gui {
         }
 
         int width = 0;
+        TextLineSplitter splitter = new TextLineSplitter(fontRenderer::getStringWidth);
         for (String line : lines) {
-            width = Math.max(width, fontRenderer.getStringWidth(line));
+            width = Math.max(width, splitter.stringWidth(line));
         }
-        int height = lines.size() * 10;
+        int height = lines.size() * 10 - (lines.size() == 1 ? 2 : 0);
         int x = mouseX + 12;
         int y = mouseY - 12;
         if (x + width > screenWidth) {
@@ -35,17 +43,27 @@ public final class ChatHoverTooltipRenderer extends Gui {
             y = screenHeight - height - 3;
         }
 
-        INSTANCE.zLevel = 400.0F;
-        INSTANCE.drawTooltipBackground(x, y, width, height);
+        float previousZLevel = INSTANCE.zLevel;
+        GL11.glPushAttrib(GL11.GL_ENABLE_BIT | GL11.GL_CURRENT_BIT | GL11.GL_COLOR_BUFFER_BIT
+                | GL11.GL_DEPTH_BUFFER_BIT | GL11.GL_LIGHTING_BIT | GL11.GL_TEXTURE_BIT);
         GL11.glPushMatrix();
-        GL11.glTranslatef(0.0F, 0.0F, 400.0F);
-        for (int index = 0; index < lines.size(); index++) {
-            fontRenderer.drawStringWithShadow(lines.get(index), x, y + index * 10, 0xFFFFFFFF);
+        try {
+            GL11.glDisable(GL11.GL_LIGHTING);
+            GL11.glDisable(GL11.GL_DEPTH_TEST);
+            GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+            INSTANCE.zLevel = 400.0F;
+            INSTANCE.drawTooltipBackground(x, y, width, height);
+            GL11.glTranslatef(0.0F, 0.0F, 400.0F);
+            int lineY = y;
+            for (int index = 0; index < lines.size(); index++) {
+                fontRenderer.drawStringWithShadow(lines.get(index), x, lineY, 0xFFFFFFFF);
+                lineY += 10 + (index == 0 ? 2 : 0);
+            }
+        } finally {
+            INSTANCE.zLevel = previousZLevel;
+            GL11.glPopMatrix();
+            GL11.glPopAttrib();
         }
-        GL11.glPopMatrix();
-        INSTANCE.zLevel = 0.0F;
-        GL11.glEnable(GL11.GL_LIGHTING);
-        GL11.glEnable(GL11.GL_DEPTH_TEST);
     }
 
     private void drawTooltipBackground(int x, int y, int width, int height) {

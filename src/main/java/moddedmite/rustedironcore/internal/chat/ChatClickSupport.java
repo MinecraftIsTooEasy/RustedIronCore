@@ -1,7 +1,7 @@
 package moddedmite.rustedironcore.internal.chat;
 
-import moddedmite.rustedironcore.api.chat.ChatClickAction;
 import moddedmite.rustedironcore.api.chat.ChatClickEvent;
+import moddedmite.rustedironcore.api.chat.TextComponent;
 import moddedmite.rustedironcore.api.chat.TextHoverEvent;
 import moddedmite.rustedironcore.client.api.chat.ChatClickTextProviders;
 import moddedmite.rustedironcore.client.api.chat.ChatClickTextRange;
@@ -15,8 +15,10 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Deque;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 public final class ChatClickSupport {
 
@@ -86,16 +88,21 @@ public final class ChatClickSupport {
         return false;
     }
 
-    public static boolean hasTextComponent(ChatMessageComponent component) {
-        return ((ChatClickComponentAccess) component).ric$getTextComponent() != null;
+    public static boolean canUseVanillaChat(ChatMessageComponent component) {
+        return !hasChatInteraction(component)
+                && ((ChatClickComponentAccess) component).ric$getTextComponent() == null;
     }
 
-    public static boolean removeClickEventsNotAllowedFromServer(ChatMessageComponent component) {
+    public static boolean filterServerClickEvents(ChatMessageComponent component) {
         ChatClickComponentAccess access = (ChatClickComponentAccess) component;
         ChatClickEvent event = access.ric$getClickEvent();
         boolean removed = event != null && !event.action().isAllowedFromServer();
         if (removed) {
             access.ric$setClickEvent(null);
+        }
+        TextComponent structured = access.ric$getTextComponent();
+        if (structured != null) {
+            removed |= filterServerClickEvents(structured, new HashSet<>());
         }
         List<?> children = access.ric$getChildren();
         if (children == null) {
@@ -103,8 +110,32 @@ public final class ChatClickSupport {
         }
         for (Object child : children) {
             if (child instanceof ChatMessageComponent childComponent) {
-                removed |= removeClickEventsNotAllowedFromServer(childComponent);
+                removed |= filterServerClickEvents(childComponent);
             }
+        }
+        return removed;
+    }
+
+    private static boolean filterServerClickEvents(TextComponent component, Set<TextComponent> visited) {
+        if (!visited.add(component)) return false;
+        ChatClickEvent event = component.getStyle().getClickEvent();
+        boolean removed = event != null && !event.action().isAllowedFromServer();
+        if (removed) component.withStyle(style -> style.withClickEvent(null));
+
+        TextComponent.Content content = component.getContent();
+        if (content instanceof TextComponent.Translatable translatable) {
+            for (Object argument : translatable.arguments()) {
+                if (argument instanceof TextComponent child) {
+                    removed |= filterServerClickEvents(child, visited);
+                }
+            }
+        } else if (content instanceof TextComponent.Selector selector && selector.separator().isPresent()) {
+            removed |= filterServerClickEvents(selector.separator().get(), visited);
+        } else if (content instanceof TextComponent.Nbt nbt && nbt.separator().isPresent()) {
+            removed |= filterServerClickEvents(nbt.separator().get(), visited);
+        }
+        for (TextComponent sibling : component.getSiblings()) {
+            removed |= filterServerClickEvents(sibling, visited);
         }
         return removed;
     }

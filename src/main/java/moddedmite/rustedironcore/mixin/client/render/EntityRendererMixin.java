@@ -1,13 +1,16 @@
 package moddedmite.rustedironcore.mixin.client.render;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import moddedmite.rustedironcore.api.block.Bed;
 import moddedmite.rustedironcore.api.model.JsonModelDisplayContext;
 import moddedmite.rustedironcore.api.model.JsonModelRenderContext;
 import moddedmite.rustedironcore.internal.client.hud.ClientHud;
+import net.minecraft.Block;
 import net.minecraft.EntityRenderer;
 import net.minecraft.ItemRenderer;
+import net.minecraft.WorldClient;
 import net.minecraft.WorldProvider;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
@@ -17,6 +20,19 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(EntityRenderer.class)
 public abstract class EntityRendererMixin {
+
+    @WrapOperation(method = "orientCamera(F)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/WorldClient;getBlockId(III)I"))
+    private int recognizeCameraBed(WorldClient world, int x, int y, int z, Operation<Integer> original) {
+        int id = original.call(world, x, y, z);
+        return Block.blocksList[id] instanceof Bed bed && bed.isBed(world, x, y, z) ? Block.bed.blockID : id;
+    }
+
+    @WrapOperation(method = "orientCamera(F)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/WorldClient;getBlockMetadata(III)I"))
+    private int resolveCameraBedDirection(WorldClient world, int x, int y, int z, Operation<Integer> original) {
+        int metadata = original.call(world, x, y, z);
+        Bed bed = Bed.getBed(world, x, y, z);
+        return bed == null ? metadata : (metadata & ~3) | bed.getBedDirection(world, x, y, z);
+    }
 
     @Inject(method = "updateCameraAndRender(F)V", at = @At("HEAD"))
     private void beginModelFrame(float partialTick, CallbackInfo ci) {

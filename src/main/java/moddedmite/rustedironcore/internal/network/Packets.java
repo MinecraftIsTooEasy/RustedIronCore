@@ -9,6 +9,8 @@ import moddedmite.rustedironcore.internal.network.packets.S2CSyncTradeRecipe;
 import moddedmite.rustedironcore.internal.network.packets.S2CUpdateNutrition;
 import moddedmite.rustedironcore.internal.network.packets.C2SRequestChatSuggestions;
 import moddedmite.rustedironcore.internal.network.packets.S2CChatSuggestions;
+import moddedmite.rustedironcore.internal.network.packets.S2CAdvancements;
+import moddedmite.rustedironcore.internal.network.packets.C2SRequestAdvancements;
 import net.minecraft.ResourceLocation;
 
 public class Packets {
@@ -23,10 +25,12 @@ public class Packets {
     public static final ResourceLocation ChatSuggestions = new ResourceLocation(CompactID, "cmd_suggest");
 
     public static void registerServerReaders() {
+        PacketReader.registerServerPacketReader(C2SRequestAdvancements.CHANNEL, buffer -> new C2SRequestAdvancements());
         PacketReader.registerServerPacketReader(RequestChatSuggestions, C2SRequestChatSuggestions::new);
     }
 
     public static void registerClientReaders() {
+        PacketReader.registerClientPacketReader(S2CAdvancements.CHANNEL, S2CAdvancements::new);
         PacketReader.registerClientPacketReader(UpdateNutrition, S2CUpdateNutrition::new);
         PacketReader.registerClientPacketReader(SyncNutritionLimit, S2CSyncNutritionLimit::new);
         PacketReader.registerClientPacketReader(SyncTradeRecipe, S2CSyncTradeRecipe::new);

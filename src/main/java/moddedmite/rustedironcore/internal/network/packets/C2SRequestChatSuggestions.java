@@ -59,7 +59,8 @@ public class C2SRequestChatSuggestions implements Packet {
         ICommandSender sender = (ICommandSender) entityPlayer;
         CommandSuggestionResult commandResult = CommandSuggestionDispatcher.suggest(this.input, this.cursor, sender);
         if (commandResult != null) {
-            if (commandResult.suggestions().isEmpty()) {
+            if (commandResult.suggestions().isEmpty()
+                    && CommandSuggestionDispatcher.allowsLegacyFallback(this.input, this.cursor, sender)) {
                 List<CommandSuggestionEntry> legacySuggestions = this.getLegacySuggestions(sender);
                 if (!legacySuggestions.isEmpty()) {
                     commandResult = new CommandSuggestionResult(legacySuggestions, commandResult.syntax(),

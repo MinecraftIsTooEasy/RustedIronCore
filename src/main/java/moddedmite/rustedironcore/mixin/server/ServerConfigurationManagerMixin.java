@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class ServerConfigurationManagerMixin {
     @Inject(method = "respawnPlayer", at = @At("RETURN"))
     private void onPlayerRespawn(ServerPlayer par1EntityPlayerMP, int par2, boolean par3, CallbackInfoReturnable<ServerPlayer> cir) {
-        Handlers.PlayerEvent.onPlayerRespawn(new PlayerRespawnEvent(par1EntityPlayerMP, Dimension.fromId(par2)));
+        Handlers.PlayerEvent.onPlayerRespawn(new PlayerRespawnEvent(cir.getReturnValue(), Dimension.fromId(par2)));
     }
 
     @Inject(method = "transferPlayerToDimension", at = @At("RETURN"))

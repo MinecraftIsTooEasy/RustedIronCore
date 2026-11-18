@@ -22,6 +22,11 @@ public final class ResourcePackOrder {
         PACKS.computeIfAbsent(manager, ignored -> new ArrayList<>()).add(pack);
     }
 
+    /** Snapshot of the current reload stack, from lowest to highest priority. */
+    public static List<ResourcePack> packs(ResourceManager manager) {
+        return List.copyOf(PACKS.getOrDefault(manager, List.of()));
+    }
+
     /** -1 means absent. This does not open a resource or leak its metadata stream. */
     public static int rank(ResourceManager manager, ResourceLocation location) {
         List<ResourcePack> packs = PACKS.getOrDefault(manager, List.of());

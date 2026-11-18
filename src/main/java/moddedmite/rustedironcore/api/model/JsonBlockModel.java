@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import huix.glacier.util.Identifier;
+import net.minecraft.Item;
 import net.minecraft.ItemPotion;
 import net.minecraft.ItemStack;
 
@@ -345,7 +346,10 @@ public final class JsonBlockModel {
 
     public int itemTintColor(ItemStack stack, int index) {
         if (index < 0) return 0xFFFFFF;
-        if (itemTints.isEmpty()) return stack.getItem().getColorFromItemStack(stack, index);
+        if (itemTints.isEmpty()) {
+            Item item = stack.getItem();
+            return item == null ? 0xFFFFFF : item.getColorFromItemStack(stack, index);
+        }
         if (index >= itemTints.size()) return 0xFFFFFF;
         JsonObject tint = itemTints.get(index);
         String type = tint.get("type").getAsString();

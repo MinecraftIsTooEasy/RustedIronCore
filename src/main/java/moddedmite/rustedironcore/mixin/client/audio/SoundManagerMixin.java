@@ -3,8 +3,11 @@ package moddedmite.rustedironcore.mixin.client.audio;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import moddedmite.rustedironcore.api.sound.ResourceSoundPlayer;
+import moddedmite.rustedironcore.api.sound.JsonSoundEvents;
+import moddedmite.rustedironcore.api.sound.SoundEvents;
 import moddedmite.rustedironcore.internal.client.hud.ClientHud;
 import net.minecraft.GameSettings;
+import net.minecraft.Entity;
 import net.minecraft.Minecraft;
 import net.minecraft.ResourceLocation;
 import net.minecraft.SoundManager;
@@ -20,7 +23,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import paulscode.sound.SoundSystem;
 
 @Mixin(SoundManager.class)
-public class SoundManagerMixin {
+public abstract class SoundManagerMixin {
 
     @Shadow
     private boolean loaded;
@@ -35,13 +38,62 @@ public class SoundManagerMixin {
     @Shadow
     private int ticksBeforeMusic;
 
+    @Shadow
+    public abstract void playSound(String name, float x, float y, float z, float volume, float pitch);
+
+    @Shadow
+    public abstract void playLongDistanceSound(String name, float x, float y, float z, float volume, float pitch);
+
+    @Shadow
+    public abstract void playSoundFX(String name, float volume, float pitch);
+
+    @Shadow
+    public abstract void playEntitySound(String name, Entity entity, float volume, float pitch, boolean loop);
+
     @Unique
     private static final ResourceLocation ric$bossMusic = new ResourceLocation("ric", "sounds/music/game/end/boss.ogg", false);
 
     @Unique
     private boolean ric$playingBossMusic;
 
-    @WrapOperation(method = "playSoundFX(Ljava/lang/String;FF)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/SoundPool;getRandomSoundFromSoundPool(Ljava/lang/String;)Lnet/minecraft/SoundPoolEntry;"))
+    @Inject(method = "playSound(Ljava/lang/String;FFFFF)V", at = @At("HEAD"), cancellable = true)
+    private void playWorldEvent(String name, float x, float y, float z, float volume, float pitch, CallbackInfo ci) {
+        JsonSoundEvents.Selection selected = ric$selectEvent(name, ci);
+        if (selected != null) playSound(ric$resourceName(selected), x, y, z, volume * selected.volume(), pitch * selected.pitch());
+    }
+
+    @Inject(method = "playLongDistanceSound(Ljava/lang/String;FFFFF)V", at = @At("HEAD"), cancellable = true)
+    private void playDistantEvent(String name, float x, float y, float z, float volume, float pitch, CallbackInfo ci) {
+        JsonSoundEvents.Selection selected = ric$selectEvent(name, ci);
+        if (selected != null) playLongDistanceSound(ric$resourceName(selected), x, y, z, volume * selected.volume(), pitch * selected.pitch());
+    }
+
+    @Inject(method = "playSoundFX(Ljava/lang/String;FF)V", at = @At("HEAD"), cancellable = true)
+    private void playInterfaceEvent(String name, float volume, float pitch, CallbackInfo ci) {
+        JsonSoundEvents.Selection selected = ric$selectEvent(name, ci);
+        if (selected != null) playSoundFX(ric$resourceName(selected), volume * selected.volume(), pitch * selected.pitch());
+    }
+
+    @Inject(method = "playEntitySound(Ljava/lang/String;Lnet/minecraft/Entity;FFZ)V", at = @At("HEAD"), cancellable = true)
+    private void playEntityEvent(String name, Entity entity, float volume, float pitch, boolean loop, CallbackInfo ci) {
+        JsonSoundEvents.Selection selected = ric$selectEvent(name, ci);
+        if (selected != null) playEntitySound(ric$resourceName(selected), entity, volume * selected.volume(), pitch * selected.pitch(), loop);
+    }
+
+    @Unique
+    private JsonSoundEvents.Selection ric$selectEvent(String name, CallbackInfo ci) {
+        if (SoundEvents.get(name) == null) return null;
+        ci.cancel();
+        return ResourceSoundPlayer.selectEvent(new ResourceLocation(name, false));
+    }
+
+    @Unique
+    private String ric$resourceName(JsonSoundEvents.Selection selected) {
+        ResourceLocation file = new ResourceLocation(selected.file(), false);
+        return "ric.resource:" + file.getResourceDomain() + ":sounds/" + file.getResourcePath() + ".ogg";
+    }
+
+    @WrapOperation(method = {"playSoundFX(Ljava/lang/String;FF)V", "playSound(Ljava/lang/String;FFFFF)V", "playLongDistanceSound(Ljava/lang/String;FFFFF)V", "playEntitySound(Ljava/lang/String;Lnet/minecraft/Entity;FFZ)V"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/SoundPool;getRandomSoundFromSoundPool(Ljava/lang/String;)Lnet/minecraft/SoundPoolEntry;"))
     private SoundPoolEntry selectResourceSound(SoundPool pool, String name, Operation<SoundPoolEntry> original) {
         SoundPoolEntry resource = ResourceSoundPlayer.lookup(name);
         return resource == null ? original.call(pool, name) : resource;

@@ -2,6 +2,7 @@ package moddedmite.rustedironcore.api.event.events;
 
 import moddedmite.rustedironcore.api.event.Handlers;
 import moddedmite.rustedironcore.api.interfaces.IRecipeExtend;
+import moddedmite.rustedironcore.api.advancement.AdvancementRecipes;
 import net.minecraft.*;
 
 import java.util.ArrayList;
@@ -68,6 +69,12 @@ public class CraftingRecipeRegisterEvent {
         private final List<ConsumeRule> consumeRules = new ArrayList<>();
 
         private boolean keepQuality;
+        private ResourceLocation advancementId;
+
+        public RecipeArgs id(ResourceLocation id) {
+            this.advancementId = id;
+            return this;
+        }
 
         private RecipeArgs(ItemStack result, boolean include_in_lowest_crafting_difficulty_determination, Object... inputs) {
             this.result = result;
@@ -119,6 +126,7 @@ public class CraftingRecipeRegisterEvent {
         }
 
         public void modifyShapedRecipe(ShapedRecipes shapedRecipes) {
+            if (this.advancementId != null) AdvancementRecipes.register(this.advancementId, shapedRecipes);
             if (this.extendsNBT) shapedRecipes.func_92100_c();
             if (this.difficulty != null) shapedRecipes.setDifficulty(this.difficulty);
             shapedRecipes.setSkillsets(this.skillsets);
@@ -132,6 +140,7 @@ public class CraftingRecipeRegisterEvent {
         }
 
         public void modifyShapelessRecipe(ShapelessRecipes shapelessRecipes) {
+            if (this.advancementId != null) AdvancementRecipes.register(this.advancementId, shapelessRecipes);
             if (this.extendsNBT) shapelessRecipes.propagateTagCompound();
             if (this.difficulty != null) shapelessRecipes.setDifficulty(this.difficulty);
             shapelessRecipes.setSkillsets(this.skillsets);

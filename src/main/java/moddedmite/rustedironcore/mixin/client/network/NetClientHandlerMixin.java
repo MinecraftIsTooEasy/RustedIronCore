@@ -34,9 +34,8 @@ public abstract class NetClientHandlerMixin {
     private void readChatComponents(Packet3Chat packet, CallbackInfo ci) {
         ChatMessageComponent component = ChatMessageComponent.createFromJson(packet.message);
         boolean removedUnsafeEvents = !this.mc.isIntegratedServerRunning()
-                && ChatClickSupport.removeClickEventsNotAllowedFromServer(component);
-        if (!removedUnsafeEvents && !ChatClickSupport.hasChatInteraction(component)
-                && !ChatClickSupport.hasTextComponent(component)) {
+                && ChatClickSupport.filterServerClickEvents(component);
+        if (!removedUnsafeEvents && ChatClickSupport.canUseVanillaChat(component)) {
             return;
         }
         ((ChatGuiAccess) this.mc.ingameGUI.getChatGUI()).ric$printChatMessage(component);

@@ -165,9 +165,6 @@ public abstract class GuiNewChatMixin implements ChatGuiAccess {
             ChatInteractionRenderer.renderClickHighlight(this.mc.fontRenderer, line.getChatLineString(), hit.span(),
                     hit.lineIndex() - this.field_73768_d, this.func_96131_h());
         }
-
-        ChatInteractionRenderer.renderHoverTooltip(this.mc.fontRenderer, hit.span().hoverEvent(), mouseX, mouseY,
-                resolution.getScaledWidth(), resolution.getScaledHeight());
     }
 
     @Override

@@ -122,6 +122,7 @@ public abstract class ChatMessageComponentMixin implements ChatClickComponentAcc
         if (component != null) {
             if (this.ric$clickEvent != null) component.withStyle(style -> style.withClickEvent(this.ric$clickEvent));
             if (this.ric$insertion != null) component.withStyle(style -> style.withInsertion(this.ric$insertion));
+            if (this.ric$hoverEvent != null) component.withStyle(style -> style.withHoverEvent(this.ric$hoverEvent));
             if (this.ric$font != null) component.withStyle(style -> style.withFont(this.ric$font));
         }
     }

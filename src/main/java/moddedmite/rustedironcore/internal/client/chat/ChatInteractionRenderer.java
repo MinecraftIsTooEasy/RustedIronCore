@@ -8,19 +8,18 @@ import moddedmite.rustedironcore.internal.chat.LegacyTextFormatting;
 import net.minecraft.FontRenderer;
 import org.lwjgl.opengl.GL11;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public final class ChatInteractionRenderer {
 
     public static void renderClickHighlight(FontRenderer fontRenderer, String lineText, ChatInteractionSpan span,
                                             int displayLine, float chatScale) {
         int rawStart = LegacyTextFormatting.rawIndex(lineText, span.start());
         int rawEnd = LegacyTextFormatting.rawIndex(lineText, span.end());
-        int x = fontRenderer.getStringWidth(lineText.substring(0, rawStart));
+        String prefix = lineText.substring(0, rawStart);
+        int x = fontRenderer.getStringWidth(prefix);
         String spanText = lineText.substring(rawStart, rawEnd);
         int leadingFormattingLength = LegacyTextFormatting.leadingFormattingLength(spanText);
-        String highlighted = spanText.substring(0, leadingFormattingLength)
+        String highlighted = LegacyTextFormatting.activeFormatting(prefix)
+                + spanText.substring(0, leadingFormattingLength)
                 + LegacyTextFormatting.CODE + "n" + spanText.substring(leadingFormattingLength);
 
         GL11.glPushMatrix();
@@ -36,11 +35,7 @@ public final class ChatInteractionRenderer {
         try {
             JsonElement contents = hoverEvent.contents();
             TextComponent tooltip = TextComponentSerializer.fromJson(contents);
-            List<String> lines = new ArrayList<>();
-            for (Object line : fontRenderer.listFormattedStringToWidth(MiteTextComponentAdapter.toFormattedString(tooltip), 200)) {
-                lines.add((String) line);
-            }
-            ChatHoverTooltipRenderer.render(fontRenderer, lines, mouseX, mouseY, screenWidth, screenHeight);
+            ChatHoverTooltipRenderer.render(fontRenderer, tooltip, mouseX, mouseY, screenWidth, screenHeight);
         } catch (RuntimeException ignored) {
             // Invalid hover payloads do not affect chat rendering.
         }

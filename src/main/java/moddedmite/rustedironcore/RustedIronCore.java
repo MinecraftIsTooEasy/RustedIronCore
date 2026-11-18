@@ -1,8 +1,10 @@
 package moddedmite.rustedironcore;
 
 import moddedmite.rustedironcore.api.event.Handlers;
+import moddedmite.rustedironcore.api.advancement.CriteriaTriggers;
 import moddedmite.rustedironcore.api.util.FabricUtil;
 import moddedmite.rustedironcore.internal.config.RICConfig;
+import moddedmite.rustedironcore.internal.advancement.AdvancementEvents;
 import moddedmite.rustedironcore.internal.event.listeners.CommandRegistry;
 import moddedmite.rustedironcore.internal.event.listeners.DimensionRegistry;
 import moddedmite.rustedironcore.internal.event.listeners.PlayerEventListener;
@@ -47,6 +49,13 @@ public class RustedIronCore implements ModInitializer {
     }
 
     private void registerInternals() {
+        CriteriaTriggers.init();
+        AdvancementEvents advancements = new AdvancementEvents();
+        Handlers.Initialization.register(advancements);
+        Handlers.PlayerEvent.register(advancements);
+        Handlers.Tick.register(advancements);
+        Handlers.Achievement.register(advancements);
+        Handlers.EntityEvent.register(advancements);
         Handlers.PlayerEvent.register(new PlayerEventListener());
         Handlers.Tick.register(new TickListener());
         Handlers.Command.register(new CommandRegistry());

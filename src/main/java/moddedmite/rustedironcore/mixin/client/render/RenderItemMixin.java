@@ -2,7 +2,13 @@ package moddedmite.rustedironcore.mixin.client.render;
 
 import moddedmite.rustedironcore.api.model.JsonModelDisplayContext;
 import moddedmite.rustedironcore.api.model.JsonBlockModelManager;
-import net.minecraft.*;
+import moddedmite.rustedironcore.api.model.JsonItemEntityRenderer;
+import net.minecraft.Block;
+import net.minecraft.EntityItem;
+import net.minecraft.FontRenderer;
+import net.minecraft.ItemStack;
+import net.minecraft.RenderItem;
+import net.minecraft.TextureManager;
 import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -29,6 +35,13 @@ public abstract class RenderItemMixin {
 
     @Inject(method = "doRenderItem", at = @At("HEAD"), cancellable = true)
     private void renderJsonDroppedItem(EntityItem par1EntityItem, double par2, double par4, double par6, float par8, float par9, CallbackInfo ci) {
+        if (!RenderItem.renderInFrame) {
+            if (JsonItemEntityRenderer.render(par1EntityItem, par2, par4, par6, par9)) {
+                ci.cancel();
+            }
+            return;
+        }
+
         ItemStack stack = par1EntityItem.getEntityItem();
         if (stack == null) {
             return;
