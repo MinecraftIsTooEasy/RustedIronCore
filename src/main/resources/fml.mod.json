@@ -32,7 +32,9 @@
   },
   "mixins": [
     "rustedironcore.mixins.json",
-    "glacier.mixins.json"
+    "rustedironcore.vulkan.mixins.json",
+    "glacier.mixins.json",
+    "glacier.vulkan.mixins.json"
   ],
   "accessWidener": "rustedironcore.accesswidener",
   "custom": {

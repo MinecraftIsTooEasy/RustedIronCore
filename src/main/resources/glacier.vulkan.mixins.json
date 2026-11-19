@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "package": "huix.glacier.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "target": "DEFAULT",
+  "minVersion": "0.8.3",
+  "mixinPriority": 400,
+  "overwrites": {
+    "requireAnnotations": true
+  },
+  "plugin": "moddedmite.rustedironcore.internal.config.GlacierVulkanMixinConfig"
+}

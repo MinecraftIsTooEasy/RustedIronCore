@@ -6,20 +6,22 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
 import moddedmite.rustedironcore.internal.chat.LegacyTextFormatting;
 import moddedmite.rustedironcore.internal.client.chat.LegacyTextWidth;
+import moddedmite.rustedironcore.internal.client.chat.RgbTextColor;
 import net.minecraft.EnumChatFormatting;
 import net.minecraft.FontRenderer;
-import net.minecraft.Minecraft;
-import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+/**
+ * RGB formatting codes, shared by both render routes. The colour itself is applied by {@code FontRendererColorMixin} (OpenGL) or
+ * {@code FontRendererVulkanMixin} (FML 4.x native renderer), through {@link RgbTextColor}.
+ */
 @Mixin(FontRenderer.class)
-public abstract class FontRendererMixin {
+public abstract class FontRendererMixin implements RgbTextColor {
 
     @Unique
     private int ric$activeRgbColor = -1;
@@ -43,31 +45,6 @@ public abstract class FontRendererMixin {
             this.ric$activeRgbColor = -1;
         }
         return formatting;
-    }
-
-    @Redirect(method = "renderStringAtPos(Ljava/lang/String;Z)V", at = @At(value = "INVOKE", target = "Lorg/lwjgl/opengl/GL11;glColor4f(FFFF)V", ordinal = 0))
-    private void renderRgbColor(float red, float green, float blue, float alpha, @Local(argsOnly = true) boolean shadow) {
-        if (this.ric$activeRgbColor < 0) {
-            GL11.glColor4f(red, green, blue, alpha);
-            return;
-        }
-
-        int rgb = this.ric$activeRgbColor;
-        int r = rgb >> 16 & 255;
-        int g = rgb >> 8 & 255;
-        int b = rgb & 255;
-        if (Minecraft.theMinecraft.gameSettings.anaglyph) {
-            int luminance = (r * 30 + g * 59 + b * 11) / 100;
-            g = (r * 30 + g * 70) / 100;
-            b = (r * 30 + b * 70) / 100;
-            r = luminance;
-        }
-        if (shadow) {
-            r /= 4;
-            g /= 4;
-            b /= 4;
-        }
-        GL11.glColor4f(r / 255.0F, g / 255.0F, b / 255.0F, alpha);
     }
 
     @Inject(method = "sizeStringToWidth(Ljava/lang/String;I)I", at = @At("HEAD"), cancellable = true)
@@ -95,4 +72,8 @@ public abstract class FontRendererMixin {
         cir.setReturnValue(LegacyTextFormatting.preserveLastRgbColor(text, cir.getReturnValue()));
     }
 
+    @Override
+    public int ric$activeRgbColor() {
+        return this.ric$activeRgbColor;
+    }
 }
