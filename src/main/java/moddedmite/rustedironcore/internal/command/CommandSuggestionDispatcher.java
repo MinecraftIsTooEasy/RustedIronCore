@@ -30,43 +30,58 @@ public final class CommandSuggestionDispatcher {
     private static final int MAX_SUGGESTIONS = 256;
     private static final Set<String> DEV_ONLY_COMMANDS = Set.of("time", "gamemode", "difficulty", "defaultgamemode", "toggledownfall", "weather", "xp", "effect", "enchant", "gamerule", "clear", "give");
     private static CommandDispatcher<ICommandSender> dispatcher = new CommandDispatcher<>();
-    private static final List<LiteralArgumentBuilder<ICommandSender>> pendingBuiltinTrees = new ArrayList<>();
-    private static final List<LiteralArgumentBuilder<ICommandSender>> pendingExternalTrees = new ArrayList<>();
-    private static final List<LiteralArgumentBuilder<ICommandSender>> pendingStandaloneTrees = new ArrayList<>();
+    private static final List<LiteralArgumentBuilder<ICommandSender>> builtinTrees = new ArrayList<>();
+    private static final List<LiteralArgumentBuilder<ICommandSender>> externalTrees = new ArrayList<>();
+    private static final List<LiteralArgumentBuilder<ICommandSender>> standaloneTrees = new ArrayList<>();
+    private static Map<?, ?> legacyCommandRegistry = Map.of();
     private static Map<String, ICommand> legacyCommands = Map.of();
+    private static boolean needsRebuild;
 
     public static Map<String, ICommand> getLegacyCommands() {
+        refreshLegacyCommands();
         return legacyCommands;
     }
 
     public static void beginRegistration() {
         dispatcher = new CommandDispatcher<>();
-        pendingBuiltinTrees.clear();
-        pendingExternalTrees.clear();
-        pendingStandaloneTrees.clear();
+        builtinTrees.clear();
+        externalTrees.clear();
+        standaloneTrees.clear();
+        legacyCommandRegistry = Map.of();
         legacyCommands = Map.of();
+        needsRebuild = false;
     }
 
     public static void register(LiteralArgumentBuilder<ICommandSender> command) {
-        pendingExternalTrees.add(command);
+        externalTrees.add(command);
+        needsRebuild = true;
     }
 
     public static void registerBuiltin(LiteralArgumentBuilder<ICommandSender> command) {
-        pendingBuiltinTrees.add(command);
+        builtinTrees.add(command);
+        needsRebuild = true;
     }
 
     public static void registerStandalone(LiteralArgumentBuilder<ICommandSender> command) {
-        pendingStandaloneTrees.add(command);
+        standaloneTrees.add(command);
+        needsRebuild = true;
+    }
+
+    public static void onLegacyCommandRegistered(Map<?, ?> commands) {
+        // Only the active server registry owns this dispatcher; ignore other command managers.
+        if (commands == legacyCommandRegistry) needsRebuild = true;
+    }
+
+    private static void refreshLegacyCommands() {
+        if (needsRebuild) registerLegacyCommands(legacyCommandRegistry);
     }
 
     public static void registerLegacyCommands(Map<?, ?> commands) {
+        legacyCommandRegistry = commands;
+        needsRebuild = false;
+        // Rebuild from the live registry so replacements also refresh aliases and permissions.
+        dispatcher = new CommandDispatcher<>();
         Map<String, ICommand> registered = new HashMap<>();
-        List<LiteralArgumentBuilder<ICommandSender>> builtinTrees = new ArrayList<>(pendingBuiltinTrees);
-        pendingBuiltinTrees.clear();
-        List<LiteralArgumentBuilder<ICommandSender>> externalTrees = new ArrayList<>(pendingExternalTrees);
-        pendingExternalTrees.clear();
-        List<LiteralArgumentBuilder<ICommandSender>> standaloneTrees = new ArrayList<>(pendingStandaloneTrees);
-        pendingStandaloneTrees.clear();
         Set<String> syntaxRoots = new HashSet<>();
         Map<String, List<LiteralArgumentBuilder<ICommandSender>>> standaloneByName = new HashMap<>();
         for (LiteralArgumentBuilder<ICommandSender> tree : standaloneTrees) {
@@ -136,6 +151,7 @@ public final class CommandSuggestionDispatcher {
     public static CommandSuggestionResult suggest(String input, int cursorPosition, ICommandSender source) {
         if (!input.startsWith("/")) return null;
 
+        refreshLegacyCommands();
         int cursor = Math.max(1, Math.min(cursorPosition, input.length()));
         String command = input.substring(1);
         ParseResults<ICommandSender> parse = dispatcher.parse(command, source);
@@ -220,6 +236,7 @@ public final class CommandSuggestionDispatcher {
     }
 
     public static boolean allowsLegacyFallback(String input, int cursor, ICommandSender source) {
+        refreshLegacyCommands();
         String command = input.substring(1, Math.max(1, Math.min(cursor, input.length())));
         String name = command.split(" ", 2)[0];
         if (!canUseLegacyCommand(source, name)) return false;

@@ -2,15 +2,29 @@ package moddedmite.rustedironcore.mixin.util;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import moddedmite.rustedironcore.internal.command.CommandSuggestionDispatcher;
 import moddedmite.rustedironcore.internal.server.chat.TextComponentServerResolver;
 import net.minecraft.CommandHandler;
 import net.minecraft.ICommand;
 import net.minecraft.ICommandSender;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import java.util.Map;
 
 @Mixin(CommandHandler.class)
-public class CommandHandlerMixin {
+public abstract class CommandHandlerMixin {
+
+    @Shadow
+    public abstract Map<?, ?> getCommands();
+
+    @Inject(method = "registerCommand", at = @At("RETURN"))
+    private void onCommandRegistered(CallbackInfoReturnable<ICommand> cir) {
+        CommandSuggestionDispatcher.onLegacyCommandRegistered(this.getCommands());
+    }
 
     @WrapOperation(method = "executeCommand", at = @At(value = "INVOKE", target = "Lnet/minecraft/ICommand;processCommand(Lnet/minecraft/ICommandSender;[Ljava/lang/String;)V"))
     private void retainCommandSource(ICommand command, ICommandSender sender, String[] arguments, Operation<Void> original) {
