@@ -6,13 +6,13 @@
   "minVersion": "0.8.3",
   "mixins": [
     "MinecraftServerMixin",
-    "client.gui.GuiContainerCreativeMixin",
     "creativetab.CreativeTabsMixin",
     "util.ReferenceFileWriterMixin"
   ],
   "client": [
     "client.MinecraftClientMixin"
   ],
+  "plugin": "moddedmite.rustedironcore.internal.config.GlacierMixinConfig",
   "overwrites": {
     "requireAnnotations": true
   }
